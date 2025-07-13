@@ -771,6 +771,52 @@ body {
   font-size: 1rem;
 }
 
+/* Bottom Actions */
+.bottom-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: var(--bg-white);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.action-btn {
+  flex: 1;
+  padding: 0.625rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.action-btn.log-btn {
+  background-color: var(--accent-primary);
+  color: white;
+}
+
+.action-btn.log-btn:hover {
+  background-color: var(--accent-primary-light);
+  transform: translateY(-1px);
+}
+
+.action-btn.logout-btn {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.action-btn.logout-btn:hover {
+  background-color: var(--accent-danger);
+  color: white;
+  border-color: var(--accent-danger);
+}
+
 /* Enhanced Responsive Design */
 @media (max-width: 1024px) {
   .main-content {
