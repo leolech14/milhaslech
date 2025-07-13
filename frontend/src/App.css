@@ -450,14 +450,14 @@ body {
 }
 
 .refresh-btn {
-  padding: 0.625rem 1.25rem;
-  background-color: var(--accent-primary);
-  color: white;
-  border: none;
-  border-radius: 8px;
+  padding: 0.25rem 0.5rem;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 500;
   transition: all 0.2s ease;
 }
 
