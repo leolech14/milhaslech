@@ -350,9 +350,8 @@ function App() {
             fetchDashboardStats();
             fetchPostits();
           }}
+          dashboardStats={dashboardStats}
         />
-        
-        <TopStats dashboardStats={dashboardStats} />
         
         <QuoteSection />
         
