@@ -10,6 +10,12 @@ function App() {
   const [showGlobalLog, setShowGlobalLog] = useState(false);
   const [dashboardStats, setDashboardStats] = useState(null);
   const [expandedPrograms, setExpandedPrograms] = useState({});
+  const [editingPrograms, setEditingPrograms] = useState({});
+  const [programChanges, setProgramChanges] = useState({});
+  const [copyFeedback, setCopyFeedback] = useState('');
+
+  // Fixed order for family members
+  const familyOrder = ["Osvandré", "Marilise", "Graciela", "Leonardo"];
 
   // Fetch data functions
   const fetchCompanies = async () => {
@@ -26,7 +32,13 @@ function App() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/members`);
       const data = await response.json();
-      setMembers(data);
+      // Sort members according to family order
+      const sortedMembers = data.sort((a, b) => {
+        const indexA = familyOrder.indexOf(a.name);
+        const indexB = familyOrder.indexOf(b.name);
+        return indexA - indexB;
+      });
+      setMembers(sortedMembers);
     } catch (error) {
       console.error('Erro ao buscar membros:', error);
     }
@@ -36,7 +48,8 @@ function App() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/global-log`);
       const data = await response.json();
-      setGlobalLog(data);
+      // Reverse the log so newest entries appear at the bottom
+      setGlobalLog(data.reverse());
     } catch (error) {
       console.error('Erro ao buscar log global:', error);
     }
@@ -72,6 +85,99 @@ function App() {
       ...prev,
       [key]: !prev[key]
     }));
+    
+    // Clear any editing state when collapsing
+    if (expandedPrograms[key]) {
+      setEditingPrograms(prev => ({
+        ...prev,
+        [key]: false
+      }));
+      setProgramChanges(prev => ({
+        ...prev,
+        [key]: {}
+      }));
+    }
+  };
+
+  // Start editing a program
+  const startEditing = (memberId, companyId, currentData) => {
+    const key = `${memberId}-${companyId}`;
+    setEditingPrograms(prev => ({
+      ...prev,
+      [key]: true
+    }));
+    setProgramChanges(prev => ({
+      ...prev,
+      [key]: { ...currentData }
+    }));
+  };
+
+  // Cancel editing
+  const cancelEditing = (memberId, companyId) => {
+    const key = `${memberId}-${companyId}`;
+    setEditingPrograms(prev => ({
+      ...prev,
+      [key]: false
+    }));
+    setProgramChanges(prev => ({
+      ...prev,
+      [key]: {}
+    }));
+  };
+
+  // Update field in editing state
+  const updateEditingField = (memberId, companyId, field, value) => {
+    const key = `${memberId}-${companyId}`;
+    setProgramChanges(prev => ({
+      ...prev,
+      [key]: {
+        ...prev[key],
+        [field]: field === 'current_balance' ? parseInt(value) || 0 : value
+      }
+    }));
+  };
+
+  // Save changes
+  const saveChanges = async (memberId, companyId) => {
+    const key = `${memberId}-${companyId}`;
+    const changes = programChanges[key];
+    
+    if (!changes || Object.keys(changes).length === 0) {
+      cancelEditing(memberId, companyId);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(changes),
+      });
+      
+      if (response.ok) {
+        await fetchMembers();
+        await fetchGlobalLog();
+        await fetchDashboardStats();
+        cancelEditing(memberId, companyId);
+      } else {
+        console.error('Erro ao salvar alterações');
+      }
+    } catch (error) {
+      console.error('Erro ao salvar alterações:', error);
+    }
+  };
+
+  // Copy to clipboard
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyFeedback('Copiado com sucesso');
+      setTimeout(() => setCopyFeedback(''), 1000);
+    } catch (error) {
+      console.error('Erro ao copiar:', error);
+    }
   };
 
   // Format date
@@ -90,31 +196,6 @@ function App() {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   };
 
-  // Update program field
-  const updateProgramField = async (memberId, companyId, field, value) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          [field]: field === 'current_balance' ? parseInt(value) || 0 : value
-        }),
-      });
-      
-      if (response.ok) {
-        await fetchMembers();
-        await fetchGlobalLog();
-        await fetchDashboardStats();
-      } else {
-        console.error('Erro ao atualizar campo');
-      }
-    } catch (error) {
-      console.error('Erro ao atualizar campo:', error);
-    }
-  };
-
   return (
     <div className="app">
       <Sidebar 
@@ -131,15 +212,21 @@ function App() {
           }}
         />
         
-        <div className="members-grid">
+        <div className="members-container">
           {members.map(member => (
             <MemberCard 
               key={member.id}
               member={member}
               companies={companies}
               expandedPrograms={expandedPrograms}
+              editingPrograms={editingPrograms}
+              programChanges={programChanges}
               onToggleProgram={toggleProgram}
-              onUpdateField={updateProgramField}
+              onStartEditing={startEditing}
+              onCancelEditing={cancelEditing}
+              onUpdateField={updateEditingField}
+              onSaveChanges={saveChanges}
+              onCopyToClipboard={copyToClipboard}
               formatDate={formatDate}
               formatNumber={formatNumber}
               getCompanyById={getCompanyById}
@@ -155,6 +242,12 @@ function App() {
           formatDate={formatDate}
           getCompanyById={getCompanyById}
         />
+      )}
+
+      {copyFeedback && (
+        <div className="copy-feedback">
+          {copyFeedback}
+        </div>
       )}
     </div>
   );
@@ -192,7 +285,7 @@ const Sidebar = ({ onShowGlobalLog, dashboardStats }) => (
     </div>
     
     <button className="log-btn" onClick={onShowGlobalLog}>
-      📋 Log Global
+      📋 Histórico de Atualizações
     </button>
   </aside>
 );
@@ -210,7 +303,11 @@ const TopBar = ({ onRefresh }) => (
   </header>
 );
 
-const MemberCard = ({ member, companies, expandedPrograms, onToggleProgram, onUpdateField, formatDate, formatNumber, getCompanyById }) => {
+const MemberCard = ({ 
+  member, companies, expandedPrograms, editingPrograms, programChanges,
+  onToggleProgram, onStartEditing, onCancelEditing, onUpdateField, onSaveChanges,
+  onCopyToClipboard, formatDate, formatNumber, getCompanyById 
+}) => {
   return (
     <div className="member-card">
       <div className="member-header">
@@ -221,6 +318,8 @@ const MemberCard = ({ member, companies, expandedPrograms, onToggleProgram, onUp
         {companies.map(company => {
           const program = member.programs[company.id];
           const isExpanded = expandedPrograms[`${member.id}-${company.id}`];
+          const isEditing = editingPrograms[`${member.id}-${company.id}`];
+          const changes = programChanges[`${member.id}-${company.id}`] || {};
           
           return (
             <ProgramBlock
@@ -229,8 +328,14 @@ const MemberCard = ({ member, companies, expandedPrograms, onToggleProgram, onUp
               company={company}
               program={program}
               isExpanded={isExpanded}
+              isEditing={isEditing}
+              changes={changes}
               onToggle={() => onToggleProgram(member.id, company.id)}
-              onUpdateField={onUpdateField}
+              onStartEditing={() => onStartEditing(member.id, company.id, program)}
+              onCancelEditing={() => onCancelEditing(member.id, company.id)}
+              onUpdateField={(field, value) => onUpdateField(member.id, company.id, field, value)}
+              onSaveChanges={() => onSaveChanges(member.id, company.id)}
+              onCopyToClipboard={onCopyToClipboard}
               formatDate={formatDate}
               formatNumber={formatNumber}
             />
@@ -241,37 +346,20 @@ const MemberCard = ({ member, companies, expandedPrograms, onToggleProgram, onUp
   );
 };
 
-const ProgramBlock = ({ member, company, program, isExpanded, onToggle, onUpdateField, formatDate, formatNumber }) => {
-  const [editingField, setEditingField] = useState(null);
-  const [editValue, setEditValue] = useState('');
-
-  const handleFieldEdit = (field, currentValue) => {
-    setEditingField(field);
-    setEditValue(currentValue);
-  };
-
-  const handleFieldSave = async (field) => {
-    await onUpdateField(member.id, company.id, field, editValue);
-    setEditingField(null);
-    setEditValue('');
-  };
-
-  const handleKeyPress = (e, field) => {
-    if (e.key === 'Enter') {
-      handleFieldSave(field);
-    } else if (e.key === 'Escape') {
-      setEditingField(null);
-      setEditValue('');
-    }
-  };
+const ProgramBlock = ({ 
+  member, company, program, isExpanded, isEditing, changes,
+  onToggle, onStartEditing, onCancelEditing, onUpdateField, onSaveChanges,
+  onCopyToClipboard, formatDate, formatNumber 
+}) => {
+  const currentData = { ...program, ...changes };
 
   return (
-    <div className={`program-block ${isExpanded ? 'expanded' : ''}`} style={{ borderLeft: `4px solid ${company.color}` }}>
-      <div className="program-header" onClick={onToggle}>
+    <div className={`program-block ${isExpanded ? 'expanded' : ''}`}>
+      <div className="program-header" onClick={onToggle} style={{ borderLeft: `4px solid ${company.color}` }}>
         <div className="program-info">
           <h4>{company.name}</h4>
           <p className="program-balance">
-            {formatNumber(program.current_balance)} {company.points_name}
+            {formatNumber(currentData.current_balance)} {company.points_name}
           </p>
         </div>
         <div className="expand-icon">
@@ -281,157 +369,124 @@ const ProgramBlock = ({ member, company, program, isExpanded, onToggle, onUpdate
       
       {isExpanded && (
         <div className="program-details">
-          <div className="detail-grid">
-            <div className="detail-item">
-              <label>Login:</label>
-              {editingField === 'login' ? (
-                <input
-                  type="text"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={() => handleFieldSave('login')}
-                  onKeyPress={(e) => handleKeyPress(e, 'login')}
-                  autoFocus
+          {!isEditing ? (
+            <div className="view-mode">
+              <div className="detail-grid">
+                <FieldDisplay label="Login" value={currentData.login} onCopy={onCopyToClipboard} />
+                <FieldDisplay label="Senha" value={currentData.password} onCopy={onCopyToClipboard} type="password" />
+                <FieldDisplay label="CPF" value={currentData.cpf} onCopy={onCopyToClipboard} />
+                <FieldDisplay label="Nº do Cartão" value={currentData.card_number} onCopy={onCopyToClipboard} />
+                <FieldDisplay 
+                  label={`Saldo (${company.points_name})`} 
+                  value={formatNumber(currentData.current_balance)} 
+                  onCopy={onCopyToClipboard} 
                 />
-              ) : (
-                <span 
-                  className="editable-field"
-                  onClick={() => handleFieldEdit('login', program.login)}
-                >
-                  {program.login || 'Clique para editar'}
-                </span>
-              )}
+                <FieldDisplay label="Categoria" value={currentData.elite_tier} onCopy={onCopyToClipboard} />
+              </div>
+              
+              <button className="edit-btn" onClick={onStartEditing}>
+                ✏️ Editar
+              </button>
+              
+              <div className="program-footer">
+                <div className="last-change">
+                  <small>Última atualização: {formatDate(program.last_updated)}</small>
+                  {program.last_change && (
+                    <small className="change-info">{program.last_change}</small>
+                  )}
+                </div>
+              </div>
             </div>
-            
-            <div className="detail-item">
-              <label>Senha:</label>
-              {editingField === 'password' ? (
-                <input
+          ) : (
+            <div className="edit-mode">
+              <div className="detail-grid">
+                <EditableField 
+                  label="Login" 
+                  value={currentData.login} 
+                  onChange={(value) => onUpdateField('login', value)}
+                />
+                <EditableField 
+                  label="Senha" 
+                  value={currentData.password} 
+                  onChange={(value) => onUpdateField('password', value)}
                   type="password"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={() => handleFieldSave('password')}
-                  onKeyPress={(e) => handleKeyPress(e, 'password')}
-                  autoFocus
                 />
-              ) : (
-                <span 
-                  className="editable-field"
-                  onClick={() => handleFieldEdit('password', program.password)}
-                >
-                  {program.password ? '••••••••' : 'Clique para editar'}
-                </span>
-              )}
-            </div>
-            
-            <div className="detail-item">
-              <label>CPF:</label>
-              {editingField === 'cpf' ? (
-                <input
-                  type="text"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={() => handleFieldSave('cpf')}
-                  onKeyPress={(e) => handleKeyPress(e, 'cpf')}
-                  autoFocus
+                <EditableField 
+                  label="CPF" 
+                  value={currentData.cpf} 
+                  onChange={(value) => onUpdateField('cpf', value)}
                 />
-              ) : (
-                <span 
-                  className="editable-field"
-                  onClick={() => handleFieldEdit('cpf', program.cpf)}
-                >
-                  {program.cpf || 'Clique para editar'}
-                </span>
-              )}
-            </div>
-            
-            <div className="detail-item">
-              <label>Nº do Cartão:</label>
-              {editingField === 'card_number' ? (
-                <input
-                  type="text"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={() => handleFieldSave('card_number')}
-                  onKeyPress={(e) => handleKeyPress(e, 'card_number')}
-                  autoFocus
+                <EditableField 
+                  label="Nº do Cartão" 
+                  value={currentData.card_number} 
+                  onChange={(value) => onUpdateField('card_number', value)}
                 />
-              ) : (
-                <span 
-                  className="editable-field"
-                  onClick={() => handleFieldEdit('card_number', program.card_number)}
-                >
-                  {program.card_number || 'Clique para editar'}
-                </span>
-              )}
-            </div>
-            
-            <div className="detail-item">
-              <label>Saldo ({company.points_name}):</label>
-              {editingField === 'current_balance' ? (
-                <input
+                <EditableField 
+                  label={`Saldo (${company.points_name})`} 
+                  value={currentData.current_balance} 
+                  onChange={(value) => onUpdateField('current_balance', value)}
                   type="number"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={() => handleFieldSave('current_balance')}
-                  onKeyPress={(e) => handleKeyPress(e, 'current_balance')}
-                  autoFocus
                 />
-              ) : (
-                <span 
-                  className="editable-field balance-field"
-                  onClick={() => handleFieldEdit('current_balance', program.current_balance)}
-                >
-                  {formatNumber(program.current_balance)}
-                </span>
-              )}
-            </div>
-            
-            <div className="detail-item">
-              <label>Categoria:</label>
-              {editingField === 'elite_tier' ? (
-                <input
-                  type="text"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={() => handleFieldSave('elite_tier')}
-                  onKeyPress={(e) => handleKeyPress(e, 'elite_tier')}
-                  autoFocus
+                <EditableField 
+                  label="Categoria" 
+                  value={currentData.elite_tier} 
+                  onChange={(value) => onUpdateField('elite_tier', value)}
                 />
-              ) : (
-                <span 
-                  className="editable-field"
-                  onClick={() => handleFieldEdit('elite_tier', program.elite_tier)}
-                >
-                  {program.elite_tier || 'Clique para editar'}
-                </span>
-              )}
+              </div>
+              
+              <div className="edit-actions">
+                <button className="cancel-btn" onClick={onCancelEditing}>
+                  Cancelar
+                </button>
+                <button className="save-btn" onClick={onSaveChanges}>
+                  Salvar
+                </button>
+              </div>
             </div>
-          </div>
-          
-          <div className="program-footer">
-            <div className="last-change">
-              <small>
-                Última atualização: {formatDate(program.last_updated)}
-              </small>
-              {program.last_change && (
-                <small className="change-info">
-                  {program.last_change}
-                </small>
-              )}
-            </div>
-          </div>
+          )}
         </div>
       )}
     </div>
   );
 };
 
+const FieldDisplay = ({ label, value, onCopy, type = "text" }) => (
+  <div className="detail-item">
+    <label>{label}:</label>
+    <div className="field-with-copy">
+      <span className="field-value">
+        {type === "password" && value ? "••••••••" : (value || "Não informado")}
+      </span>
+      {value && (
+        <button 
+          className="copy-btn" 
+          onClick={() => onCopy(value)}
+          title="Copiar"
+        >
+          📋
+        </button>
+      )}
+    </div>
+  </div>
+);
+
+const EditableField = ({ label, value, onChange, type = "text" }) => (
+  <div className="detail-item">
+    <label>{label}:</label>
+    <input
+      type={type}
+      value={value || ''}
+      onChange={(e) => onChange(e.target.value)}
+      className="edit-input"
+    />
+  </div>
+);
+
 const GlobalLogModal = ({ globalLog, onClose, formatDate, getCompanyById }) => (
   <div className="modal-overlay">
     <div className="modal log-modal">
       <div className="modal-header">
-        <h2>Log Global de Alterações</h2>
+        <h2>Histórico de Atualizações</h2>
         <button className="close-btn" onClick={onClose}>×</button>
       </div>
       
@@ -454,7 +509,7 @@ const GlobalLogModal = ({ globalLog, onClose, formatDate, getCompanyById }) => (
             </div>
           ))
         ) : (
-          <p className="no-logs">Nenhuma alteração registrada</p>
+          <p className="no-logs">Nenhuma atualização registrada</p>
         )}
       </div>
     </div>
