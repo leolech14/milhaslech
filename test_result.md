@@ -165,7 +165,7 @@ frontend:
         agent: "main"
         comment: "4 member cards, each with 3 expandable program blocks"
   
-  - task: "Sidebar with company navigation"
+  - task: "Inline field editing with click-to-edit"
     implemented: true
     working: true
     file: "App.js, App.css"
@@ -175,9 +175,9 @@ frontend:
     status_history:
       - working: true
         agent: "main"
-        comment: "Sidebar shows all companies with color coding and active states"
+        comment: "Click any field to edit inline, Enter to save, Escape to cancel"
   
-  - task: "Member card grid layout"
+  - task: "Global log modal"
     implemented: true
     working: true
     file: "App.js, App.css"
@@ -187,9 +187,9 @@ frontend:
     status_history:
       - working: true
         agent: "main"
-        comment: "Responsive grid with member cards showing balance, tier, and history"
+        comment: "Modal showing all changes with member, company, field, and timestamp"
   
-  - task: "Add/Edit member modals"
+  - task: "Program expansion/collapse functionality"
     implemented: true
     working: true
     file: "App.js, App.css"
@@ -199,31 +199,7 @@ frontend:
     status_history:
       - working: true
         agent: "main"
-        comment: "Modal forms for creating and editing members with validation"
-  
-  - task: "Add company modal"
-    implemented: true
-    working: true
-    file: "App.js, App.css"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "Modal to add new loyalty programs with custom colors"
-  
-  - task: "Balance history display"
-    implemented: true
-    working: true
-    file: "App.js, App.css"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "Toggle history view within member cards showing changes over time"
+        comment: "Click program header to expand/collapse, shows all editable fields"
 
 metadata:
   created_by: "main_agent"
