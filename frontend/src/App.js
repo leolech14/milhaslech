@@ -421,10 +421,16 @@ const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats, postits, onCreateP
   </aside>
 );
 
-const TopBar = ({ onRefresh }) => (
+const TopBar = ({ onRefresh, dashboardStats }) => (
   <header className="top-bar">
     <div className="top-bar-left">
       <h2>Painel de Controle</h2>
+      {dashboardStats && (
+        <div className="total-points-inline">
+          <span>Total:</span>
+          <span>{dashboardStats.total_points.toLocaleString('pt-BR')} pontos</span>
+        </div>
+      )}
     </div>
     <div className="top-bar-center">
       <a href="https://www.latamairlines.com/br/pt" target="_blank" rel="noopener noreferrer" className="program-link">
