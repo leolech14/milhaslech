@@ -146,6 +146,7 @@ body {
   height: 100vh;
   z-index: 100;
   box-shadow: var(--shadow);
+  overflow-y: auto;
 }
 
 .sidebar-header {
@@ -164,6 +165,158 @@ body {
 .sidebar-header p {
   font-size: 0.875rem;
   opacity: 0.9;
+}
+
+/* Post-it Section */
+.postit-section {
+  padding: 1rem;
+  flex: 1;
+}
+
+.postit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.postit-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+}
+
+.add-postit-btn {
+  padding: 0.25rem 0.5rem;
+  background-color: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.add-postit-btn:hover {
+  background-color: var(--accent-primary-light);
+}
+
+.postits-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.postit {
+  background-color: #ffffcc;
+  background-image: linear-gradient(135deg, #ffffcc 0%, #fff5a5 100%);
+  border: 1px solid #e6e6a3;
+  border-radius: 8px;
+  padding: 0.75rem;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 80px;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.postit:hover {
+  transform: translateY(-2px) rotate(1deg);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.postit.new-postit {
+  background-color: #e8f5e8;
+  background-image: linear-gradient(135deg, #e8f5e8 0%, #d4f1d4 100%);
+  border-color: #b8e6b8;
+}
+
+.postit.editing {
+  background-color: #ffe6e6;
+  background-image: linear-gradient(135deg, #ffe6e6 0%, #ffd1d1 100%);
+  border-color: #ffb3b3;
+  cursor: default;
+}
+
+.postit-delete {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  background: rgba(220, 38, 38, 0.8);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.postit-delete:hover {
+  background: var(--accent-danger);
+  transform: scale(1.1);
+}
+
+.postit-content {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #444;
+  word-wrap: break-word;
+  margin-top: 0.5rem;
+}
+
+.postit textarea {
+  width: 100%;
+  height: 60px;
+  border: none;
+  background: transparent;
+  resize: none;
+  font-size: 0.8rem;
+  font-family: inherit;
+  color: #444;
+  outline: none;
+  margin-top: 0.5rem;
+}
+
+.postit-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.postit-save, .postit-cancel {
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.postit-save {
+  background-color: var(--accent-success);
+  color: white;
+}
+
+.postit-save:hover {
+  background-color: #15803d;
+}
+
+.postit-cancel {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.postit-cancel:hover {
+  background-color: var(--accent-danger);
+  color: white;
 }
 
 .sidebar-actions {
