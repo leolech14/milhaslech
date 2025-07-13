@@ -461,7 +461,7 @@ const TopBar = ({ onRefresh, dashboardStats, darkMode, onToggleDarkMode }) => (
     </div>
     <div className="top-bar-right">
       <button className="dark-mode-toggle" onClick={onToggleDarkMode}>
-        {darkMode ? '☀️' : '🌙'}
+        {darkMode ? '🔆' : '🌚'}
       </button>
       <button className="refresh-btn" onClick={onRefresh}>
         ↻ Atualizar
