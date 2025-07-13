@@ -235,6 +235,30 @@ body {
   color: var(--accent-primary);
 }
 
+.top-bar-center {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.program-link {
+  padding: 0.375rem 0.75rem;
+  background-color: var(--bg-secondary);
+  color: var(--accent-primary);
+  text-decoration: none;
+  border: 1px solid var(--accent-primary);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.program-link:hover {
+  background-color: var(--accent-primary);
+  color: white;
+  transform: translateY(-1px);
+}
+
 .top-bar-right {
   display: flex;
   gap: 1rem;
