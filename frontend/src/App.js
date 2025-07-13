@@ -336,7 +336,7 @@ function App() {
             <button type="submit" className="login-btn">Entrar</button>
           </form>
           <button className="dark-mode-toggle login-dark-toggle" onClick={toggleDarkMode}>
-            {darkMode ? '☀️' : '🌙'}
+            {darkMode ? '🔆' : '🌚'}
           </button>
         </div>
       </div>
