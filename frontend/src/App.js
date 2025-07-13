@@ -423,7 +423,7 @@ const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats, postits, onCreateP
   <aside className="sidebar">
     <div className="sidebar-header">
       <h1>Programas de Milhas</h1>
-      <p>Família Lech</p>
+      <p>lech.world</p>
     </div>
     
     <PostItSection 
