@@ -340,6 +340,17 @@ const TopBar = ({ onRefresh }) => (
     <div className="top-bar-left">
       <h2>Painel de Controle</h2>
     </div>
+    <div className="top-bar-center">
+      <a href="https://www.latamairlines.com/br/pt" target="_blank" rel="noopener noreferrer" className="program-link">
+        Login LATAM
+      </a>
+      <a href="https://b2c.voegol.com.br/minhas-viagens/login" target="_blank" rel="noopener noreferrer" className="program-link">
+        Login Smiles
+      </a>
+      <a href="https://www.voeazul.com.br/br/pt/programa-fidelidade" target="_blank" rel="noopener noreferrer" className="program-link">
+        Login Azul
+      </a>
+    </div>
     <div className="top-bar-right">
       <button className="refresh-btn" onClick={onRefresh}>
         ↻ Atualizar
