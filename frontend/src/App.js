@@ -332,15 +332,6 @@ const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats }) => (
       <h1>Programas de Milhas</h1>
       <p>Família Lech</p>
     </div>
-    
-    <div className="sidebar-actions">
-      <button className="log-btn" onClick={onShowGlobalLog}>
-        📋 Histórico de Atualizações
-      </button>
-      <button className="logout-btn" onClick={onLogout}>
-        🚪 Sair
-      </button>
-    </div>
   </aside>
 );
 
