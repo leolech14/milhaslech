@@ -567,31 +567,6 @@ const BottomActions = ({ onShowGlobalLog, onLogout }) => (
   </div>
 );
 
-const StatsCard = ({ dashboardStats }) => (
-  <div className="stats-card">
-    {dashboardStats && (
-      <div className="stats-grid">
-        <div className="stat-compact">
-          <span>Membros</span>
-          <span>{dashboardStats.total_members}</span>
-        </div>
-        <div className="stat-compact">
-          <span>Programas</span>
-          <span>{dashboardStats.total_companies}</span>
-        </div>
-        <div className="stat-compact">
-          <span>Total de Pontos</span>
-          <span>{dashboardStats.total_points.toLocaleString('pt-BR')}</span>
-        </div>
-        <div className="stat-compact">
-          <span>Última atualização</span>
-          <span>{dashboardStats.recent_activity}</span>
-        </div>
-      </div>
-    )}
-  </div>
-);
-
 const MemberCard = ({ 
   member, companies, expandedPrograms, editingPrograms, programChanges,
   onToggleProgram, onStartEditing, onCancelEditing, onUpdateField, onSaveChanges,
