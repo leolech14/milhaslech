@@ -515,13 +515,15 @@ body {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background-color: var(--bg-tertiary);
-  border-color: var(--border-color);
+  background-color: var(--bg-secondary);
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow);
 }
 
 .login-dark-toggle:hover {
   background-color: var(--accent-primary);
   border-color: var(--accent-primary);
+  box-shadow: var(--shadow-hover);
 }
 
 /* Quote Section */
