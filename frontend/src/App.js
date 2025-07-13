@@ -437,7 +437,7 @@ const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats, postits, onCreateP
   </aside>
 );
 
-const TopBar = ({ onRefresh, dashboardStats }) => (
+const TopBar = ({ onRefresh, dashboardStats, darkMode, onToggleDarkMode }) => (
   <header className="top-bar">
     <div className="top-bar-left">
       <h2>Painel de pontos</h2>
@@ -460,6 +460,9 @@ const TopBar = ({ onRefresh, dashboardStats }) => (
       </a>
     </div>
     <div className="top-bar-right">
+      <button className="dark-mode-toggle" onClick={onToggleDarkMode}>
+        {darkMode ? '☀️' : '🌙'}
+      </button>
       <button className="refresh-btn" onClick={onRefresh}>
         ↻ Atualizar
       </button>
