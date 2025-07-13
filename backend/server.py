@@ -1,75 +1,314 @@
-from fastapi import FastAPI, APIRouter
-from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
-import os
-import logging
-from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List
-import uuid
+from fastapi import FastAPI, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from pymongo import MongoClient
+from pydantic import BaseModel
+from typing import List, Optional
 from datetime import datetime
+import uuid
+import os
+from dotenv import load_dotenv
 
+# Load environment variables
+load_dotenv()
 
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+app = FastAPI(title="Loyalty Control Tower API", version="1.0")
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
-
-# Create the main app without a prefix
-app = FastAPI()
-
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
-
-
-# Define Models
-class StatusCheck(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
-
-class StatusCheckCreate(BaseModel):
-    client_name: str
-
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
-
-# Include the router in the main app
-app.include_router(api_router)
-
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# MongoDB connection
+mongo_client = MongoClient(os.getenv("MONGO_URL"))
+db = mongo_client[os.getenv("DB_NAME")]
 
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+# Collections
+companies_collection = db.companies
+members_collection = db.members
+balance_history_collection = db.balance_history
+
+# Pydantic models
+class Company(BaseModel):
+    id: str
+    name: str
+    color: str
+    logo: Optional[str] = None
+    max_members: int = 4
+
+class Member(BaseModel):
+    id: str
+    company_id: str
+    owner_name: str
+    loyalty_number: str
+    current_balance: int = 0
+    elite_tier: Optional[str] = None
+    notes: Optional[str] = None
+    created_at: datetime
+    last_updated: datetime
+
+class BalanceHistory(BaseModel):
+    id: str
+    member_id: str
+    balance: int
+    previous_balance: int
+    change: int
+    elite_tier: Optional[str] = None
+    notes: Optional[str] = None
+    updated_at: datetime
+    updated_by: str = "manual"
+
+class MemberCreate(BaseModel):
+    company_id: str
+    owner_name: str
+    loyalty_number: str
+    current_balance: int = 0
+    elite_tier: Optional[str] = None
+    notes: Optional[str] = None
+
+class MemberUpdate(BaseModel):
+    owner_name: Optional[str] = None
+    loyalty_number: Optional[str] = None
+    current_balance: Optional[int] = None
+    elite_tier: Optional[str] = None
+    notes: Optional[str] = None
+
+class CompanyCreate(BaseModel):
+    name: str
+    color: str
+    logo: Optional[str] = None
+    max_members: int = 4
+
+# Initialize default companies
+async def init_default_companies():
+    default_companies = [
+        {
+            "id": "latam",
+            "name": "LATAM Pass",
+            "color": "#d31b2c",
+            "max_members": 4
+        },
+        {
+            "id": "smiles",
+            "name": "GOL Smiles",
+            "color": "#ff6600",
+            "max_members": 4
+        },
+        {
+            "id": "azul",
+            "name": "Azul TudoAzul",
+            "color": "#0072ce",
+            "max_members": 4
+        }
+    ]
+    
+    for company in default_companies:
+        existing = companies_collection.find_one({"id": company["id"]})
+        if not existing:
+            companies_collection.insert_one(company)
+
+# Startup event
+@app.on_event("startup")
+async def startup_event():
+    await init_default_companies()
+
+# Company endpoints
+@app.get("/api/companies", response_model=List[Company])
+async def get_companies():
+    companies = list(companies_collection.find({}, {"_id": 0}))
+    return companies
+
+@app.post("/api/companies", response_model=Company)
+async def create_company(company: CompanyCreate):
+    company_id = str(uuid.uuid4())
+    company_data = {
+        "id": company_id,
+        "name": company.name,
+        "color": company.color,
+        "logo": company.logo,
+        "max_members": company.max_members
+    }
+    
+    companies_collection.insert_one(company_data)
+    return Company(**company_data)
+
+@app.get("/api/companies/{company_id}", response_model=Company)
+async def get_company(company_id: str):
+    company = companies_collection.find_one({"id": company_id}, {"_id": 0})
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    return Company(**company)
+
+# Member endpoints
+@app.get("/api/members", response_model=List[Member])
+async def get_members(company_id: Optional[str] = None):
+    filter_query = {}
+    if company_id:
+        filter_query["company_id"] = company_id
+    
+    members = list(members_collection.find(filter_query, {"_id": 0}))
+    return members
+
+@app.post("/api/members", response_model=Member)
+async def create_member(member: MemberCreate):
+    # Check if company exists
+    company = companies_collection.find_one({"id": member.company_id})
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    # Check member limit
+    current_members = members_collection.count_documents({"company_id": member.company_id})
+    if current_members >= company["max_members"]:
+        raise HTTPException(status_code=400, detail=f"Maximum {company['max_members']} members allowed for this company")
+    
+    # Create member
+    member_id = str(uuid.uuid4())
+    now = datetime.utcnow()
+    
+    member_data = {
+        "id": member_id,
+        "company_id": member.company_id,
+        "owner_name": member.owner_name,
+        "loyalty_number": member.loyalty_number,
+        "current_balance": member.current_balance,
+        "elite_tier": member.elite_tier,
+        "notes": member.notes,
+        "created_at": now,
+        "last_updated": now
+    }
+    
+    members_collection.insert_one(member_data)
+    
+    # Create initial balance history
+    if member.current_balance > 0:
+        history_data = {
+            "id": str(uuid.uuid4()),
+            "member_id": member_id,
+            "balance": member.current_balance,
+            "previous_balance": 0,
+            "change": member.current_balance,
+            "elite_tier": member.elite_tier,
+            "notes": "Initial balance",
+            "updated_at": now,
+            "updated_by": "manual"
+        }
+        balance_history_collection.insert_one(history_data)
+    
+    return Member(**member_data)
+
+@app.get("/api/members/{member_id}", response_model=Member)
+async def get_member(member_id: str):
+    member = members_collection.find_one({"id": member_id}, {"_id": 0})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+    return Member(**member)
+
+@app.put("/api/members/{member_id}", response_model=Member)
+async def update_member(member_id: str, member_update: MemberUpdate):
+    member = members_collection.find_one({"id": member_id})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+    
+    # Prepare update data
+    update_data = {}
+    if member_update.owner_name is not None:
+        update_data["owner_name"] = member_update.owner_name
+    if member_update.loyalty_number is not None:
+        update_data["loyalty_number"] = member_update.loyalty_number
+    if member_update.elite_tier is not None:
+        update_data["elite_tier"] = member_update.elite_tier
+    if member_update.notes is not None:
+        update_data["notes"] = member_update.notes
+    
+    # Handle balance update
+    if member_update.current_balance is not None:
+        previous_balance = member["current_balance"]
+        new_balance = member_update.current_balance
+        update_data["current_balance"] = new_balance
+        
+        # Create balance history entry
+        if new_balance != previous_balance:
+            history_data = {
+                "id": str(uuid.uuid4()),
+                "member_id": member_id,
+                "balance": new_balance,
+                "previous_balance": previous_balance,
+                "change": new_balance - previous_balance,
+                "elite_tier": member_update.elite_tier or member["elite_tier"],
+                "notes": member_update.notes or "Manual update",
+                "updated_at": datetime.utcnow(),
+                "updated_by": "manual"
+            }
+            balance_history_collection.insert_one(history_data)
+    
+    update_data["last_updated"] = datetime.utcnow()
+    
+    # Update member
+    members_collection.update_one(
+        {"id": member_id},
+        {"$set": update_data}
+    )
+    
+    # Return updated member
+    updated_member = members_collection.find_one({"id": member_id}, {"_id": 0})
+    return Member(**updated_member)
+
+@app.delete("/api/members/{member_id}")
+async def delete_member(member_id: str):
+    result = members_collection.delete_one({"id": member_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Member not found")
+    
+    # Also delete balance history
+    balance_history_collection.delete_many({"member_id": member_id})
+    
+    return {"message": "Member deleted successfully"}
+
+# Balance history endpoints
+@app.get("/api/members/{member_id}/history", response_model=List[BalanceHistory])
+async def get_member_history(member_id: str):
+    history = list(balance_history_collection.find(
+        {"member_id": member_id},
+        {"_id": 0}
+    ).sort("updated_at", -1))
+    return history
+
+# Dashboard stats
+@app.get("/api/dashboard/stats")
+async def get_dashboard_stats():
+    total_members = members_collection.count_documents({})
+    companies = list(companies_collection.find({}, {"_id": 0}))
+    
+    # Get member counts per company
+    company_stats = []
+    for company in companies:
+        member_count = members_collection.count_documents({"company_id": company["id"]})
+        total_points = 0
+        
+        members = list(members_collection.find({"company_id": company["id"]}, {"current_balance": 1}))
+        for member in members:
+            total_points += member.get("current_balance", 0)
+        
+        company_stats.append({
+            "company": company,
+            "member_count": member_count,
+            "total_points": total_points
+        })
+    
+    return {
+        "total_members": total_members,
+        "total_companies": len(companies),
+        "company_stats": company_stats
+    }
+
+# Health check
+@app.get("/api/health")
+async def health_check():
+    return {"status": "healthy", "timestamp": datetime.utcnow()}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
