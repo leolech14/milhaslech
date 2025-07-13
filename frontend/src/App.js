@@ -309,7 +309,7 @@ function App() {
   // Render login screen if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="login-container">
+      <div className={`login-container ${darkMode ? 'dark-mode' : ''}`}>
         <div className="login-box">
           <h1>Programas de Milhas</h1>
           <h2>Família Lech</h2>
@@ -335,6 +335,9 @@ function App() {
             {loginError && <div className="login-error">{loginError}</div>}
             <button type="submit" className="login-btn">Entrar</button>
           </form>
+          <button className="dark-mode-toggle login-dark-toggle" onClick={toggleDarkMode}>
+            {darkMode ? '☀️' : '🌙'}
+          </button>
         </div>
       </div>
     );
