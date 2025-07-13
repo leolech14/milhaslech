@@ -22,23 +22,23 @@
 
 /* Dark Mode Variables */
 .dark-mode {
-  --bg-primary: #1a1d23;         /* Very dark background */
-  --bg-secondary: #2d3748;       /* Dark gray for cards */
-  --bg-tertiary: #4a5568;        /* Medium dark gray for inputs */
-  --bg-white: #2d3748;           /* Dark for details */
-  --text-primary: #f7fafc;       /* Light text */
-  --text-secondary: #e2e8f0;     /* Medium light text */
-  --text-muted: #a0aec0;         /* Muted light text */
-  --border-color: #4a5568;       /* Dark borders */
-  --accent-primary: #4299e1;     /* Lighter blue for dark mode */
-  --accent-primary-light: #63b3ed;
-  --accent-secondary: #3182ce;   /* Secondary blue */
+  --bg-primary: #1e1e1e;         /* Dark gray background instead of white */
+  --bg-secondary: #2d2d2d;       /* Darker gray for cards */
+  --bg-tertiary: #3a3a3a;        /* Medium dark gray for inputs */
+  --bg-white: #2d2d2d;           /* Dark gray for details instead of white */
+  --text-primary: #e8e8e8;       /* Light text */
+  --text-secondary: #c0c0c0;     /* Medium light text */
+  --text-muted: #888888;         /* Muted light text */
+  --border-color: #4a4a4a;       /* Dark borders */
+  --accent-primary: #4a90e2;     /* Lighter blue for dark mode */
+  --accent-primary-light: #6ba3f0;
+  --accent-secondary: #357abd;   /* Secondary blue */
   --accent-success: #48bb78;     /* Green for dark mode */
   --accent-warning: #ed8936;     /* Orange for dark mode */
   --accent-danger: #f56565;      /* Red for dark mode */
-  --navy-accent: #4299e1;        /* Blue accent for dark mode */
-  --shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
-  --shadow-hover: 0 5px 15px rgba(0, 0, 0, 0.6);
+  --navy-accent: #4a90e2;        /* Blue accent for dark mode */
+  --shadow: 0 3px 6px rgba(0, 0, 0, 0.5);
+  --shadow-hover: 0 5px 15px rgba(0, 0, 0, 0.7);
 }
 
 * {
