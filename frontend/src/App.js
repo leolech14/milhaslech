@@ -34,6 +34,9 @@ function App() {
     
     if (darkModePreference === 'true') {
       setDarkMode(true);
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
     }
   }, []);
 
