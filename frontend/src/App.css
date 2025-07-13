@@ -20,6 +20,27 @@
   --border-radius: 10px;
 }
 
+/* Dark Mode Variables */
+.dark-mode {
+  --bg-primary: #1a1d23;         /* Very dark background */
+  --bg-secondary: #2d3748;       /* Dark gray for cards */
+  --bg-tertiary: #4a5568;        /* Medium dark gray for inputs */
+  --bg-white: #2d3748;           /* Dark for details */
+  --text-primary: #f7fafc;       /* Light text */
+  --text-secondary: #e2e8f0;     /* Medium light text */
+  --text-muted: #a0aec0;         /* Muted light text */
+  --border-color: #4a5568;       /* Dark borders */
+  --accent-primary: #4299e1;     /* Lighter blue for dark mode */
+  --accent-primary-light: #63b3ed;
+  --accent-secondary: #3182ce;   /* Secondary blue */
+  --accent-success: #48bb78;     /* Green for dark mode */
+  --accent-warning: #ed8936;     /* Orange for dark mode */
+  --accent-danger: #f56565;      /* Red for dark mode */
+  --navy-accent: #4299e1;        /* Blue accent for dark mode */
+  --shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+  --shadow-hover: 0 5px 15px rgba(0, 0, 0, 0.6);
+}
+
 * {
   margin: 0;
   padding: 0;
