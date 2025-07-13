@@ -375,7 +375,8 @@ const BottomActions = ({ onShowGlobalLog, onLogout }) => (
     </button>
   </div>
 );
-  <div className="stats-card">
+
+const StatsCard = ({ dashboardStats }) => (
     {dashboardStats && (
       <div className="stats-grid">
         <div className="stat-compact">
