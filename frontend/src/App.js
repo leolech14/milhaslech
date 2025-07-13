@@ -365,7 +365,16 @@ const QuoteSection = () => (
   </div>
 );
 
-const StatsCard = ({ dashboardStats }) => (
+const BottomActions = ({ onShowGlobalLog, onLogout }) => (
+  <div className="bottom-actions">
+    <button className="action-btn log-btn" onClick={onShowGlobalLog}>
+      📋 Histórico
+    </button>
+    <button className="action-btn logout-btn" onClick={onLogout}>
+      🚪 Sair
+    </button>
+  </div>
+);
   <div className="stats-card">
     {dashboardStats && (
       <div className="stats-grid">
