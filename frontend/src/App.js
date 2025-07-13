@@ -226,6 +226,58 @@ function App() {
     }
   };
 
+  // Post-it functions
+  const createPostit = async (content) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/postits`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content }),
+      });
+      
+      if (response.ok) {
+        fetchPostits();
+      }
+    } catch (error) {
+      console.error('Erro ao criar post-it:', error);
+    }
+  };
+
+  const updatePostit = async (postitId, content) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/postits/${postitId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content }),
+      });
+      
+      if (response.ok) {
+        fetchPostits();
+        setEditingPostit(null);
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar post-it:', error);
+    }
+  };
+
+  const deletePostit = async (postitId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/postits/${postitId}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        fetchPostits();
+      }
+    } catch (error) {
+      console.error('Erro ao excluir post-it:', error);
+    }
+  };
+
   // Format date
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
