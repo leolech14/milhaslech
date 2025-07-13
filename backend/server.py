@@ -155,7 +155,17 @@ async def init_default_data():
 async def startup_event():
     await init_default_data()
 
-# Helper function to log changes
+class PostIt(BaseModel):
+    id: str
+    content: str
+    created_at: datetime
+    updated_at: datetime
+
+class PostItCreate(BaseModel):
+    content: str
+
+class PostItUpdate(BaseModel):
+    content: str
 def log_change(member_id: str, member_name: str, company_id: str, company_name: str, 
                field_changed: str, old_value: str, new_value: str, change_type: str = "update"):
     log_entry = {
