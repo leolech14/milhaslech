@@ -345,6 +345,54 @@ async def get_dashboard_stats():
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.utcnow()}
 
+# Post-it endpoints
+@app.get("/api/postits", response_model=List[PostIt])
+async def get_postits():
+    postits = list(postits_collection.find({}, {"_id": 0}).sort("created_at", 1))
+    return postits
+
+@app.post("/api/postits", response_model=PostIt)
+async def create_postit(postit: PostItCreate):
+    postit_id = str(uuid.uuid4())
+    now = datetime.utcnow()
+    
+    postit_data = {
+        "id": postit_id,
+        "content": postit.content,
+        "created_at": now,
+        "updated_at": now
+    }
+    
+    postits_collection.insert_one(postit_data)
+    return PostIt(**postit_data)
+
+@app.put("/api/postits/{postit_id}", response_model=PostIt)
+async def update_postit(postit_id: str, postit_update: PostItUpdate):
+    postit = postits_collection.find_one({"id": postit_id})
+    if not postit:
+        raise HTTPException(status_code=404, detail="Post-it não encontrado")
+    
+    update_data = {
+        "content": postit_update.content,
+        "updated_at": datetime.utcnow()
+    }
+    
+    postits_collection.update_one(
+        {"id": postit_id},
+        {"$set": update_data}
+    )
+    
+    updated_postit = postits_collection.find_one({"id": postit_id}, {"_id": 0})
+    return PostIt(**updated_postit)
+
+@app.delete("/api/postits/{postit_id}")
+async def delete_postit(postit_id: str):
+    result = postits_collection.delete_one({"id": postit_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Post-it não encontrado")
+    
+    return {"message": "Post-it excluído com sucesso"}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
