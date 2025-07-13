@@ -22,14 +22,14 @@
 
 /* Dark Mode Variables */
 .dark-mode {
-  --bg-primary: #1e1e1e;         /* Dark gray background instead of white */
-  --bg-secondary: #2d2d2d;       /* Darker gray for cards */
-  --bg-tertiary: #3a3a3a;        /* Medium dark gray for inputs */
-  --bg-white: #2d2d2d;           /* Dark gray for details instead of white */
-  --text-primary: #e8e8e8;       /* Light text */
-  --text-secondary: #c0c0c0;     /* Medium light text */
-  --text-muted: #888888;         /* Muted light text */
-  --border-color: #4a4a4a;       /* Dark borders */
+  --bg-primary: #0d0d0d;         /* Much darker background */
+  --bg-secondary: #1a1a1a;       /* Darker gray for cards */
+  --bg-tertiary: #2a2a2a;        /* Medium dark gray for inputs */
+  --bg-white: #1a1a1a;           /* Dark gray for details */
+  --text-primary: #f0f0f0;       /* Light text */
+  --text-secondary: #d0d0d0;     /* Medium light text */
+  --text-muted: #999999;         /* Muted light text */
+  --border-color: #333333;       /* Dark borders */
   --accent-primary: #4a90e2;     /* Lighter blue for dark mode */
   --accent-primary-light: #6ba3f0;
   --accent-secondary: #357abd;   /* Secondary blue */
@@ -37,8 +37,24 @@
   --accent-warning: #ed8936;     /* Orange for dark mode */
   --accent-danger: #f56565;      /* Red for dark mode */
   --navy-accent: #4a90e2;        /* Blue accent for dark mode */
-  --shadow: 0 3px 6px rgba(0, 0, 0, 0.5);
-  --shadow-hover: 0 5px 15px rgba(0, 0, 0, 0.7);
+  --shadow: 0 3px 6px rgba(0, 0, 0, 0.8);
+  --shadow-hover: 0 5px 15px rgba(0, 0, 0, 0.9);
+}
+
+/* Dark Mode Brand Card */
+.dark-mode .brand-card {
+  background: linear-gradient(135deg, #2a4a6b, #1a365d);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Dark Mode Login Container Texture */
+.dark-mode .login-container::before {
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(74, 144, 226, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+    linear-gradient(45deg, transparent 25%, rgba(74, 144, 226, 0.02) 25%, rgba(74, 144, 226, 0.02) 50%, transparent 50%, transparent 75%, rgba(255, 255, 255, 0.01) 75%);
 }
 
 * {
@@ -52,6 +68,34 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(26, 54, 93, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 60% 40%, rgba(26, 54, 93, 0.08) 0%, transparent 40%),
+    linear-gradient(45deg, transparent 25%, rgba(26, 54, 93, 0.06) 25%, rgba(26, 54, 93, 0.06) 50%, transparent 50%, transparent 75%, rgba(255, 255, 255, 0.04) 75%);
+  background-size: 300px 300px, 200px 200px, 150px 150px, 40px 40px;
+  background-position: 0 0, 150px 150px, 300px 100px, 0 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Dark Mode Body Texture */
+body.dark-mode::before {
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(74, 144, 226, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 60% 40%, rgba(74, 144, 226, 0.10) 0%, transparent 40%),
+    linear-gradient(45deg, transparent 25%, rgba(74, 144, 226, 0.05) 25%, rgba(74, 144, 226, 0.05) 50%, transparent 50%, transparent 75%, rgba(255, 255, 255, 0.03) 75%);
 }
 
 .app {
@@ -67,6 +111,24 @@ body {
   align-items: center;
   height: 100vh;
   background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+  position: relative;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(26, 54, 93, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+    linear-gradient(45deg, transparent 25%, rgba(26, 54, 93, 0.02) 25%, rgba(26, 54, 93, 0.02) 50%, transparent 50%, transparent 75%, rgba(255, 255, 255, 0.02) 75%);
+  background-size: 200px 200px, 150px 150px, 30px 30px;
+  background-position: 0 0, 100px 100px, 0 0;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .login-box {
@@ -78,6 +140,8 @@ body {
   width: 100%;
   max-width: 400px;
   text-align: center;
+  position: relative;
+  z-index: 2;
 }
 
 .login-box h1 {
@@ -92,6 +156,45 @@ body {
   font-size: 1.125rem;
   font-weight: 500;
   margin-bottom: 2rem;
+}
+
+/* Brand Card Styles */
+.brand-card {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin: 1rem 0 2rem 0;
+  box-shadow: 
+    0 4px 12px rgba(26, 54, 93, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.brand-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  background-size: 50px 50px, 30px 30px;
+  pointer-events: none;
+}
+
+.brand-text {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
 .login-form {
@@ -175,6 +278,9 @@ body {
   border-bottom: 2px solid var(--accent-primary);
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
   color: white;
+  border: 3px solid var(--bg-primary);
+  border-radius: 8px;
+  margin: 0.5rem;
 }
 
 .sidebar-header h1 {
@@ -490,36 +596,58 @@ body {
 
 /* Dark Mode Toggle */
 .dark-mode-toggle {
-  padding: 0.25rem 0.5rem;
-  background: transparent;
+  padding: 0.375rem 0.625rem;
+  background: var(--bg-secondary);
   border: 2px solid var(--accent-primary);
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 1rem;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 36px;
-  height: 32px;
+  min-width: 40px;
+  height: 36px;
+  box-shadow: var(--shadow);
 }
 
 .dark-mode-toggle:hover {
   background-color: var(--accent-primary);
   transform: scale(1.05);
+  box-shadow: var(--shadow-hover);
 }
 
 .login-dark-toggle {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background-color: var(--bg-tertiary);
-  border-color: var(--border-color);
+  background-color: var(--bg-secondary);
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow);
 }
 
 .login-dark-toggle:hover {
   background-color: var(--accent-primary);
   border-color: var(--accent-primary);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Global Dark Mode Toggle for Login Screen */
+.global-dark-toggle {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  z-index: 1000;
+  background-color: var(--bg-white);
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-hover);
+}
+
+.global-dark-toggle:hover {
+  background-color: var(--accent-primary);
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-hover);
+  transform: scale(1.1);
 }
 
 /* Quote Section */
@@ -546,6 +674,32 @@ body {
   flex-direction: column;
   gap: 1rem;
   overflow-y: auto;
+  background-color: var(--bg-primary);
+  position: relative;
+}
+
+.members-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 30% 70%, rgba(26, 54, 93, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 60%),
+    repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(26, 54, 93, 0.03) 20px, rgba(26, 54, 93, 0.03) 21px);
+  background-size: 250px 250px, 180px 180px, 25px 25px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Dark Mode Members Container Texture */
+.dark-mode .members-container::before {
+  background-image: 
+    radial-gradient(circle at 30% 70%, rgba(74, 144, 226, 0.12) 0%, transparent 60%),
+    radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.06) 0%, transparent 60%),
+    repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(74, 144, 226, 0.04) 20px, rgba(74, 144, 226, 0.04) 21px);
 }
 
 /* Member Cards */
@@ -556,6 +710,8 @@ body {
   padding: 1.25rem;
   box-shadow: var(--shadow);
   transition: all 0.2s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .member-card:hover {

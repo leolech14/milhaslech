@@ -34,6 +34,9 @@ function App() {
     
     if (darkModePreference === 'true') {
       setDarkMode(true);
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
     }
   }, []);
 
@@ -43,7 +46,7 @@ function App() {
     setLoginError('');
     
     // Case-insensitive login check
-    if (loginForm.username.toLowerCase() === 'lech' && loginForm.password.toLowerCase() === 'milhas.online') {
+    if (loginForm.username.toLowerCase() === 'lech' && loginForm.password.toLowerCase() === 'world') {
       setIsAuthenticated(true);
       localStorage.setItem('lech_authenticated', 'true');
     } else {
@@ -238,6 +241,13 @@ function App() {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
     localStorage.setItem('lech_dark_mode', newDarkMode.toString());
+    
+    // Apply dark mode class to body for global texture
+    if (newDarkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
   };
   const createPostit = async (content) => {
     try {
@@ -310,9 +320,14 @@ function App() {
   if (!isAuthenticated) {
     return (
       <div className={`login-container ${darkMode ? 'dark-mode' : ''}`}>
+        <button className="dark-mode-toggle global-dark-toggle" onClick={toggleDarkMode}>
+          {darkMode ? '🔆' : '🌚'}
+        </button>
         <div className="login-box">
           <h1>Programas de Milhas</h1>
-          <h2>Família Lech</h2>
+          <div className="brand-card">
+            <span className="brand-text">lech.world</span>
+          </div>
           <form onSubmit={handleLogin} className="login-form">
             <div className="form-group">
               <label>Login:</label>
@@ -335,9 +350,6 @@ function App() {
             {loginError && <div className="login-error">{loginError}</div>}
             <button type="submit" className="login-btn">Entrar</button>
           </form>
-          <button className="dark-mode-toggle login-dark-toggle" onClick={toggleDarkMode}>
-            {darkMode ? '☀️' : '🌙'}
-          </button>
         </div>
       </div>
     );
@@ -423,7 +435,7 @@ const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats, postits, onCreateP
   <aside className="sidebar">
     <div className="sidebar-header">
       <h1>Programas de Milhas</h1>
-      <p>Família Lech</p>
+      <p>lech.world</p>
     </div>
     
     <PostItSection 
@@ -461,7 +473,7 @@ const TopBar = ({ onRefresh, dashboardStats, darkMode, onToggleDarkMode }) => (
     </div>
     <div className="top-bar-right">
       <button className="dark-mode-toggle" onClick={onToggleDarkMode}>
-        {darkMode ? '☀️' : '🌙'}
+        {darkMode ? '🔆' : '🌚'}
       </button>
       <button className="refresh-btn" onClick={onRefresh}>
         ↻ Atualizar
