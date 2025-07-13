@@ -166,40 +166,12 @@ body {
   opacity: 0.9;
 }
 
-.sidebar-stats {
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-  flex: 1;
-  background-color: var(--bg-white);
-}
-
-.stat-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.875rem;
-  padding: 0.5rem;
-  background-color: var(--bg-secondary);
-  border-radius: 6px;
-  border-left: 4px solid var(--navy-accent);
-  font-size: 0.875rem;
-}
-
-.stat-item span:first-child {
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.stat-item span:last-child {
-  color: var(--text-primary);
-  font-weight: 700;
-}
-
 .sidebar-actions {
   padding: 1rem 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  margin-top: auto;
 }
 
 .log-btn, .logout-btn {
