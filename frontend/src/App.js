@@ -329,29 +329,6 @@ const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats }) => (
       <p>Família Lech</p>
     </div>
     
-    <div className="sidebar-stats">
-      {dashboardStats && (
-        <>
-          <div className="stat-item">
-            <span>Membros</span>
-            <span>{dashboardStats.total_members}</span>
-          </div>
-          <div className="stat-item">
-            <span>Programas</span>
-            <span>{dashboardStats.total_companies}</span>
-          </div>
-          <div className="stat-item">
-            <span>Total de Pontos</span>
-            <span>{dashboardStats.total_points.toLocaleString('pt-BR')}</span>
-          </div>
-          <div className="stat-item">
-            <span>Atividade Hoje</span>
-            <span>{dashboardStats.recent_activity}</span>
-          </div>
-        </>
-      )}
-    </div>
-    
     <div className="sidebar-actions">
       <button className="log-btn" onClick={onShowGlobalLog}>
         📋 Histórico de Atualizações
