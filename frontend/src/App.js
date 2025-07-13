@@ -33,7 +33,8 @@ function App() {
     e.preventDefault();
     setLoginError('');
     
-    if (loginForm.username === 'lech' && loginForm.password === 'milhas.online') {
+    // Case-insensitive login check
+    if (loginForm.username.toLowerCase() === 'lech' && loginForm.password.toLowerCase() === 'milhas.online') {
       setIsAuthenticated(true);
       localStorage.setItem('lech_authenticated', 'true');
     } else {
