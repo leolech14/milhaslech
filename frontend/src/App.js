@@ -98,6 +98,16 @@ function App() {
     }
   };
 
+  const fetchPostits = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/postits`);
+      const data = await response.json();
+      setPostits(data);
+    } catch (error) {
+      console.error('Erro ao buscar post-its:', error);
+    }
+  };
+
   // Load data on component mount
   useEffect(() => {
     if (isAuthenticated) {
