@@ -166,6 +166,18 @@ backend:
         comment: "✅ VERIFIED: All 4 family members (Osvandré, Marilise, Graciela, Leonardo) initialized correctly on startup. Each member has all 3 programs (latam, smiles, azul) with empty initial data as expected. Database structure matches new design perfectly."
 
 frontend:
+  - task: "Dark mode implementation completion"
+    implemented: true
+    working: true
+    file: "App.js, App.css"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Dark mode functionality with toggle button, CSS variables, and localStorage persistence. Background is properly dark gray (#1e1e1e), not white. All components styled for dark theme."
+  
   - task: "4-card layout with expandable program blocks"
     implemented: true
     working: true
