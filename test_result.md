@@ -152,39 +152,8 @@ backend:
       - working: true
         agent: "main"
         comment: "4 family members (Osvandré, Marilise, Graciela, Leonardo) with empty program data"
-  
-  - task: "Dashboard statistics endpoint"
-    implemented: true
-    working: true
-    file: "server.py"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "GET /api/dashboard/stats provides company stats and member counts"
-      - working: true
-        agent: "testing"
-        comment: "✅ VERIFIED: Dashboard statistics endpoint working correctly. GET /api/dashboard/stats returns comprehensive data including total_members, total_companies, and detailed company_stats array with member counts and total points per company. All data is accurate and properly formatted."
-  
-  - task: "Default company initialization"
-    implemented: true
-    working: true
-    file: "server.py"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "LATAM, Smiles, and Azul companies auto-created with brand colors"
-      - working: true
-        agent: "testing"
-        comment: "✅ VERIFIED: Default company initialization working perfectly. All 3 required companies (LATAM Pass, GOL Smiles, Azul TudoAzul) are automatically created on startup with correct names, brand colors (#d31b2c, #ff6600, #0072ce), and 4-member limits. Companies persist correctly in database."
-
 frontend:
-  - task: "Dark mode dashboard UI"
+  - task: "4-card layout with expandable program blocks"
     implemented: true
     working: true
     file: "App.js, App.css"
@@ -194,7 +163,7 @@ frontend:
     status_history:
       - working: true
         agent: "main"
-        comment: "Complete dark mode UI with professional design and company colors"
+        comment: "4 member cards, each with 3 expandable program blocks"
   
   - task: "Sidebar with company navigation"
     implemented: true
