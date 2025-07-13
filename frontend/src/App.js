@@ -334,6 +334,12 @@ function App() {
         onShowGlobalLog={() => setShowGlobalLog(true)}
         onLogout={handleLogout}
         dashboardStats={dashboardStats}
+        postits={postits}
+        onCreatePostit={createPostit}
+        onUpdatePostit={updatePostit}
+        onDeletePostit={deletePostit}
+        editingPostit={editingPostit}
+        setEditingPostit={setEditingPostit}
       />
       
       <main className="main-content">
@@ -342,8 +348,11 @@ function App() {
             fetchMembers();
             fetchGlobalLog();
             fetchDashboardStats();
+            fetchPostits();
           }}
         />
+        
+        <TopStats dashboardStats={dashboardStats} />
         
         <QuoteSection />
         
@@ -367,8 +376,6 @@ function App() {
               getCompanyById={getCompanyById}
             />
           ))}
-          
-          <StatsCard dashboardStats={dashboardStats} />
           
           <BottomActions 
             onShowGlobalLog={() => setShowGlobalLog(true)}
