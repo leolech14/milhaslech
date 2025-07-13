@@ -672,6 +672,31 @@ body.dark-mode::before {
   gap: 1rem;
   overflow-y: auto;
   background-color: var(--bg-primary);
+  position: relative;
+}
+
+.members-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 30% 70%, rgba(26, 54, 93, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 60%),
+    repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(26, 54, 93, 0.03) 20px, rgba(26, 54, 93, 0.03) 21px);
+  background-size: 250px 250px, 180px 180px, 25px 25px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Dark Mode Members Container Texture */
+.dark-mode .members-container::before {
+  background-image: 
+    radial-gradient(circle at 30% 70%, rgba(74, 144, 226, 0.12) 0%, transparent 60%),
+    radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.06) 0%, transparent 60%),
+    repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(74, 144, 226, 0.04) 20px, rgba(74, 144, 226, 0.04) 21px);
 }
 
 /* Member Cards */
