@@ -488,6 +488,40 @@ body {
   color: var(--accent-primary);
 }
 
+/* Dark Mode Toggle */
+.dark-mode-toggle {
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  border: 2px solid var(--accent-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 32px;
+}
+
+.dark-mode-toggle:hover {
+  background-color: var(--accent-primary);
+  transform: scale(1.05);
+}
+
+.login-dark-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+.login-dark-toggle:hover {
+  background-color: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
 /* Quote Section */
 .quote-section {
   padding: 0.75rem 2rem;
