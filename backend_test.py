@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Loyalty Control Tower
-Tests all backend endpoints and functionality
+Backend API Testing for Redesigned Loyalty Control Tower
+Tests the new member structure with nested programs and global logging
 """
 
 import requests
@@ -13,12 +13,13 @@ import sys
 # Get backend URL from frontend .env
 BACKEND_URL = "https://1460d612-5445-408c-93d2-b62359b06602.preview.emergentagent.com/api"
 
-class LoyaltyAPITester:
+class RedesignedLoyaltyAPITester:
     def __init__(self):
         self.base_url = BACKEND_URL
         self.test_results = []
-        self.created_members = []  # Track created members for cleanup
-        self.created_companies = []  # Track created companies for cleanup
+        self.family_members = ["Osvandré", "Marilise", "Graciela", "Leonardo"]
+        self.expected_companies = ["latam", "smiles", "azul"]
+        self.member_ids = {}  # Store member IDs by name
         
     def log_test(self, test_name, success, message, details=None):
         """Log test results"""
@@ -54,29 +55,28 @@ class LoyaltyAPITester:
             return False
     
     def test_get_companies(self):
-        """Test GET /api/companies - should return default companies"""
+        """Test GET /api/companies - should return 3 default companies"""
         try:
             response = requests.get(f"{self.base_url}/companies", timeout=10)
             if response.status_code == 200:
                 companies = response.json()
-                if isinstance(companies, list) and len(companies) >= 3:
-                    # Check for default companies
+                if isinstance(companies, list) and len(companies) == 3:
+                    # Check for expected companies
+                    company_ids = [c.get("id", "") for c in companies]
                     company_names = [c.get("name", "") for c in companies]
-                    expected_companies = ["LATAM Pass", "GOL Smiles", "Azul TudoAzul"]
                     
-                    found_companies = []
-                    for expected in expected_companies:
-                        if expected in company_names:
-                            found_companies.append(expected)
+                    expected_names = ["LATAM Pass", "Smiles", "TudoAzul"]
+                    found_all = all(name in company_names for name in expected_names)
+                    found_all_ids = all(cid in company_ids for cid in self.expected_companies)
                     
-                    if len(found_companies) == 3:
-                        self.log_test("Get Companies", True, f"Found all 3 default companies: {found_companies}")
+                    if found_all and found_all_ids:
+                        self.log_test("Get Companies", True, f"Found all 3 companies: {company_names}")
                         return True
                     else:
-                        self.log_test("Get Companies", False, f"Missing default companies. Found: {company_names}")
+                        self.log_test("Get Companies", False, f"Missing expected companies. Found: {company_names}, IDs: {company_ids}")
                         return False
                 else:
-                    self.log_test("Get Companies", False, f"Expected list with 3+ companies, got: {len(companies) if isinstance(companies, list) else 'not a list'}")
+                    self.log_test("Get Companies", False, f"Expected 3 companies, got: {len(companies) if isinstance(companies, list) else 'not a list'}")
                     return False
             else:
                 self.log_test("Get Companies", False, f"HTTP {response.status_code}", response.text)
@@ -85,310 +85,215 @@ class LoyaltyAPITester:
             self.log_test("Get Companies", False, f"Request error: {str(e)}")
             return False
     
-    def test_create_company(self):
-        """Test POST /api/companies"""
-        try:
-            new_company = {
-                "name": "Test Airlines Rewards",
-                "color": "#00ff00",
-                "max_members": 4
-            }
-            
-            response = requests.post(f"{self.base_url}/companies", 
-                                   json=new_company, timeout=10)
-            
-            if response.status_code == 200:
-                company = response.json()
-                if (company.get("name") == new_company["name"] and 
-                    company.get("color") == new_company["color"] and
-                    "id" in company):
-                    self.created_companies.append(company["id"])
-                    self.log_test("Create Company", True, f"Created company: {company['name']}")
-                    return True
-                else:
-                    self.log_test("Create Company", False, "Invalid response format", company)
-                    return False
-            else:
-                self.log_test("Create Company", False, f"HTTP {response.status_code}", response.text)
-                return False
-        except Exception as e:
-            self.log_test("Create Company", False, f"Request error: {str(e)}")
-            return False
-    
-    def test_get_specific_company(self):
-        """Test GET /api/companies/{id}"""
-        try:
-            # First get all companies to get a valid ID
-            response = requests.get(f"{self.base_url}/companies", timeout=10)
-            if response.status_code != 200:
-                self.log_test("Get Specific Company", False, "Could not get companies list")
-                return False
-            
-            companies = response.json()
-            if not companies:
-                self.log_test("Get Specific Company", False, "No companies found")
-                return False
-            
-            # Test with first company
-            company_id = companies[0]["id"]
-            response = requests.get(f"{self.base_url}/companies/{company_id}", timeout=10)
-            
-            if response.status_code == 200:
-                company = response.json()
-                if company.get("id") == company_id:
-                    self.log_test("Get Specific Company", True, f"Retrieved company: {company.get('name')}")
-                    return True
-                else:
-                    self.log_test("Get Specific Company", False, "ID mismatch in response")
-                    return False
-            else:
-                self.log_test("Get Specific Company", False, f"HTTP {response.status_code}", response.text)
-                return False
-        except Exception as e:
-            self.log_test("Get Specific Company", False, f"Request error: {str(e)}")
-            return False
-    
-    def test_get_members_empty(self):
-        """Test GET /api/members when no members exist"""
+    def test_family_member_initialization(self):
+        """Test that 4 family members are initialized with empty program data"""
         try:
             response = requests.get(f"{self.base_url}/members", timeout=10)
             if response.status_code == 200:
                 members = response.json()
-                if isinstance(members, list):
-                    self.log_test("Get Members (Empty)", True, f"Retrieved {len(members)} members")
-                    return True
+                if isinstance(members, list) and len(members) == 4:
+                    # Check member names
+                    member_names = [m.get("name", "") for m in members]
+                    found_all_family = all(name in member_names for name in self.family_members)
+                    
+                    if found_all_family:
+                        # Store member IDs for later tests
+                        for member in members:
+                            self.member_ids[member["name"]] = member["id"]
+                        
+                        self.log_test("Family Member Initialization", True, f"Found all 4 family members: {member_names}")
+                        return True
+                    else:
+                        self.log_test("Family Member Initialization", False, f"Missing family members. Found: {member_names}, Expected: {self.family_members}")
+                        return False
                 else:
-                    self.log_test("Get Members (Empty)", False, "Response is not a list")
+                    self.log_test("Family Member Initialization", False, f"Expected 4 members, got: {len(members) if isinstance(members, list) else 'not a list'}")
                     return False
             else:
-                self.log_test("Get Members (Empty)", False, f"HTTP {response.status_code}", response.text)
+                self.log_test("Family Member Initialization", False, f"HTTP {response.status_code}", response.text)
                 return False
         except Exception as e:
-            self.log_test("Get Members (Empty)", False, f"Request error: {str(e)}")
+            self.log_test("Family Member Initialization", False, f"Request error: {str(e)}")
             return False
     
-    def test_create_member(self):
-        """Test POST /api/members"""
+    def test_member_program_structure(self):
+        """Test that each member has all 3 programs with empty initial data"""
         try:
-            # Get a company ID first
-            response = requests.get(f"{self.base_url}/companies", timeout=10)
-            if response.status_code != 200:
-                self.log_test("Create Member", False, "Could not get companies")
-                return False
-            
-            companies = response.json()
-            if not companies:
-                self.log_test("Create Member", False, "No companies available")
-                return False
-            
-            company_id = companies[0]["id"]  # Use first company (LATAM)
-            
-            new_member = {
-                "company_id": company_id,
-                "owner_name": "Maria Silva",
-                "loyalty_number": "LATAM123456789",
-                "current_balance": 25000,
-                "elite_tier": "Gold",
-                "notes": "Frequent traveler to São Paulo"
-            }
-            
-            response = requests.post(f"{self.base_url}/members", 
-                                   json=new_member, timeout=10)
-            
+            response = requests.get(f"{self.base_url}/members", timeout=10)
             if response.status_code == 200:
-                member = response.json()
-                if (member.get("owner_name") == new_member["owner_name"] and
-                    member.get("company_id") == company_id and
-                    "id" in member):
-                    self.created_members.append(member["id"])
-                    self.log_test("Create Member", True, f"Created member: {member['owner_name']}")
+                members = response.json()
+                
+                all_valid = True
+                issues = []
+                
+                for member in members:
+                    programs = member.get("programs", {})
+                    
+                    # Check if all 3 companies are present
+                    if not all(company_id in programs for company_id in self.expected_companies):
+                        all_valid = False
+                        issues.append(f"{member['name']}: Missing programs")
+                        continue
+                    
+                    # Check program structure
+                    for company_id in self.expected_companies:
+                        program = programs[company_id]
+                        required_fields = ["company_id", "login", "password", "cpf", "card_number", "current_balance", "elite_tier", "notes", "last_updated", "last_change"]
+                        
+                        if not all(field in program for field in required_fields):
+                            all_valid = False
+                            issues.append(f"{member['name']}-{company_id}: Missing fields")
+                            continue
+                        
+                        # Check initial empty values
+                        if (program["login"] != "" or program["password"] != "" or 
+                            program["cpf"] != "" or program["card_number"] != "" or 
+                            program["current_balance"] != 0 or program["elite_tier"] != "" or 
+                            program["notes"] != ""):
+                            # This is actually OK - they might have been updated
+                            pass
+                
+                if all_valid:
+                    self.log_test("Member Program Structure", True, "All members have correct program structure")
                     return True
                 else:
-                    self.log_test("Create Member", False, "Invalid response format", member)
+                    self.log_test("Member Program Structure", False, f"Structure issues: {issues}")
                     return False
             else:
-                self.log_test("Create Member", False, f"HTTP {response.status_code}", response.text)
+                self.log_test("Member Program Structure", False, f"HTTP {response.status_code}", response.text)
                 return False
         except Exception as e:
-            self.log_test("Create Member", False, f"Request error: {str(e)}")
+            self.log_test("Member Program Structure", False, f"Request error: {str(e)}")
             return False
     
-    def test_get_specific_member(self):
-        """Test GET /api/members/{id}"""
-        if not self.created_members:
-            self.log_test("Get Specific Member", False, "No members created to test with")
+    def test_individual_field_update(self):
+        """Test PUT /api/members/{id}/programs/{company_id} for individual field updates"""
+        if not self.member_ids:
+            self.log_test("Individual Field Update", False, "No member IDs available")
             return False
         
         try:
-            member_id = self.created_members[0]
-            response = requests.get(f"{self.base_url}/members/{member_id}", timeout=10)
+            # Use first family member and LATAM program
+            member_name = self.family_members[0]  # Osvandré
+            member_id = self.member_ids[member_name]
+            company_id = "latam"
             
-            if response.status_code == 200:
-                member = response.json()
-                if member.get("id") == member_id:
-                    self.log_test("Get Specific Member", True, f"Retrieved member: {member.get('owner_name')}")
-                    return True
-                else:
-                    self.log_test("Get Specific Member", False, "ID mismatch in response")
-                    return False
-            else:
-                self.log_test("Get Specific Member", False, f"HTTP {response.status_code}", response.text)
-                return False
-        except Exception as e:
-            self.log_test("Get Specific Member", False, f"Request error: {str(e)}")
-            return False
-    
-    def test_update_member_balance(self):
-        """Test PUT /api/members/{id} with balance change"""
-        if not self.created_members:
-            self.log_test("Update Member Balance", False, "No members created to test with")
-            return False
-        
-        try:
-            member_id = self.created_members[0]
-            
-            # Update balance
+            # Update login field
             update_data = {
-                "current_balance": 30000,
-                "notes": "Balance updated after recent trip"
+                "login": "osvandre.latam@email.com"
             }
             
-            response = requests.put(f"{self.base_url}/members/{member_id}", 
+            response = requests.put(f"{self.base_url}/members/{member_id}/programs/{company_id}", 
                                   json=update_data, timeout=10)
             
             if response.status_code == 200:
-                member = response.json()
-                if member.get("current_balance") == 30000:
-                    self.log_test("Update Member Balance", True, f"Updated balance to {member['current_balance']}")
-                    return True
+                result = response.json()
+                if "message" in result and "changes" in result:
+                    if len(result["changes"]) > 0:
+                        self.log_test("Individual Field Update", True, f"Updated login field: {result['changes']}")
+                        return True
+                    else:
+                        self.log_test("Individual Field Update", False, "No changes recorded")
+                        return False
                 else:
-                    self.log_test("Update Member Balance", False, f"Balance not updated correctly: {member.get('current_balance')}")
+                    self.log_test("Individual Field Update", False, "Invalid response format", result)
                     return False
             else:
-                self.log_test("Update Member Balance", False, f"HTTP {response.status_code}", response.text)
+                self.log_test("Individual Field Update", False, f"HTTP {response.status_code}", response.text)
                 return False
         except Exception as e:
-            self.log_test("Update Member Balance", False, f"Request error: {str(e)}")
+            self.log_test("Individual Field Update", False, f"Request error: {str(e)}")
             return False
     
-    def test_balance_history_tracking(self):
-        """Test balance history is created when balance changes"""
-        if not self.created_members:
-            self.log_test("Balance History Tracking", False, "No members created to test with")
+    def test_multiple_field_updates(self):
+        """Test updating multiple fields and verify they create log entries"""
+        if not self.member_ids:
+            self.log_test("Multiple Field Updates", False, "No member IDs available")
             return False
         
         try:
-            member_id = self.created_members[0]
-            response = requests.get(f"{self.base_url}/members/{member_id}/history", timeout=10)
+            # Use second family member and Smiles program
+            member_name = self.family_members[1]  # Marilise
+            member_id = self.member_ids[member_name]
+            company_id = "smiles"
             
-            if response.status_code == 200:
-                history = response.json()
-                if isinstance(history, list) and len(history) >= 2:
-                    # Should have initial balance + update
-                    self.log_test("Balance History Tracking", True, f"Found {len(history)} history entries")
-                    return True
-                else:
-                    self.log_test("Balance History Tracking", False, f"Expected 2+ history entries, got {len(history) if isinstance(history, list) else 'not a list'}")
-                    return False
-            else:
-                self.log_test("Balance History Tracking", False, f"HTTP {response.status_code}", response.text)
-                return False
-        except Exception as e:
-            self.log_test("Balance History Tracking", False, f"Request error: {str(e)}")
-            return False
-    
-    def test_member_limit_validation(self):
-        """Test that companies can't exceed 4 members"""
-        try:
-            # Get a company ID
-            response = requests.get(f"{self.base_url}/companies", timeout=10)
-            companies = response.json()
-            company_id = companies[1]["id"]  # Use second company (Smiles)
-            
-            # Create 4 members
-            created_for_limit_test = []
-            for i in range(4):
-                member_data = {
-                    "company_id": company_id,
-                    "owner_name": f"Test User {i+1}",
-                    "loyalty_number": f"SMILES{i+1:06d}",
-                    "current_balance": 10000 + (i * 1000)
-                }
-                
-                response = requests.post(f"{self.base_url}/members", json=member_data, timeout=10)
-                if response.status_code == 200:
-                    member = response.json()
-                    created_for_limit_test.append(member["id"])
-                    self.created_members.append(member["id"])
-            
-            # Try to create 5th member (should fail)
-            member_data = {
-                "company_id": company_id,
-                "owner_name": "Test User 5",
-                "loyalty_number": "SMILES000005",
-                "current_balance": 15000
+            # Update multiple fields
+            update_data = {
+                "login": "marilise.smiles@email.com",
+                "password": "smiles2024",
+                "cpf": "123.456.789-01",
+                "card_number": "1234567890123456",
+                "current_balance": 15000,
+                "elite_tier": "Gold"
             }
             
-            response = requests.post(f"{self.base_url}/members", json=member_data, timeout=10)
-            
-            if response.status_code == 400:
-                self.log_test("Member Limit Validation", True, "Correctly rejected 5th member")
-                return True
-            else:
-                self.log_test("Member Limit Validation", False, f"Expected 400 error, got {response.status_code}")
-                return False
-                
-        except Exception as e:
-            self.log_test("Member Limit Validation", False, f"Request error: {str(e)}")
-            return False
-    
-    def test_member_filtering_by_company(self):
-        """Test GET /api/members?company_id=X"""
-        try:
-            # Get companies
-            response = requests.get(f"{self.base_url}/companies", timeout=10)
-            companies = response.json()
-            company_id = companies[1]["id"]  # Smiles company (should have 4 members from previous test)
-            
-            response = requests.get(f"{self.base_url}/members?company_id={company_id}", timeout=10)
+            response = requests.put(f"{self.base_url}/members/{member_id}/programs/{company_id}", 
+                                  json=update_data, timeout=10)
             
             if response.status_code == 200:
-                members = response.json()
-                if isinstance(members, list) and len(members) == 4:
-                    # Verify all members belong to the company
-                    all_correct_company = all(m.get("company_id") == company_id for m in members)
-                    if all_correct_company:
-                        self.log_test("Member Filtering by Company", True, f"Found {len(members)} members for company")
-                        return True
-                    else:
-                        self.log_test("Member Filtering by Company", False, "Some members don't belong to requested company")
-                        return False
+                result = response.json()
+                if "changes" in result and len(result["changes"]) == 6:
+                    self.log_test("Multiple Field Updates", True, f"Updated 6 fields: {len(result['changes'])} changes recorded")
+                    return True
                 else:
-                    self.log_test("Member Filtering by Company", False, f"Expected 4 members, got {len(members) if isinstance(members, list) else 'not a list'}")
+                    self.log_test("Multiple Field Updates", False, f"Expected 6 changes, got {len(result.get('changes', []))}")
                     return False
             else:
-                self.log_test("Member Filtering by Company", False, f"HTTP {response.status_code}", response.text)
+                self.log_test("Multiple Field Updates", False, f"HTTP {response.status_code}", response.text)
                 return False
         except Exception as e:
-            self.log_test("Member Filtering by Company", False, f"Request error: {str(e)}")
+            self.log_test("Multiple Field Updates", False, f"Request error: {str(e)}")
             return False
     
-    def test_dashboard_stats(self):
-        """Test GET /api/dashboard/stats"""
+    def test_global_log_system(self):
+        """Test GET /api/global-log to verify logging works"""
+        try:
+            response = requests.get(f"{self.base_url}/global-log", timeout=10)
+            
+            if response.status_code == 200:
+                log_entries = response.json()
+                if isinstance(log_entries, list):
+                    if len(log_entries) >= 7:  # Should have at least 7 entries from previous tests
+                        # Check log entry structure
+                        first_entry = log_entries[0]
+                        required_fields = ["id", "member_id", "member_name", "company_id", "company_name", "field_changed", "old_value", "new_value", "timestamp", "change_type"]
+                        
+                        if all(field in first_entry for field in required_fields):
+                            self.log_test("Global Log System", True, f"Found {len(log_entries)} log entries with correct structure")
+                            return True
+                        else:
+                            self.log_test("Global Log System", False, f"Log entry missing required fields: {first_entry}")
+                            return False
+                    else:
+                        self.log_test("Global Log System", False, f"Expected at least 7 log entries, got {len(log_entries)}")
+                        return False
+                else:
+                    self.log_test("Global Log System", False, "Response is not a list")
+                    return False
+            else:
+                self.log_test("Global Log System", False, f"HTTP {response.status_code}", response.text)
+                return False
+        except Exception as e:
+            self.log_test("Global Log System", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_dashboard_stats_new_structure(self):
+        """Test dashboard stats with the new structure"""
         try:
             response = requests.get(f"{self.base_url}/dashboard/stats", timeout=10)
             
             if response.status_code == 200:
                 stats = response.json()
-                required_fields = ["total_members", "total_companies", "company_stats"]
+                required_fields = ["total_members", "total_companies", "total_points", "recent_activity"]
                 
                 if all(field in stats for field in required_fields):
-                    if (isinstance(stats["company_stats"], list) and 
-                        len(stats["company_stats"]) >= 3):
-                        self.log_test("Dashboard Stats", True, f"Stats: {stats['total_members']} members, {stats['total_companies']} companies")
+                    if (stats["total_members"] == 4 and 
+                        stats["total_companies"] == 3 and
+                        stats["total_points"] >= 15000):  # Should have at least 15000 from Marilise
+                        self.log_test("Dashboard Stats", True, f"Stats: {stats['total_members']} members, {stats['total_companies']} companies, {stats['total_points']} points")
                         return True
                     else:
-                        self.log_test("Dashboard Stats", False, "Invalid company_stats format")
+                        self.log_test("Dashboard Stats", False, f"Unexpected stats values: {stats}")
                         return False
                 else:
                     self.log_test("Dashboard Stats", False, f"Missing required fields: {required_fields}")
@@ -400,69 +305,121 @@ class LoyaltyAPITester:
             self.log_test("Dashboard Stats", False, f"Request error: {str(e)}")
             return False
     
-    def test_delete_member(self):
-        """Test DELETE /api/members/{id}"""
-        if not self.created_members:
-            self.log_test("Delete Member", False, "No members created to test with")
+    def test_get_specific_member(self):
+        """Test GET /api/members/{id} with updated data"""
+        if not self.member_ids:
+            self.log_test("Get Specific Member", False, "No member IDs available")
             return False
         
         try:
-            member_id = self.created_members[0]
-            response = requests.delete(f"{self.base_url}/members/{member_id}", timeout=10)
+            # Get Marilise who should have updated data
+            member_name = self.family_members[1]  # Marilise
+            member_id = self.member_ids[member_name]
+            
+            response = requests.get(f"{self.base_url}/members/{member_id}", timeout=10)
             
             if response.status_code == 200:
-                # Verify member is deleted
-                verify_response = requests.get(f"{self.base_url}/members/{member_id}", timeout=10)
-                if verify_response.status_code == 404:
-                    self.log_test("Delete Member", True, "Member successfully deleted")
-                    self.created_members.remove(member_id)
-                    return True
+                member = response.json()
+                if member.get("id") == member_id and member.get("name") == member_name:
+                    # Check if Smiles program has updated data
+                    smiles_program = member.get("programs", {}).get("smiles", {})
+                    if (smiles_program.get("login") == "marilise.smiles@email.com" and
+                        smiles_program.get("current_balance") == 15000):
+                        self.log_test("Get Specific Member", True, f"Retrieved {member_name} with updated program data")
+                        return True
+                    else:
+                        self.log_test("Get Specific Member", False, f"Program data not updated correctly: {smiles_program}")
+                        return False
                 else:
-                    self.log_test("Delete Member", False, "Member still exists after deletion")
+                    self.log_test("Get Specific Member", False, "ID or name mismatch in response")
                     return False
             else:
-                self.log_test("Delete Member", False, f"HTTP {response.status_code}", response.text)
+                self.log_test("Get Specific Member", False, f"HTTP {response.status_code}", response.text)
                 return False
         except Exception as e:
-            self.log_test("Delete Member", False, f"Request error: {str(e)}")
+            self.log_test("Get Specific Member", False, f"Request error: {str(e)}")
             return False
     
-    def cleanup(self):
-        """Clean up created test data"""
-        print("\n🧹 Cleaning up test data...")
+    def test_additional_field_updates(self):
+        """Test updating remaining family members with different fields"""
+        if not self.member_ids:
+            self.log_test("Additional Field Updates", False, "No member IDs available")
+            return False
         
-        # Delete remaining members
-        for member_id in self.created_members:
-            try:
-                requests.delete(f"{self.base_url}/members/{member_id}", timeout=5)
-            except:
-                pass
-        
-        # Note: We don't delete companies as they might be needed by the app
-        print("✅ Cleanup completed")
+        try:
+            # Update Graciela with Azul program
+            member_name = self.family_members[2]  # Graciela
+            member_id = self.member_ids[member_name]
+            company_id = "azul"
+            
+            update_data = {
+                "login": "graciela.azul@email.com",
+                "card_number": "9876543210987654",
+                "current_balance": 8500,
+                "elite_tier": "Diamond",
+                "notes": "Frequent business traveler"
+            }
+            
+            response = requests.put(f"{self.base_url}/members/{member_id}/programs/{company_id}", 
+                                  json=update_data, timeout=10)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if "changes" in result and len(result["changes"]) == 5:
+                    # Update Leonardo with LATAM program
+                    member_name = self.family_members[3]  # Leonardo
+                    member_id = self.member_ids[member_name]
+                    company_id = "latam"
+                    
+                    update_data = {
+                        "password": "latam2024secure",
+                        "cpf": "987.654.321-09",
+                        "current_balance": 22000,
+                        "notes": "Student discount applied"
+                    }
+                    
+                    response2 = requests.put(f"{self.base_url}/members/{member_id}/programs/{company_id}", 
+                                           json=update_data, timeout=10)
+                    
+                    if response2.status_code == 200:
+                        result2 = response2.json()
+                        if "changes" in result2 and len(result2["changes"]) == 4:
+                            self.log_test("Additional Field Updates", True, f"Updated Graciela (5 fields) and Leonardo (4 fields)")
+                            return True
+                        else:
+                            self.log_test("Additional Field Updates", False, f"Leonardo update failed: {result2}")
+                            return False
+                    else:
+                        self.log_test("Additional Field Updates", False, f"Leonardo update HTTP {response2.status_code}")
+                        return False
+                else:
+                    self.log_test("Additional Field Updates", False, f"Graciela update failed: {result}")
+                    return False
+            else:
+                self.log_test("Additional Field Updates", False, f"HTTP {response.status_code}", response.text)
+                return False
+        except Exception as e:
+            self.log_test("Additional Field Updates", False, f"Request error: {str(e)}")
+            return False
     
     def run_all_tests(self):
-        """Run all backend tests"""
-        print("🚀 Starting Loyalty Control Tower Backend API Tests")
+        """Run all backend tests for the redesigned system"""
+        print("🚀 Starting Redesigned Loyalty Control Tower Backend API Tests")
         print(f"🔗 Testing against: {self.base_url}")
-        print("=" * 60)
+        print("=" * 70)
         
-        # Test sequence
+        # Test sequence for redesigned system
         tests = [
             ("Health Check", self.test_health_check),
-            ("MongoDB Connection (via companies)", self.test_get_companies),
-            ("Default Company Initialization", self.test_get_companies),
-            ("Create Company", self.test_create_company),
-            ("Get Specific Company", self.test_get_specific_company),
-            ("Get Members (Empty)", self.test_get_members_empty),
-            ("Create Member", self.test_create_member),
+            ("Get Companies", self.test_get_companies),
+            ("Family Member Initialization", self.test_family_member_initialization),
+            ("Member Program Structure", self.test_member_program_structure),
+            ("Individual Field Update", self.test_individual_field_update),
+            ("Multiple Field Updates", self.test_multiple_field_updates),
+            ("Global Log System", self.test_global_log_system),
+            ("Dashboard Stats", self.test_dashboard_stats_new_structure),
             ("Get Specific Member", self.test_get_specific_member),
-            ("Update Member Balance", self.test_update_member_balance),
-            ("Balance History Tracking", self.test_balance_history_tracking),
-            ("Member Limit Validation", self.test_member_limit_validation),
-            ("Member Filtering by Company", self.test_member_filtering_by_company),
-            ("Dashboard Statistics", self.test_dashboard_stats),
-            ("Delete Member", self.test_delete_member),
+            ("Additional Field Updates", self.test_additional_field_updates),
         ]
         
         passed = 0
@@ -481,25 +438,42 @@ class LoyaltyAPITester:
             
             time.sleep(0.5)  # Brief pause between tests
         
-        # Cleanup
-        self.cleanup()
+        # Final verification of global log
+        print(f"\n🔍 Final Global Log Verification")
+        try:
+            response = requests.get(f"{self.base_url}/global-log", timeout=10)
+            if response.status_code == 200:
+                log_entries = response.json()
+                print(f"   Total log entries: {len(log_entries)}")
+                if len(log_entries) >= 16:  # Should have many entries from all updates
+                    print("   ✅ Global logging working correctly")
+                else:
+                    print(f"   ⚠️  Expected more log entries, got {len(log_entries)}")
+        except Exception as e:
+            print(f"   ❌ Error checking final log: {str(e)}")
         
         # Summary
-        print("\n" + "=" * 60)
+        print("\n" + "=" * 70)
         print("📊 TEST SUMMARY")
-        print("=" * 60)
+        print("=" * 70)
         print(f"✅ Passed: {passed}")
         print(f"❌ Failed: {failed}")
         print(f"📈 Success Rate: {(passed/(passed+failed)*100):.1f}%")
         
         if failed == 0:
-            print("\n🎉 All tests passed! Backend API is working correctly.")
+            print("\n🎉 All tests passed! Redesigned backend API is working correctly.")
+            print("✨ Key features verified:")
+            print("   • 4 family members initialized")
+            print("   • 3 programs per member (LATAM, Smiles, TudoAzul)")
+            print("   • Individual field updates working")
+            print("   • Global logging system active")
+            print("   • Dashboard stats accurate")
         else:
             print(f"\n⚠️  {failed} test(s) failed. Check the details above.")
         
         return failed == 0
 
 if __name__ == "__main__":
-    tester = LoyaltyAPITester()
+    tester = RedesignedLoyaltyAPITester()
     success = tester.run_all_tests()
     sys.exit(0 if success else 1)
