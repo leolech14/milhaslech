@@ -203,24 +203,20 @@ frontend:
 
 metadata:
   created_by: "main_agent"
-  version: "1.0"
-  test_sequence: 0
+  version: "2.0"
+  test_sequence: 1
   run_ui: false
 
 test_plan:
   current_focus:
-    - "MongoDB connection and database setup"
-    - "Company management endpoints (CRUD)"
-    - "Member management endpoints (CRUD)"
-    - "Balance history tracking"
-    - "Dashboard statistics endpoint"
-    - "Default company initialization"
+    - "Redesigned member structure with programs nested"
+    - "Inline field editing API endpoints"
+    - "Global log system for all changes"
+    - "Family member initialization"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Built complete loyalty control tower with FastAPI backend and React frontend. All 3 default companies (LATAM, Smiles, Azul) initialized. Backend has full CRUD for companies and members, balance history tracking, and dashboard stats. Frontend has dark mode UI with company-specific colors. Ready for backend testing."
-  - agent: "testing"
-    message: "✅ BACKEND TESTING COMPLETE: Conducted comprehensive testing of all backend APIs using backend_test.py. All 14 test cases passed with 100% success rate. Tested: MongoDB connection, company CRUD operations, member CRUD with validation, balance history tracking, dashboard statistics, member limit enforcement (4 per company), member filtering by company, and health check. Backend is fully functional and ready for production use. All endpoints respond correctly with proper data validation and error handling."
+    message: "Complete redesign: 4 family member cards with expandable program blocks. All fields editable inline. Global log system tracks all changes. Ready for backend testing."
