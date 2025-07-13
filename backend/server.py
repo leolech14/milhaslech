@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-app = FastAPI(title="Loyalty Control Tower API", version="1.0")
+app = FastAPI(title="Programas de Milhas Família Lech API", version="1.0")
 
 # CORS middleware
 app.add_middleware(
@@ -38,6 +38,7 @@ class Company(BaseModel):
     color: str
     logo: Optional[str] = None
     max_members: int = 4
+    points_name: str  # "milhas", "pontos", etc.
 
 class Member(BaseModel):
     id: str
@@ -81,39 +82,72 @@ class CompanyCreate(BaseModel):
     color: str
     logo: Optional[str] = None
     max_members: int = 4
+    points_name: str = "pontos"
 
-# Initialize default companies
-async def init_default_companies():
+# Initialize default companies and family members
+async def init_default_data():
     default_companies = [
         {
             "id": "latam",
             "name": "LATAM Pass",
             "color": "#d31b2c",
-            "max_members": 4
+            "max_members": 4,
+            "points_name": "milhas"
         },
         {
             "id": "smiles",
-            "name": "GOL Smiles",
+            "name": "Smiles",
             "color": "#ff6600",
-            "max_members": 4
+            "max_members": 4,
+            "points_name": "milhas"
         },
         {
             "id": "azul",
-            "name": "Azul TudoAzul",
+            "name": "TudoAzul",
             "color": "#0072ce",
-            "max_members": 4
+            "max_members": 4,
+            "points_name": "pontos"
         }
     ]
     
+    family_members = ["Osvandré", "Marilise", "Graciela", "Leonardo"]
+    
+    # Create companies
     for company in default_companies:
         existing = companies_collection.find_one({"id": company["id"]})
         if not existing:
             companies_collection.insert_one(company)
+    
+    # Create family members for each company
+    for company in default_companies:
+        for member_name in family_members:
+            existing_member = members_collection.find_one({
+                "company_id": company["id"], 
+                "owner_name": member_name
+            })
+            
+            if not existing_member:
+                member_id = str(uuid.uuid4())
+                now = datetime.utcnow()
+                
+                member_data = {
+                    "id": member_id,
+                    "company_id": company["id"],
+                    "owner_name": member_name,
+                    "loyalty_number": "",  # Empty for user to fill
+                    "current_balance": 0,
+                    "elite_tier": "",
+                    "notes": "",
+                    "created_at": now,
+                    "last_updated": now
+                }
+                
+                members_collection.insert_one(member_data)
 
 # Startup event
 @app.on_event("startup")
 async def startup_event():
-    await init_default_companies()
+    await init_default_data()
 
 # Company endpoints
 @app.get("/api/companies", response_model=List[Company])
@@ -129,7 +163,8 @@ async def create_company(company: CompanyCreate):
         "name": company.name,
         "color": company.color,
         "logo": company.logo,
-        "max_members": company.max_members
+        "max_members": company.max_members,
+        "points_name": company.points_name
     }
     
     companies_collection.insert_one(company_data)
@@ -139,7 +174,7 @@ async def create_company(company: CompanyCreate):
 async def get_company(company_id: str):
     company = companies_collection.find_one({"id": company_id}, {"_id": 0})
     if not company:
-        raise HTTPException(status_code=404, detail="Company not found")
+        raise HTTPException(status_code=404, detail="Programa não encontrado")
     return Company(**company)
 
 # Member endpoints
@@ -157,12 +192,12 @@ async def create_member(member: MemberCreate):
     # Check if company exists
     company = companies_collection.find_one({"id": member.company_id})
     if not company:
-        raise HTTPException(status_code=404, detail="Company not found")
+        raise HTTPException(status_code=404, detail="Programa não encontrado")
     
     # Check member limit
     current_members = members_collection.count_documents({"company_id": member.company_id})
     if current_members >= company["max_members"]:
-        raise HTTPException(status_code=400, detail=f"Maximum {company['max_members']} members allowed for this company")
+        raise HTTPException(status_code=400, detail=f"Máximo de {company['max_members']} contas permitidas para este programa")
     
     # Create member
     member_id = str(uuid.uuid4())
@@ -191,7 +226,7 @@ async def create_member(member: MemberCreate):
             "previous_balance": 0,
             "change": member.current_balance,
             "elite_tier": member.elite_tier,
-            "notes": "Initial balance",
+            "notes": "Saldo inicial",
             "updated_at": now,
             "updated_by": "manual"
         }
@@ -203,14 +238,14 @@ async def create_member(member: MemberCreate):
 async def get_member(member_id: str):
     member = members_collection.find_one({"id": member_id}, {"_id": 0})
     if not member:
-        raise HTTPException(status_code=404, detail="Member not found")
+        raise HTTPException(status_code=404, detail="Conta não encontrada")
     return Member(**member)
 
 @app.put("/api/members/{member_id}", response_model=Member)
 async def update_member(member_id: str, member_update: MemberUpdate):
     member = members_collection.find_one({"id": member_id})
     if not member:
-        raise HTTPException(status_code=404, detail="Member not found")
+        raise HTTPException(status_code=404, detail="Conta não encontrada")
     
     # Prepare update data
     update_data = {}
@@ -238,7 +273,7 @@ async def update_member(member_id: str, member_update: MemberUpdate):
                 "previous_balance": previous_balance,
                 "change": new_balance - previous_balance,
                 "elite_tier": member_update.elite_tier or member["elite_tier"],
-                "notes": member_update.notes or "Manual update",
+                "notes": member_update.notes or "Atualização manual",
                 "updated_at": datetime.utcnow(),
                 "updated_by": "manual"
             }
@@ -260,12 +295,12 @@ async def update_member(member_id: str, member_update: MemberUpdate):
 async def delete_member(member_id: str):
     result = members_collection.delete_one({"id": member_id})
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Member not found")
+        raise HTTPException(status_code=404, detail="Conta não encontrada")
     
     # Also delete balance history
     balance_history_collection.delete_many({"member_id": member_id})
     
-    return {"message": "Member deleted successfully"}
+    return {"message": "Conta excluída com sucesso"}
 
 # Balance history endpoints
 @app.get("/api/members/{member_id}/history", response_model=List[BalanceHistory])

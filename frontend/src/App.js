@@ -20,7 +20,7 @@ function App() {
       const data = await response.json();
       setCompanies(data);
     } catch (error) {
-      console.error('Error fetching companies:', error);
+      console.error('Erro ao buscar programas:', error);
     }
   };
 
@@ -31,7 +31,7 @@ function App() {
       const data = await response.json();
       setMembers(data);
     } catch (error) {
-      console.error('Error fetching members:', error);
+      console.error('Erro ao buscar contas:', error);
     }
   };
 
@@ -41,7 +41,7 @@ function App() {
       const data = await response.json();
       setDashboardStats(data);
     } catch (error) {
-      console.error('Error fetching dashboard stats:', error);
+      console.error('Erro ao buscar estatísticas:', error);
     }
   };
 
@@ -54,7 +54,7 @@ function App() {
         [memberId]: data
       }));
     } catch (error) {
-      console.error('Error fetching member history:', error);
+      console.error('Erro ao buscar histórico:', error);
     }
   };
 
@@ -90,7 +90,7 @@ function App() {
 
   // Format date
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('pt-BR', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -101,7 +101,7 @@ function App() {
 
   // Format number with commas
   const formatNumber = (num) => {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   };
 
   return (
@@ -183,11 +183,11 @@ function App() {
         setShowAddMember(false);
       } else {
         const error = await response.json();
-        alert(error.detail || 'Error creating member');
+        alert(error.detail || 'Erro ao criar conta');
       }
     } catch (error) {
-      console.error('Error creating member:', error);
-      alert('Error creating member');
+      console.error('Erro ao criar conta:', error);
+      alert('Erro ao criar conta');
     }
   }
 
@@ -207,16 +207,16 @@ function App() {
         setEditingMember(null);
       } else {
         const error = await response.json();
-        alert(error.detail || 'Error updating member');
+        alert(error.detail || 'Erro ao atualizar conta');
       }
     } catch (error) {
-      console.error('Error updating member:', error);
-      alert('Error updating member');
+      console.error('Erro ao atualizar conta:', error);
+      alert('Erro ao atualizar conta');
     }
   }
 
   async function deleteMember(memberId) {
-    if (window.confirm('Are you sure you want to delete this member?')) {
+    if (window.confirm('Tem certeza que deseja excluir esta conta?')) {
       try {
         const response = await fetch(`${API_BASE_URL}/api/members/${memberId}`, {
           method: 'DELETE',
@@ -226,11 +226,11 @@ function App() {
           fetchMembers();
           fetchDashboardStats();
         } else {
-          alert('Error deleting member');
+          alert('Erro ao excluir conta');
         }
       } catch (error) {
-        console.error('Error deleting member:', error);
-        alert('Error deleting member');
+        console.error('Erro ao excluir conta:', error);
+        alert('Erro ao excluir conta');
       }
     }
   }
@@ -250,11 +250,11 @@ function App() {
         setShowAddCompany(false);
       } else {
         const error = await response.json();
-        alert(error.detail || 'Error creating company');
+        alert(error.detail || 'Erro ao criar programa');
       }
     } catch (error) {
-      console.error('Error creating company:', error);
-      alert('Error creating company');
+      console.error('Erro ao criar programa:', error);
+      alert('Erro ao criar programa');
     }
   }
 }
@@ -263,8 +263,8 @@ function App() {
 const Sidebar = ({ companies, selectedCompany, onCompanySelect, onAddCompany, dashboardStats }) => (
   <aside className="sidebar">
     <div className="sidebar-header">
-      <h1>Loyalty Control</h1>
-      <p>Tower Dashboard</p>
+      <h1>Programas de Milhas</h1>
+      <p>Família Lech</p>
     </div>
     
     <nav className="sidebar-nav">
@@ -272,7 +272,7 @@ const Sidebar = ({ companies, selectedCompany, onCompanySelect, onAddCompany, da
         className={selectedCompany === 'all' ? 'active' : ''}
         onClick={() => onCompanySelect('all')}
       >
-        All Programs
+        Todos os Programas
       </button>
       
       {companies.map(company => (
@@ -291,11 +291,11 @@ const Sidebar = ({ companies, selectedCompany, onCompanySelect, onAddCompany, da
       {dashboardStats && (
         <>
           <div className="stat-item">
-            <span>Total Members</span>
+            <span>Total de Contas</span>
             <span>{dashboardStats.total_members}</span>
           </div>
           <div className="stat-item">
-            <span>Programs</span>
+            <span>Programas</span>
             <span>{dashboardStats.total_companies}</span>
           </div>
         </>
@@ -303,7 +303,7 @@ const Sidebar = ({ companies, selectedCompany, onCompanySelect, onAddCompany, da
     </div>
     
     <button className="add-company-btn" onClick={onAddCompany}>
-      + Add Company
+      +
     </button>
   </aside>
 );
@@ -311,14 +311,14 @@ const Sidebar = ({ companies, selectedCompany, onCompanySelect, onAddCompany, da
 const TopBar = ({ onAddMember, onRefresh }) => (
   <header className="top-bar">
     <div className="top-bar-left">
-      <h2>Dashboard</h2>
+      <h2>Painel de Controle</h2>
     </div>
     <div className="top-bar-right">
       <button className="refresh-btn" onClick={onRefresh}>
-        ↻ Refresh
+        ↻ Atualizar
       </button>
       <button className="add-member-btn" onClick={onAddMember}>
-        + Add Member
+        + Nova Conta
       </button>
     </div>
   </header>
@@ -338,24 +338,38 @@ const MemberCard = ({ member, company, onEdit, onDelete, onViewHistory, history,
     return latest.change;
   };
 
+  const getPointsLabel = () => {
+    return company?.points_name || 'pontos';
+  };
+
+  const isEmptyMember = () => {
+    return !member.loyalty_number && member.current_balance === 0;
+  };
+
   return (
-    <div className="member-card" style={{ borderTop: `4px solid ${company?.color}` }}>
+    <div className={`member-card ${isEmptyMember() ? 'empty-member' : ''}`} style={{ borderTop: `4px solid ${company?.color}` }}>
       <div className="member-header">
         <div className="member-info">
           <h3>{member.owner_name}</h3>
           <p>{company?.name}</p>
-          <p>#{member.loyalty_number}</p>
+          {member.loyalty_number ? (
+            <p>#{member.loyalty_number}</p>
+          ) : (
+            <p className="empty-field">Número não cadastrado</p>
+          )}
         </div>
         <div className="member-actions">
-          <button onClick={onEdit}>Edit</button>
-          <button onClick={onDelete} className="delete-btn">Delete</button>
+          <button onClick={onEdit}>Editar</button>
+          <button onClick={onDelete} className="delete-btn">Excluir</button>
         </div>
       </div>
       
       <div className="member-balance">
         <div className="balance-main">
-          <span className="balance-label">Current Balance</span>
-          <span className="balance-value">{formatNumber(member.current_balance)}</span>
+          <span className="balance-label">Saldo Atual</span>
+          <span className="balance-value">
+            {formatNumber(member.current_balance)} {getPointsLabel()}
+          </span>
         </div>
         
         {getBalanceChange() && (
@@ -372,9 +386,9 @@ const MemberCard = ({ member, company, onEdit, onDelete, onViewHistory, history,
       )}
       
       <div className="member-footer">
-        <span>Updated: {formatDate(member.last_updated)}</span>
+        <span>Atualizado: {formatDate(member.last_updated)}</span>
         <button onClick={handleViewHistory}>
-          {showHistory ? 'Hide' : 'View'} History
+          {showHistory ? 'Ocultar' : 'Ver'} Histórico
         </button>
       </div>
       
@@ -383,7 +397,7 @@ const MemberCard = ({ member, company, onEdit, onDelete, onViewHistory, history,
           {history.length > 0 ? (
             history.map(entry => (
               <div key={entry.id} className="history-entry">
-                <span>{formatNumber(entry.balance)} points</span>
+                <span>{formatNumber(entry.balance)} {getPointsLabel()}</span>
                 <span className={entry.change > 0 ? 'positive' : 'negative'}>
                   {entry.change > 0 ? '+' : ''}{formatNumber(entry.change)}
                 </span>
@@ -391,7 +405,7 @@ const MemberCard = ({ member, company, onEdit, onDelete, onViewHistory, history,
               </div>
             ))
           ) : (
-            <p>No history available</p>
+            <p>Nenhum histórico disponível</p>
           )}
         </div>
       )}
@@ -399,6 +413,12 @@ const MemberCard = ({ member, company, onEdit, onDelete, onViewHistory, history,
       {member.notes && (
         <div className="member-notes">
           <p>{member.notes}</p>
+        </div>
+      )}
+
+      {isEmptyMember() && (
+        <div className="empty-prompt">
+          <p>Clique em "Editar" para adicionar os dados desta conta</p>
         </div>
       )}
     </div>
@@ -426,16 +446,16 @@ const AddMemberModal = ({ companies, onClose, onSubmit }) => {
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <h2>Add New Member</h2>
+        <h2>Nova Conta</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Company</label>
+            <label>Programa</label>
             <select 
               value={formData.company_id} 
               onChange={(e) => setFormData({...formData, company_id: e.target.value})}
               required
             >
-              <option value="">Select Company</option>
+              <option value="">Selecione o Programa</option>
               {companies.map(company => (
                 <option key={company.id} value={company.id}>
                   {company.name}
@@ -445,7 +465,7 @@ const AddMemberModal = ({ companies, onClose, onSubmit }) => {
           </div>
           
           <div className="form-group">
-            <label>Owner Name</label>
+            <label>Nome do Titular</label>
             <input 
               type="text" 
               value={formData.owner_name}
@@ -455,17 +475,18 @@ const AddMemberModal = ({ companies, onClose, onSubmit }) => {
           </div>
           
           <div className="form-group">
-            <label>Loyalty Number</label>
+            <label>Número da Conta</label>
             <input 
               type="text" 
               value={formData.loyalty_number}
               onChange={(e) => setFormData({...formData, loyalty_number: e.target.value})}
+              placeholder="Ex: 123456789"
               required
             />
           </div>
           
           <div className="form-group">
-            <label>Current Balance</label>
+            <label>Saldo Atual</label>
             <input 
               type="number" 
               value={formData.current_balance}
@@ -474,27 +495,28 @@ const AddMemberModal = ({ companies, onClose, onSubmit }) => {
           </div>
           
           <div className="form-group">
-            <label>Elite Tier</label>
+            <label>Categoria/Status</label>
             <input 
               type="text" 
               value={formData.elite_tier}
               onChange={(e) => setFormData({...formData, elite_tier: e.target.value})}
-              placeholder="e.g., Gold, Platinum"
+              placeholder="Ex: Gold, Platinum, Diamond"
             />
           </div>
           
           <div className="form-group">
-            <label>Notes</label>
+            <label>Observações</label>
             <textarea 
               value={formData.notes}
               onChange={(e) => setFormData({...formData, notes: e.target.value})}
               rows="3"
+              placeholder="Informações adicionais..."
             />
           </div>
           
           <div className="form-actions">
-            <button type="button" onClick={onClose}>Cancel</button>
-            <button type="submit">Add Member</button>
+            <button type="button" onClick={onClose}>Cancelar</button>
+            <button type="submit">Adicionar Conta</button>
           </div>
         </form>
       </div>
@@ -519,13 +541,16 @@ const EditMemberModal = ({ member, companies, onClose, onSubmit }) => {
     });
   };
 
+  const company = companies.find(c => c.id === member.company_id);
+
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <h2>Edit Member</h2>
+        <h2>Editar Conta - {member.owner_name}</h2>
+        <p className="modal-subtitle">{company?.name}</p>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Owner Name</label>
+            <label>Nome do Titular</label>
             <input 
               type="text" 
               value={formData.owner_name}
@@ -535,17 +560,18 @@ const EditMemberModal = ({ member, companies, onClose, onSubmit }) => {
           </div>
           
           <div className="form-group">
-            <label>Loyalty Number</label>
+            <label>Número da Conta</label>
             <input 
               type="text" 
               value={formData.loyalty_number}
               onChange={(e) => setFormData({...formData, loyalty_number: e.target.value})}
+              placeholder="Ex: 123456789"
               required
             />
           </div>
           
           <div className="form-group">
-            <label>Current Balance</label>
+            <label>Saldo Atual ({company?.points_name || 'pontos'})</label>
             <input 
               type="number" 
               value={formData.current_balance}
@@ -554,27 +580,28 @@ const EditMemberModal = ({ member, companies, onClose, onSubmit }) => {
           </div>
           
           <div className="form-group">
-            <label>Elite Tier</label>
+            <label>Categoria/Status</label>
             <input 
               type="text" 
               value={formData.elite_tier}
               onChange={(e) => setFormData({...formData, elite_tier: e.target.value})}
-              placeholder="e.g., Gold, Platinum"
+              placeholder="Ex: Gold, Platinum, Diamond"
             />
           </div>
           
           <div className="form-group">
-            <label>Notes</label>
+            <label>Observações</label>
             <textarea 
               value={formData.notes}
               onChange={(e) => setFormData({...formData, notes: e.target.value})}
               rows="3"
+              placeholder="Informações adicionais..."
             />
           </div>
           
           <div className="form-actions">
-            <button type="button" onClick={onClose}>Cancel</button>
-            <button type="submit">Update Member</button>
+            <button type="button" onClick={onClose}>Cancelar</button>
+            <button type="submit">Salvar Alterações</button>
           </div>
         </form>
       </div>
@@ -586,7 +613,8 @@ const AddCompanyModal = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     name: '',
     color: '#000000',
-    max_members: 4
+    max_members: 4,
+    points_name: 'pontos'
   });
 
   const handleSubmit = (e) => {
@@ -597,29 +625,42 @@ const AddCompanyModal = ({ onClose, onSubmit }) => {
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <h2>Add New Company</h2>
+        <h2>Novo Programa</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Company Name</label>
+            <label>Nome do Programa</label>
             <input 
               type="text" 
               value={formData.name}
               onChange={(e) => setFormData({...formData, name: e.target.value})}
+              placeholder="Ex: TAP Miles&Go"
               required
             />
           </div>
           
           <div className="form-group">
-            <label>Brand Color</label>
+            <label>Cor da Marca</label>
             <input 
               type="color" 
               value={formData.color}
               onChange={(e) => setFormData({...formData, color: e.target.value})}
             />
           </div>
+
+          <div className="form-group">
+            <label>Nome dos Pontos</label>
+            <select 
+              value={formData.points_name}
+              onChange={(e) => setFormData({...formData, points_name: e.target.value})}
+            >
+              <option value="milhas">Milhas</option>
+              <option value="pontos">Pontos</option>
+              <option value="miles">Miles</option>
+            </select>
+          </div>
           
           <div className="form-group">
-            <label>Max Members</label>
+            <label>Máximo de Contas</label>
             <input 
               type="number" 
               value={formData.max_members}
@@ -630,8 +671,8 @@ const AddCompanyModal = ({ onClose, onSubmit }) => {
           </div>
           
           <div className="form-actions">
-            <button type="button" onClick={onClose}>Cancel</button>
-            <button type="submit">Add Company</button>
+            <button type="button" onClick={onClose}>Cancelar</button>
+            <button type="submit">Criar Programa</button>
           </div>
         </form>
       </div>
