@@ -117,20 +117,17 @@ backend:
         agent: "main"
         comment: "New structure: 4 members each with 3 programs (login, password, CPF, card_number, balance, etc.)"
   
-  - task: "Company management endpoints (CRUD)"
+  - task: "Inline field editing API endpoints"
     implemented: true
     working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
-        comment: "GET /api/companies, POST /api/companies, GET /api/companies/{id} endpoints implemented"
-      - working: true
-        agent: "testing"
-        comment: "✅ VERIFIED: All company endpoints working perfectly. GET /api/companies returns all companies, POST /api/companies creates new companies with proper validation, GET /api/companies/{id} retrieves specific companies. All responses have correct format and data."
+        comment: "PUT /api/members/{id}/programs/{company_id} for individual field updates"
   
   - task: "Member management endpoints (CRUD)"
     implemented: true
