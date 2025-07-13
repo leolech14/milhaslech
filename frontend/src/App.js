@@ -304,6 +304,11 @@ function App() {
           ))}
           
           <StatsCard dashboardStats={dashboardStats} />
+          
+          <BottomActions 
+            onShowGlobalLog={() => setShowGlobalLog(true)}
+            onLogout={handleLogout}
+          />
         </div>
       </main>
 
