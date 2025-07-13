@@ -1048,16 +1048,16 @@ body {
   }
   
   .total-points-inline {
-    padding: 0.375rem 0.75rem;
+    padding: 0.25rem 0.5rem;
     align-self: flex-start;
   }
   
   .total-points-inline span:first-child {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
   }
   
   .total-points-inline span:last-child {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
   }
   
   .top-bar-center {
@@ -1066,8 +1066,13 @@ body {
   }
   
   .program-link {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .refresh-btn {
     padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
   }
   
   .sidebar-header {
