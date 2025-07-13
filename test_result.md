@@ -171,11 +171,14 @@ backend:
     file: "server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "GET /api/dashboard/stats provides company stats and member counts"
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: Dashboard statistics endpoint working correctly. GET /api/dashboard/stats returns comprehensive data including total_members, total_companies, and detailed company_stats array with member counts and total points per company. All data is accurate and properly formatted."
   
   - task: "Default company initialization"
     implemented: true
