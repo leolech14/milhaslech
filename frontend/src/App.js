@@ -344,7 +344,7 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className={`app ${darkMode ? 'dark-mode' : ''}`}>
       <Sidebar 
         onShowGlobalLog={() => setShowGlobalLog(true)}
         onLogout={handleLogout}
@@ -366,6 +366,8 @@ function App() {
             fetchPostits();
           }}
           dashboardStats={dashboardStats}
+          darkMode={darkMode}
+          onToggleDarkMode={toggleDarkMode}
         />
         
         <QuoteSection />
