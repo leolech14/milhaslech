@@ -713,15 +713,13 @@ const FieldDisplay = ({ label, value, onCopy }) => (
       <span className="field-value">
         {value || "Não informado"}
       </span>
-      {value && (
-        <button 
-          className="copy-btn" 
-          onClick={() => onCopy(value)}
-          title="Copiar"
-        >
-          📋
-        </button>
-      )}
+      <button 
+        className="copy-btn" 
+        onClick={() => onCopy(value || '')}
+        title="Copiar"
+      >
+        📋
+      </button>
     </div>
   </div>
 );
