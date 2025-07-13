@@ -465,39 +465,6 @@ body {
   box-shadow: var(--shadow);
 }
 
-/* Top Stats */
-.top-stats {
-  padding: 0.75rem 2rem;
-  background-color: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.total-points {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: var(--bg-white);
-  border: 2px solid var(--accent-primary);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
-}
-
-.total-points span:first-child {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-.total-points span:last-child {
-  font-size: 1.25rem;
-  color: var(--accent-primary);
-  font-weight: 700;
-}
-
 /* Quote Section */
 .quote-section {
   padding: 0.75rem 2rem;
