@@ -115,6 +115,7 @@ function App() {
       fetchMembers();
       fetchGlobalLog();
       fetchDashboardStats();
+      fetchPostits();
     }
   }, [isAuthenticated]);
 
