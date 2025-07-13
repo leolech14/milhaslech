@@ -707,6 +707,8 @@ body.dark-mode::before {
   padding: 1.25rem;
   box-shadow: var(--shadow);
   transition: all 0.2s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .member-card:hover {
