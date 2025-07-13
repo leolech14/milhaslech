@@ -4,6 +4,9 @@ import './App.css';
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  const [loginError, setLoginError] = useState('');
   const [companies, setCompanies] = useState([]);
   const [members, setMembers] = useState([]);
   const [globalLog, setGlobalLog] = useState([]);
@@ -16,6 +19,33 @@ function App() {
 
   // Fixed order for family members
   const familyOrder = ["Osvandré", "Marilise", "Graciela", "Leonardo"];
+
+  // Check if user is already authenticated
+  useEffect(() => {
+    const authStatus = localStorage.getItem('lech_authenticated');
+    if (authStatus === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  // Handle login
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setLoginError('');
+    
+    if (loginForm.username === 'lech' && loginForm.password === 'milhas.online') {
+      setIsAuthenticated(true);
+      localStorage.setItem('lech_authenticated', 'true');
+    } else {
+      setLoginError('Login ou senha incorretos');
+    }
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('lech_authenticated');
+  };
 
   // Fetch data functions
   const fetchCompanies = async () => {
@@ -67,11 +97,13 @@ function App() {
 
   // Load data on component mount
   useEffect(() => {
-    fetchCompanies();
-    fetchMembers();
-    fetchGlobalLog();
-    fetchDashboardStats();
-  }, []);
+    if (isAuthenticated) {
+      fetchCompanies();
+      fetchMembers();
+      fetchGlobalLog();
+      fetchDashboardStats();
+    }
+  }, [isAuthenticated]);
 
   // Get company by ID
   const getCompanyById = (id) => {
@@ -196,10 +228,45 @@ function App() {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   };
 
+  // Render login screen if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="login-container">
+        <div className="login-box">
+          <h1>Programas de Milhas</h1>
+          <h2>Família Lech</h2>
+          <form onSubmit={handleLogin} className="login-form">
+            <div className="form-group">
+              <label>Login:</label>
+              <input
+                type="text"
+                value={loginForm.username}
+                onChange={(e) => setLoginForm({...loginForm, username: e.target.value})}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Senha:</label>
+              <input
+                type="password"
+                value={loginForm.password}
+                onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+                required
+              />
+            </div>
+            {loginError && <div className="login-error">{loginError}</div>}
+            <button type="submit" className="login-btn">Entrar</button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app">
       <Sidebar 
         onShowGlobalLog={() => setShowGlobalLog(true)}
+        onLogout={handleLogout}
         dashboardStats={dashboardStats}
       />
       
@@ -254,7 +321,7 @@ function App() {
 }
 
 // Components
-const Sidebar = ({ onShowGlobalLog, dashboardStats }) => (
+const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats }) => (
   <aside className="sidebar">
     <div className="sidebar-header">
       <h1>Programas de Milhas</h1>
@@ -284,9 +351,14 @@ const Sidebar = ({ onShowGlobalLog, dashboardStats }) => (
       )}
     </div>
     
-    <button className="log-btn" onClick={onShowGlobalLog}>
-      📋 Histórico de Atualizações
-    </button>
+    <div className="sidebar-actions">
+      <button className="log-btn" onClick={onShowGlobalLog}>
+        📋 Histórico de Atualizações
+      </button>
+      <button className="logout-btn" onClick={onLogout}>
+        🚪 Sair
+      </button>
+    </div>
   </aside>
 );
 
@@ -358,7 +430,7 @@ const ProgramBlock = ({
       <div className="program-header" onClick={onToggle}>
         <div className="program-info">
           <span className="program-title">
-            {company.name} {formatNumber(currentData.current_balance)} {company.points_name}
+            {company.name} → {formatNumber(currentData.current_balance)} {company.points_name}
           </span>
         </div>
         <div className="expand-icon">
