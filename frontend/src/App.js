@@ -238,6 +238,13 @@ function App() {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
     localStorage.setItem('lech_dark_mode', newDarkMode.toString());
+    
+    // Apply dark mode class to body for global texture
+    if (newDarkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
   };
   const createPostit = async (content) => {
     try {
