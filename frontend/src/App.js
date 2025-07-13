@@ -355,12 +355,11 @@ const ProgramBlock = ({
 
   return (
     <div className={`program-block ${isExpanded ? 'expanded' : ''}`}>
-      <div className="program-header" onClick={onToggle} style={{ borderLeft: `4px solid ${company.color}` }}>
+      <div className="program-header" onClick={onToggle}>
         <div className="program-info">
-          <h4>{company.name}</h4>
-          <p className="program-balance">
-            {formatNumber(currentData.current_balance)} {company.points_name}
-          </p>
+          <span className="program-title">
+            {company.name} {formatNumber(currentData.current_balance)} {company.points_name}
+          </span>
         </div>
         <div className="expand-icon">
           {isExpanded ? '▼' : '▶'}
@@ -373,7 +372,7 @@ const ProgramBlock = ({
             <div className="view-mode">
               <div className="detail-grid">
                 <FieldDisplay label="Login" value={currentData.login} onCopy={onCopyToClipboard} />
-                <FieldDisplay label="Senha" value={currentData.password} onCopy={onCopyToClipboard} type="password" />
+                <FieldDisplay label="Senha" value={currentData.password} onCopy={onCopyToClipboard} />
                 <FieldDisplay label="CPF" value={currentData.cpf} onCopy={onCopyToClipboard} />
                 <FieldDisplay label="Nº do Cartão" value={currentData.card_number} onCopy={onCopyToClipboard} />
                 <FieldDisplay 
@@ -409,7 +408,6 @@ const ProgramBlock = ({
                   label="Senha" 
                   value={currentData.password} 
                   onChange={(value) => onUpdateField('password', value)}
-                  type="password"
                 />
                 <EditableField 
                   label="CPF" 
@@ -450,12 +448,12 @@ const ProgramBlock = ({
   );
 };
 
-const FieldDisplay = ({ label, value, onCopy, type = "text" }) => (
+const FieldDisplay = ({ label, value, onCopy }) => (
   <div className="detail-item">
     <label>{label}:</label>
     <div className="field-with-copy">
       <span className="field-value">
-        {type === "password" && value ? "••••••••" : (value || "Não informado")}
+        {value || "Não informado"}
       </span>
       {value && (
         <button 
@@ -496,7 +494,7 @@ const GlobalLogModal = ({ globalLog, onClose, formatDate, getCompanyById }) => (
             <div key={entry.id} className="log-entry">
               <div className="log-main">
                 <span className="log-member">{entry.member_name}</span>
-                <span className="log-company" style={{ color: getCompanyById(entry.company_id)?.color }}>
+                <span className="log-company">
                   {entry.company_name}
                 </span>
                 <span className="log-change">

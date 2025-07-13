@@ -1,22 +1,21 @@
-/* Light Minimalist Theme Variables */
+/* Subtle Gray Theme Variables */
 :root {
-  --bg-primary: #f8f9fa;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f1f3f4;
-  --text-primary: #2c3e50;
-  --text-secondary: #6c757d;
-  --text-muted: #adb5bd;
-  --border-color: #e9ecef;
-  --accent-primary: #1e3a8a;  /* Navy blue */
-  --accent-primary-light: #3b82f6;
-  --accent-success: #059669;
-  --accent-warning: #d97706;
-  --accent-danger: #dc2626;
-  --latam-color: #d31b2c;
-  --smiles-color: #ff6600;
-  --azul-color: #0072ce;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --bg-primary: #f5f5f5;      /* Light gray background */
+  --bg-secondary: #fafafa;     /* Very light gray for cards */
+  --bg-tertiary: #eeeeee;      /* Slightly darker gray for inputs */
+  --bg-white: #ffffff;         /* Pure white for details */
+  --text-primary: #424242;     /* Dark gray text */
+  --text-secondary: #757575;   /* Medium gray text */
+  --text-muted: #9e9e9e;       /* Light gray text */
+  --border-color: #e0e0e0;     /* Light gray borders */
+  --accent-primary: #546e7a;   /* Muted blue-gray */
+  --accent-primary-light: #78909c;
+  --accent-success: #66bb6a;
+  --accent-warning: #ffa726;
+  --accent-danger: #ef5350;
+  --subtle-accent: #cfd8dc;    /* Very subtle accent for left borders */
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.12);
   --border-radius: 8px;
 }
 
@@ -42,7 +41,7 @@ body {
 /* Sidebar */
 .sidebar {
   width: 280px;
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-white);
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
@@ -55,6 +54,7 @@ body {
 .sidebar-header {
   padding: 1.5rem;
   border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
 }
 
 .sidebar-header h1 {
@@ -73,6 +73,7 @@ body {
   padding: 1.5rem;
   border-bottom: 1px solid var(--border-color);
   flex: 1;
+  background-color: var(--bg-white);
 }
 
 .stat-item {
@@ -123,7 +124,7 @@ body {
 
 /* Top Bar */
 .top-bar {
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-white);
   border-bottom: 1px solid var(--border-color);
   padding: 1rem 2rem;
   display: flex;
@@ -156,7 +157,7 @@ body {
 }
 
 .refresh-btn:hover {
-  background-color: var(--bg-primary);
+  background-color: var(--bg-secondary);
   box-shadow: var(--shadow);
 }
 
@@ -172,7 +173,7 @@ body {
 
 /* Member Cards */
 .member-card {
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-white);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: 1rem;
@@ -186,6 +187,8 @@ body {
 
 .member-header {
   margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .member-header h3 {
@@ -203,16 +206,18 @@ body {
 
 /* Program Blocks */
 .program-block {
-  background-color: var(--bg-tertiary);
+  background-color: var(--bg-secondary);
   border: 1px solid var(--border-color);
+  border-left: 4px solid var(--subtle-accent);
   border-radius: var(--border-radius);
   overflow: hidden;
   transition: all 0.3s ease;
 }
 
 .program-block.expanded {
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-white);
   box-shadow: var(--shadow);
+  border-left-color: var(--accent-primary);
 }
 
 .program-header {
@@ -225,20 +230,20 @@ body {
 }
 
 .program-header:hover {
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: var(--bg-tertiary);
 }
 
-.program-info h4 {
+.program-info {
+  flex: 1;
+}
+
+.program-title {
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-primary);
-  margin-bottom: 0.25rem;
-}
-
-.program-balance {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .expand-icon {
@@ -251,6 +256,7 @@ body {
 .program-details {
   padding: 1rem;
   border-top: 1px solid var(--border-color);
+  background-color: var(--bg-white);
 }
 
 .view-mode {
@@ -289,7 +295,7 @@ body {
 .field-value {
   flex: 1;
   padding: 0.5rem;
-  background-color: var(--bg-tertiary);
+  background-color: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 0.875rem;
@@ -301,7 +307,7 @@ body {
 
 .copy-btn {
   padding: 0.25rem;
-  background: none;
+  background: var(--bg-white);
   border: 1px solid var(--border-color);
   border-radius: 4px;
   cursor: pointer;
@@ -316,13 +322,14 @@ body {
 }
 
 .copy-btn:hover {
-  background-color: var(--bg-primary);
+  background-color: var(--bg-tertiary);
   color: var(--accent-primary);
+  border-color: var(--accent-primary);
 }
 
 .edit-input {
   padding: 0.5rem;
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-white);
   border: 2px solid var(--accent-primary);
   border-radius: 4px;
   color: var(--text-primary);
@@ -333,7 +340,7 @@ body {
 
 .edit-input:focus {
   border-color: var(--accent-primary-light);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 2px rgba(84, 110, 122, 0.1);
 }
 
 .edit-btn {
@@ -379,7 +386,7 @@ body {
 }
 
 .cancel-btn:hover {
-  background-color: var(--bg-primary);
+  background-color: var(--bg-secondary);
 }
 
 .save-btn {
@@ -446,7 +453,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -454,7 +461,7 @@ body {
 }
 
 .modal {
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-white);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   width: 90%;
@@ -472,6 +479,7 @@ body {
   align-items: center;
   padding: 1.5rem;
   border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
 }
 
 .modal-header h2 {
@@ -498,6 +506,7 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
+  background-color: var(--bg-white);
 }
 
 .log-entry {
@@ -510,7 +519,7 @@ body {
 }
 
 .log-entry:hover {
-  background-color: var(--bg-tertiary);
+  background-color: var(--bg-secondary);
 }
 
 .log-entry:last-child {
@@ -533,6 +542,7 @@ body {
 .log-company {
   font-size: 0.8125rem;
   font-weight: 500;
+  color: var(--text-secondary);
 }
 
 .log-change {
