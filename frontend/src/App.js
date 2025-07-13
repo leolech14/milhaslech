@@ -450,17 +450,6 @@ const TopBar = ({ onRefresh, dashboardStats }) => (
   </header>
 );
 
-const TopStats = ({ dashboardStats }) => (
-  <div className="top-stats">
-    {dashboardStats && (
-      <div className="total-points">
-        <span>Total de pontos:</span>
-        <span>{dashboardStats.total_points.toLocaleString('pt-BR')}</span>
-      </div>
-    )}
-  </div>
-);
-
 const QuoteSection = () => (
   <div className="quote-section">
     <p>"Quem ta ponto ta ponto, quem não ta ponto não ta ponto" - João Lech (um viajante)</p>
