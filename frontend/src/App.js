@@ -310,6 +310,9 @@ function App() {
   if (!isAuthenticated) {
     return (
       <div className={`login-container ${darkMode ? 'dark-mode' : ''}`}>
+        <button className="dark-mode-toggle global-dark-toggle" onClick={toggleDarkMode}>
+          {darkMode ? '🔆' : '🌚'}
+        </button>
         <div className="login-box">
           <h1>Programas de Milhas</h1>
           <div className="brand-card">
@@ -337,9 +340,6 @@ function App() {
             {loginError && <div className="login-error">{loginError}</div>}
             <button type="submit" className="login-btn">Entrar</button>
           </form>
-          <button className="dark-mode-toggle login-dark-toggle" onClick={toggleDarkMode}>
-            {darkMode ? '🔆' : '🌚'}
-          </button>
         </div>
       </div>
     );
