@@ -105,20 +105,17 @@
 user_problem_statement: "Redesigned: 4 cards (one per family member) with 3 expandable blocks per company. Each block shows login, password, CPF, card number, points (all editable). Includes last change info and global log of all edits."
 
 backend:
-  - task: "MongoDB connection and database setup"
+  - task: "Redesigned member structure with programs nested"
     implemented: true
     working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
-        comment: "Database connection established with MongoDB using environment variables"
-      - working: true
-        agent: "testing"
-        comment: "✅ VERIFIED: MongoDB connection working correctly. Successfully retrieved companies from database, confirming connection and database operations are functional."
+        comment: "New structure: 4 members each with 3 programs (login, password, CPF, card_number, balance, etc.)"
   
   - task: "Company management endpoints (CRUD)"
     implemented: true
