@@ -462,9 +462,9 @@ body {
 }
 
 .refresh-btn:hover {
-  background-color: var(--accent-primary-light);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow);
+  background-color: var(--bg-secondary);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
 }
 
 /* Quote Section */
