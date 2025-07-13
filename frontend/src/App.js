@@ -403,12 +403,21 @@ function App() {
 }
 
 // Components
-const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats }) => (
+const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats, postits, onCreatePostit, onUpdatePostit, onDeletePostit, editingPostit, setEditingPostit }) => (
   <aside className="sidebar">
     <div className="sidebar-header">
       <h1>Programas de Milhas</h1>
       <p>Família Lech</p>
     </div>
+    
+    <PostItSection 
+      postits={postits}
+      onCreatePostit={onCreatePostit}
+      onUpdatePostit={onUpdatePostit}
+      onDeletePostit={onDeletePostit}
+      editingPostit={editingPostit}
+      setEditingPostit={setEditingPostit}
+    />
   </aside>
 );
 
