@@ -30,6 +30,7 @@ db = mongo_client[os.getenv("DB_NAME")]
 companies_collection = db.companies
 members_collection = db.members
 global_log_collection = db.global_log
+postits_collection = db.postits
 
 # Pydantic models
 class Company(BaseModel):
