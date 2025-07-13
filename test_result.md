@@ -129,20 +129,17 @@ backend:
         agent: "main"
         comment: "PUT /api/members/{id}/programs/{company_id} for individual field updates"
   
-  - task: "Member management endpoints (CRUD)"
+  - task: "Global log system for all changes"
     implemented: true
     working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
-        comment: "Full CRUD for members: GET, POST, PUT, DELETE /api/members with company validation"
-      - working: true
-        agent: "testing"
-        comment: "✅ VERIFIED: Complete member CRUD operations working flawlessly. GET /api/members (with optional company_id filtering), POST /api/members (with company validation and 4-member limit enforcement), GET /api/members/{id}, PUT /api/members/{id} (with balance change tracking), DELETE /api/members/{id} all function correctly. Member limit validation properly rejects 5th member per company."
+        comment: "Global log collection tracks all field changes with before/after values"
   
   - task: "Balance history tracking"
     implemented: true
