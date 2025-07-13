@@ -18,6 +18,7 @@ function App() {
   const [copyFeedback, setCopyFeedback] = useState('');
   const [postits, setPostits] = useState([]);
   const [editingPostit, setEditingPostit] = useState(null);
+  const [darkMode, setDarkMode] = useState(false);
 
   // Fixed order for family members
   const familyOrder = ["Osvandré", "Marilise", "Graciela", "Leonardo"];
