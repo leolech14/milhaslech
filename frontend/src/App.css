@@ -601,6 +601,24 @@ body {
   box-shadow: var(--shadow-hover);
 }
 
+/* Global Dark Mode Toggle for Login Screen */
+.global-dark-toggle {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  z-index: 1000;
+  background-color: var(--bg-white);
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-hover);
+}
+
+.global-dark-toggle:hover {
+  background-color: var(--accent-primary);
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-hover);
+  transform: scale(1.1);
+}
+
 /* Quote Section */
 .quote-section {
   padding: 0.75rem 2rem;
