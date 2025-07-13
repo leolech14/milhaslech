@@ -278,6 +278,9 @@ body.dark-mode::before {
   border-bottom: 2px solid var(--accent-primary);
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
   color: white;
+  border: 3px solid var(--bg-primary);
+  border-radius: 8px;
+  margin: 0.5rem;
 }
 
 .sidebar-header h1 {
