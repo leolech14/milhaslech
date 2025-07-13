@@ -141,20 +141,17 @@ backend:
         agent: "main"
         comment: "Global log collection tracks all field changes with before/after values"
   
-  - task: "Balance history tracking"
+  - task: "Family member initialization"
     implemented: true
     working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
-        comment: "Balance history collection tracks all balance changes with timestamps"
-      - working: true
-        agent: "testing"
-        comment: "✅ VERIFIED: Balance history tracking working perfectly. When member balance is updated via PUT /api/members/{id}, history entries are automatically created. GET /api/members/{id}/history returns complete balance change history with previous_balance, new_balance, change amount, and timestamps. Tested with initial balance creation and subsequent updates."
+        comment: "4 family members (Osvandré, Marilise, Graciela, Leonardo) with empty program data"
   
   - task: "Dashboard statistics endpoint"
     implemented: true
