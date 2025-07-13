@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Build a loyalty control tower dashboard to monitor points across LATAM Pass, GOL Smiles, and Azul TudoAzul. Support 4 accounts per program with manual entry, dark mode UI, and ability to add new companies."
+user_problem_statement: "Redesigned: 4 cards (one per family member) with 3 expandable blocks per company. Each block shows login, password, CPF, card number, points (all editable). Includes last change info and global log of all edits."
 
 backend:
   - task: "MongoDB connection and database setup"
