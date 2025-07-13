@@ -359,7 +359,7 @@ const TopBar = ({ onRefresh }) => (
 
 const QuoteSection = () => (
   <div className="quote-section">
-    <p>"Quem ta ponto ta ponto, quem não ta ponto não ta ponto" - João Lech (Viajante)</p>
+    <p>"Quem ta ponto ta ponto, quem não ta ponto não ta ponto" - João Lech (um viajante)</p>
   </div>
 );
 
