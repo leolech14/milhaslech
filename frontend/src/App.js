@@ -280,6 +280,8 @@ function App() {
           }}
         />
         
+        <QuoteSection />
+        
         <div className="members-container">
           {members.map(member => (
             <MemberCard 
@@ -300,6 +302,8 @@ function App() {
               getCompanyById={getCompanyById}
             />
           ))}
+          
+          <StatsCard dashboardStats={dashboardStats} />
         </div>
       </main>
 
