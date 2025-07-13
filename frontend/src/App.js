@@ -23,11 +23,17 @@ function App() {
   // Fixed order for family members
   const familyOrder = ["Osvandré", "Marilise", "Graciela", "Leonardo"];
 
-  // Check if user is already authenticated
+  // Check if user is already authenticated and load dark mode preference
   useEffect(() => {
     const authStatus = localStorage.getItem('lech_authenticated');
+    const darkModePreference = localStorage.getItem('lech_dark_mode');
+    
     if (authStatus === 'true') {
       setIsAuthenticated(true);
+    }
+    
+    if (darkModePreference === 'true') {
+      setDarkMode(true);
     }
   }, []);
 
