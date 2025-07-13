@@ -445,11 +445,116 @@ const TopBar = ({ onRefresh }) => (
   </header>
 );
 
+const TopStats = ({ dashboardStats }) => (
+  <div className="top-stats">
+    {dashboardStats && (
+      <div className="total-points">
+        <span>Total de pontos:</span>
+        <span>{dashboardStats.total_points.toLocaleString('pt-BR')}</span>
+      </div>
+    )}
+  </div>
+);
+
 const QuoteSection = () => (
   <div className="quote-section">
     <p>"Quem ta ponto ta ponto, quem não ta ponto não ta ponto" - João Lech (um viajante)</p>
   </div>
 );
+
+const PostItSection = ({ postits, onCreatePostit, onUpdatePostit, onDeletePostit, editingPostit, setEditingPostit }) => {
+  const [newPostit, setNewPostit] = useState('');
+  const [showNewPostit, setShowNewPostit] = useState(false);
+
+  const handleCreatePostit = () => {
+    if (newPostit.trim()) {
+      onCreatePostit(newPostit.trim());
+      setNewPostit('');
+      setShowNewPostit(false);
+    }
+  };
+
+  const handleUpdatePostit = (postitId, content) => {
+    if (content.trim()) {
+      onUpdatePostit(postitId, content.trim());
+    }
+  };
+
+  return (
+    <div className="postit-section">
+      <div className="postit-header">
+        <h3>Post-its</h3>
+        <button className="add-postit-btn" onClick={() => setShowNewPostit(true)}>
+          + Adicionar
+        </button>
+      </div>
+      
+      <div className="postits-container">
+        {showNewPostit && (
+          <div className="postit new-postit">
+            <button className="postit-delete" onClick={() => setShowNewPostit(false)}>×</button>
+            <textarea
+              value={newPostit}
+              onChange={(e) => setNewPostit(e.target.value)}
+              placeholder="Digite seu recado..."
+              autoFocus
+            />
+            <button className="postit-save" onClick={handleCreatePostit}>Salvar</button>
+          </div>
+        )}
+        
+        {postits.map(postit => (
+          <PostItCard
+            key={postit.id}
+            postit={postit}
+            isEditing={editingPostit === postit.id}
+            onEdit={() => setEditingPostit(postit.id)}
+            onSave={(content) => handleUpdatePostit(postit.id, content)}
+            onCancel={() => setEditingPostit(null)}
+            onDelete={() => onDeletePostit(postit.id)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const PostItCard = ({ postit, isEditing, onEdit, onSave, onCancel, onDelete }) => {
+  const [editContent, setEditContent] = useState(postit.content);
+
+  const handleSave = () => {
+    onSave(editContent);
+  };
+
+  if (isEditing) {
+    return (
+      <div className="postit editing">
+        <button className="postit-delete" onClick={onCancel}>×</button>
+        <textarea
+          value={editContent}
+          onChange={(e) => setEditContent(e.target.value)}
+          autoFocus
+        />
+        <div className="postit-actions">
+          <button className="postit-save" onClick={handleSave}>Salvar</button>
+          <button className="postit-cancel" onClick={onCancel}>Cancelar</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="postit" onClick={onEdit}>
+      <button className="postit-delete" onClick={(e) => {
+        e.stopPropagation();
+        onDelete();
+      }}>×</button>
+      <div className="postit-content">
+        {postit.content}
+      </div>
+    </div>
+  );
+};
 
 const BottomActions = ({ onShowGlobalLog, onLogout }) => (
   <div className="bottom-actions">
