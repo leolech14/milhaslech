@@ -1085,23 +1085,6 @@ body {
     font-size: 0.75rem;
   }
   
-  .top-stats {
-    padding: 0.5rem 1rem;
-  }
-  
-  .total-points {
-    gap: 0.5rem;
-    padding: 0.375rem 0.75rem;
-  }
-  
-  .total-points span:first-child {
-    font-size: 0.8rem;
-  }
-  
-  .total-points span:last-child {
-    font-size: 1rem;
-  }
-  
   .postit-section {
     padding: 0.75rem;
   }
