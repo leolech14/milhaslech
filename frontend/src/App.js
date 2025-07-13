@@ -6,12 +6,10 @@ const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 function App() {
   const [companies, setCompanies] = useState([]);
   const [members, setMembers] = useState([]);
-  const [selectedCompany, setSelectedCompany] = useState('all');
-  const [showAddMember, setShowAddMember] = useState(false);
-  const [showAddCompany, setShowAddCompany] = useState(false);
-  const [editingMember, setEditingMember] = useState(null);
+  const [globalLog, setGlobalLog] = useState([]);
+  const [showGlobalLog, setShowGlobalLog] = useState(false);
   const [dashboardStats, setDashboardStats] = useState(null);
-  const [memberHistory, setMemberHistory] = useState({});
+  const [expandedPrograms, setExpandedPrograms] = useState({});
 
   // Fetch data functions
   const fetchCompanies = async () => {
@@ -24,14 +22,23 @@ function App() {
     }
   };
 
-  const fetchMembers = async (companyId = null) => {
+  const fetchMembers = async () => {
     try {
-      const url = companyId ? `${API_BASE_URL}/api/members?company_id=${companyId}` : `${API_BASE_URL}/api/members`;
-      const response = await fetch(url);
+      const response = await fetch(`${API_BASE_URL}/api/members`);
       const data = await response.json();
       setMembers(data);
     } catch (error) {
-      console.error('Erro ao buscar contas:', error);
+      console.error('Erro ao buscar membros:', error);
+    }
+  };
+
+  const fetchGlobalLog = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/global-log`);
+      const data = await response.json();
+      setGlobalLog(data);
+    } catch (error) {
+      console.error('Erro ao buscar log global:', error);
     }
   };
 
@@ -45,270 +52,152 @@ function App() {
     }
   };
 
-  const fetchMemberHistory = async (memberId) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/history`);
-      const data = await response.json();
-      setMemberHistory(prev => ({
-        ...prev,
-        [memberId]: data
-      }));
-    } catch (error) {
-      console.error('Erro ao buscar histórico:', error);
-    }
-  };
-
   // Load data on component mount
   useEffect(() => {
     fetchCompanies();
     fetchMembers();
+    fetchGlobalLog();
     fetchDashboardStats();
   }, []);
-
-  // Handle company selection
-  const handleCompanySelect = (companyId) => {
-    setSelectedCompany(companyId);
-    if (companyId === 'all') {
-      fetchMembers();
-    } else {
-      fetchMembers(companyId);
-    }
-  };
-
-  // Get filtered members
-  const getFilteredMembers = () => {
-    if (selectedCompany === 'all') {
-      return members;
-    }
-    return members.filter(member => member.company_id === selectedCompany);
-  };
 
   // Get company by ID
   const getCompanyById = (id) => {
     return companies.find(c => c.id === id);
   };
 
+  // Toggle program expansion
+  const toggleProgram = (memberId, companyId) => {
+    const key = `${memberId}-${companyId}`;
+    setExpandedPrograms(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
   // Format date
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
       year: 'numeric',
-      month: 'short',
-      day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
     });
   };
 
-  // Format number with commas
+  // Format number with dots
   const formatNumber = (num) => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
+  // Update program field
+  const updateProgramField = async (memberId, companyId, field, value) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          [field]: field === 'current_balance' ? parseInt(value) || 0 : value
+        }),
+      });
+      
+      if (response.ok) {
+        await fetchMembers();
+        await fetchGlobalLog();
+        await fetchDashboardStats();
+      } else {
+        console.error('Erro ao atualizar campo');
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar campo:', error);
+    }
   };
 
   return (
     <div className="app">
       <Sidebar 
-        companies={companies}
-        selectedCompany={selectedCompany}
-        onCompanySelect={handleCompanySelect}
-        onAddCompany={() => setShowAddCompany(true)}
+        onShowGlobalLog={() => setShowGlobalLog(true)}
         dashboardStats={dashboardStats}
       />
       
       <main className="main-content">
         <TopBar 
-          onAddMember={() => setShowAddMember(true)}
           onRefresh={() => {
             fetchMembers();
+            fetchGlobalLog();
             fetchDashboardStats();
           }}
         />
         
-        <div className="dashboard-grid">
-          {getFilteredMembers().map(member => (
+        <div className="members-grid">
+          {members.map(member => (
             <MemberCard 
               key={member.id}
               member={member}
-              company={getCompanyById(member.company_id)}
-              onEdit={() => setEditingMember(member)}
-              onDelete={() => deleteMember(member.id)}
-              onViewHistory={() => fetchMemberHistory(member.id)}
-              history={memberHistory[member.id] || []}
+              companies={companies}
+              expandedPrograms={expandedPrograms}
+              onToggleProgram={toggleProgram}
+              onUpdateField={updateProgramField}
               formatDate={formatDate}
               formatNumber={formatNumber}
+              getCompanyById={getCompanyById}
             />
           ))}
         </div>
       </main>
 
-      {showAddMember && (
-        <AddMemberModal 
-          companies={companies}
-          onClose={() => setShowAddMember(false)}
-          onSubmit={createMember}
-        />
-      )}
-
-      {showAddCompany && (
-        <AddCompanyModal 
-          onClose={() => setShowAddCompany(false)}
-          onSubmit={createCompany}
-        />
-      )}
-
-      {editingMember && (
-        <EditMemberModal 
-          member={editingMember}
-          companies={companies}
-          onClose={() => setEditingMember(null)}
-          onSubmit={updateMember}
+      {showGlobalLog && (
+        <GlobalLogModal 
+          globalLog={globalLog}
+          onClose={() => setShowGlobalLog(false)}
+          formatDate={formatDate}
+          getCompanyById={getCompanyById}
         />
       )}
     </div>
   );
-
-  // CRUD operations
-  async function createMember(memberData) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/members`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(memberData),
-      });
-      
-      if (response.ok) {
-        fetchMembers();
-        fetchDashboardStats();
-        setShowAddMember(false);
-      } else {
-        const error = await response.json();
-        alert(error.detail || 'Erro ao criar conta');
-      }
-    } catch (error) {
-      console.error('Erro ao criar conta:', error);
-      alert('Erro ao criar conta');
-    }
-  }
-
-  async function updateMember(memberId, memberData) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/members/${memberId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(memberData),
-      });
-      
-      if (response.ok) {
-        fetchMembers();
-        fetchDashboardStats();
-        setEditingMember(null);
-      } else {
-        const error = await response.json();
-        alert(error.detail || 'Erro ao atualizar conta');
-      }
-    } catch (error) {
-      console.error('Erro ao atualizar conta:', error);
-      alert('Erro ao atualizar conta');
-    }
-  }
-
-  async function deleteMember(memberId) {
-    if (window.confirm('Tem certeza que deseja excluir esta conta?')) {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/members/${memberId}`, {
-          method: 'DELETE',
-        });
-        
-        if (response.ok) {
-          fetchMembers();
-          fetchDashboardStats();
-        } else {
-          alert('Erro ao excluir conta');
-        }
-      } catch (error) {
-        console.error('Erro ao excluir conta:', error);
-        alert('Erro ao excluir conta');
-      }
-    }
-  }
-
-  async function createCompany(companyData) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/companies`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(companyData),
-      });
-      
-      if (response.ok) {
-        fetchCompanies();
-        setShowAddCompany(false);
-      } else {
-        const error = await response.json();
-        alert(error.detail || 'Erro ao criar programa');
-      }
-    } catch (error) {
-      console.error('Erro ao criar programa:', error);
-      alert('Erro ao criar programa');
-    }
-  }
 }
 
 // Components
-const Sidebar = ({ companies, selectedCompany, onCompanySelect, onAddCompany, dashboardStats }) => (
+const Sidebar = ({ onShowGlobalLog, dashboardStats }) => (
   <aside className="sidebar">
     <div className="sidebar-header">
       <h1>Programas de Milhas</h1>
       <p>Família Lech</p>
     </div>
     
-    <nav className="sidebar-nav">
-      <button 
-        className={selectedCompany === 'all' ? 'active' : ''}
-        onClick={() => onCompanySelect('all')}
-      >
-        Todos os Programas
-      </button>
-      
-      {companies.map(company => (
-        <button
-          key={company.id}
-          className={selectedCompany === company.id ? 'active' : ''}
-          onClick={() => onCompanySelect(company.id)}
-          style={{ borderLeft: `4px solid ${company.color}` }}
-        >
-          {company.name}
-        </button>
-      ))}
-    </nav>
-    
     <div className="sidebar-stats">
       {dashboardStats && (
         <>
           <div className="stat-item">
-            <span>Total de Contas</span>
+            <span>Membros</span>
             <span>{dashboardStats.total_members}</span>
           </div>
           <div className="stat-item">
             <span>Programas</span>
             <span>{dashboardStats.total_companies}</span>
           </div>
+          <div className="stat-item">
+            <span>Total de Pontos</span>
+            <span>{dashboardStats.total_points.toLocaleString('pt-BR')}</span>
+          </div>
+          <div className="stat-item">
+            <span>Atividade Hoje</span>
+            <span>{dashboardStats.recent_activity}</span>
+          </div>
         </>
       )}
     </div>
     
-    <button className="add-company-btn" onClick={onAddCompany}>
-      +
+    <button className="log-btn" onClick={onShowGlobalLog}>
+      📋 Log Global
     </button>
   </aside>
 );
 
-const TopBar = ({ onAddMember, onRefresh }) => (
+const TopBar = ({ onRefresh }) => (
   <header className="top-bar">
     <div className="top-bar-left">
       <h2>Painel de Controle</h2>
@@ -317,367 +206,259 @@ const TopBar = ({ onAddMember, onRefresh }) => (
       <button className="refresh-btn" onClick={onRefresh}>
         ↻ Atualizar
       </button>
-      <button className="add-member-btn" onClick={onAddMember}>
-        + Nova Conta
-      </button>
     </div>
   </header>
 );
 
-const MemberCard = ({ member, company, onEdit, onDelete, onViewHistory, history, formatDate, formatNumber }) => {
-  const [showHistory, setShowHistory] = useState(false);
-  
-  const handleViewHistory = () => {
-    onViewHistory();
-    setShowHistory(!showHistory);
+const MemberCard = ({ member, companies, expandedPrograms, onToggleProgram, onUpdateField, formatDate, formatNumber, getCompanyById }) => {
+  return (
+    <div className="member-card">
+      <div className="member-header">
+        <h3>{member.name}</h3>
+      </div>
+      
+      <div className="programs-container">
+        {companies.map(company => {
+          const program = member.programs[company.id];
+          const isExpanded = expandedPrograms[`${member.id}-${company.id}`];
+          
+          return (
+            <ProgramBlock
+              key={company.id}
+              member={member}
+              company={company}
+              program={program}
+              isExpanded={isExpanded}
+              onToggle={() => onToggleProgram(member.id, company.id)}
+              onUpdateField={onUpdateField}
+              formatDate={formatDate}
+              formatNumber={formatNumber}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+const ProgramBlock = ({ member, company, program, isExpanded, onToggle, onUpdateField, formatDate, formatNumber }) => {
+  const [editingField, setEditingField] = useState(null);
+  const [editValue, setEditValue] = useState('');
+
+  const handleFieldEdit = (field, currentValue) => {
+    setEditingField(field);
+    setEditValue(currentValue);
   };
 
-  const getBalanceChange = () => {
-    if (history.length < 2) return null;
-    const latest = history[0];
-    return latest.change;
+  const handleFieldSave = async (field) => {
+    await onUpdateField(member.id, company.id, field, editValue);
+    setEditingField(null);
+    setEditValue('');
   };
 
-  const getPointsLabel = () => {
-    return company?.points_name || 'pontos';
-  };
-
-  const isEmptyMember = () => {
-    return !member.loyalty_number && member.current_balance === 0;
+  const handleKeyPress = (e, field) => {
+    if (e.key === 'Enter') {
+      handleFieldSave(field);
+    } else if (e.key === 'Escape') {
+      setEditingField(null);
+      setEditValue('');
+    }
   };
 
   return (
-    <div className={`member-card ${isEmptyMember() ? 'empty-member' : ''}`} style={{ borderTop: `4px solid ${company?.color}` }}>
-      <div className="member-header">
-        <div className="member-info">
-          <h3>{member.owner_name}</h3>
-          <p>{company?.name}</p>
-          {member.loyalty_number ? (
-            <p>#{member.loyalty_number}</p>
-          ) : (
-            <p className="empty-field">Número não cadastrado</p>
-          )}
+    <div className={`program-block ${isExpanded ? 'expanded' : ''}`} style={{ borderLeft: `4px solid ${company.color}` }}>
+      <div className="program-header" onClick={onToggle}>
+        <div className="program-info">
+          <h4>{company.name}</h4>
+          <p className="program-balance">
+            {formatNumber(program.current_balance)} {company.points_name}
+          </p>
         </div>
-        <div className="member-actions">
-          <button onClick={onEdit}>Editar</button>
-          <button onClick={onDelete} className="delete-btn">Excluir</button>
+        <div className="expand-icon">
+          {isExpanded ? '▼' : '▶'}
         </div>
       </div>
       
-      <div className="member-balance">
-        <div className="balance-main">
-          <span className="balance-label">Saldo Atual</span>
-          <span className="balance-value">
-            {formatNumber(member.current_balance)} {getPointsLabel()}
-          </span>
-        </div>
-        
-        {getBalanceChange() && (
-          <div className={`balance-change ${getBalanceChange() > 0 ? 'positive' : 'negative'}`}>
-            {getBalanceChange() > 0 ? '+' : ''}{formatNumber(getBalanceChange())}
+      {isExpanded && (
+        <div className="program-details">
+          <div className="detail-grid">
+            <div className="detail-item">
+              <label>Login:</label>
+              {editingField === 'login' ? (
+                <input
+                  type="text"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onBlur={() => handleFieldSave('login')}
+                  onKeyPress={(e) => handleKeyPress(e, 'login')}
+                  autoFocus
+                />
+              ) : (
+                <span 
+                  className="editable-field"
+                  onClick={() => handleFieldEdit('login', program.login)}
+                >
+                  {program.login || 'Clique para editar'}
+                </span>
+              )}
+            </div>
+            
+            <div className="detail-item">
+              <label>Senha:</label>
+              {editingField === 'password' ? (
+                <input
+                  type="password"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onBlur={() => handleFieldSave('password')}
+                  onKeyPress={(e) => handleKeyPress(e, 'password')}
+                  autoFocus
+                />
+              ) : (
+                <span 
+                  className="editable-field"
+                  onClick={() => handleFieldEdit('password', program.password)}
+                >
+                  {program.password ? '••••••••' : 'Clique para editar'}
+                </span>
+              )}
+            </div>
+            
+            <div className="detail-item">
+              <label>CPF:</label>
+              {editingField === 'cpf' ? (
+                <input
+                  type="text"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onBlur={() => handleFieldSave('cpf')}
+                  onKeyPress={(e) => handleKeyPress(e, 'cpf')}
+                  autoFocus
+                />
+              ) : (
+                <span 
+                  className="editable-field"
+                  onClick={() => handleFieldEdit('cpf', program.cpf)}
+                >
+                  {program.cpf || 'Clique para editar'}
+                </span>
+              )}
+            </div>
+            
+            <div className="detail-item">
+              <label>Nº do Cartão:</label>
+              {editingField === 'card_number' ? (
+                <input
+                  type="text"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onBlur={() => handleFieldSave('card_number')}
+                  onKeyPress={(e) => handleKeyPress(e, 'card_number')}
+                  autoFocus
+                />
+              ) : (
+                <span 
+                  className="editable-field"
+                  onClick={() => handleFieldEdit('card_number', program.card_number)}
+                >
+                  {program.card_number || 'Clique para editar'}
+                </span>
+              )}
+            </div>
+            
+            <div className="detail-item">
+              <label>Saldo ({company.points_name}):</label>
+              {editingField === 'current_balance' ? (
+                <input
+                  type="number"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onBlur={() => handleFieldSave('current_balance')}
+                  onKeyPress={(e) => handleKeyPress(e, 'current_balance')}
+                  autoFocus
+                />
+              ) : (
+                <span 
+                  className="editable-field balance-field"
+                  onClick={() => handleFieldEdit('current_balance', program.current_balance)}
+                >
+                  {formatNumber(program.current_balance)}
+                </span>
+              )}
+            </div>
+            
+            <div className="detail-item">
+              <label>Categoria:</label>
+              {editingField === 'elite_tier' ? (
+                <input
+                  type="text"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onBlur={() => handleFieldSave('elite_tier')}
+                  onKeyPress={(e) => handleKeyPress(e, 'elite_tier')}
+                  autoFocus
+                />
+              ) : (
+                <span 
+                  className="editable-field"
+                  onClick={() => handleFieldEdit('elite_tier', program.elite_tier)}
+                >
+                  {program.elite_tier || 'Clique para editar'}
+                </span>
+              )}
+            </div>
           </div>
+          
+          <div className="program-footer">
+            <div className="last-change">
+              <small>
+                Última atualização: {formatDate(program.last_updated)}
+              </small>
+              {program.last_change && (
+                <small className="change-info">
+                  {program.last_change}
+                </small>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const GlobalLogModal = ({ globalLog, onClose, formatDate, getCompanyById }) => (
+  <div className="modal-overlay">
+    <div className="modal log-modal">
+      <div className="modal-header">
+        <h2>Log Global de Alterações</h2>
+        <button className="close-btn" onClick={onClose}>×</button>
+      </div>
+      
+      <div className="log-entries">
+        {globalLog.length > 0 ? (
+          globalLog.map(entry => (
+            <div key={entry.id} className="log-entry">
+              <div className="log-main">
+                <span className="log-member">{entry.member_name}</span>
+                <span className="log-company" style={{ color: getCompanyById(entry.company_id)?.color }}>
+                  {entry.company_name}
+                </span>
+                <span className="log-change">
+                  {entry.field_changed}: {entry.old_value} → {entry.new_value}
+                </span>
+              </div>
+              <div className="log-time">
+                {formatDate(entry.timestamp)}
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="no-logs">Nenhuma alteração registrada</p>
         )}
       </div>
-      
-      {member.elite_tier && (
-        <div className="elite-tier">
-          <span>{member.elite_tier}</span>
-        </div>
-      )}
-      
-      <div className="member-footer">
-        <span>Atualizado: {formatDate(member.last_updated)}</span>
-        <button onClick={handleViewHistory}>
-          {showHistory ? 'Ocultar' : 'Ver'} Histórico
-        </button>
-      </div>
-      
-      {showHistory && (
-        <div className="member-history">
-          {history.length > 0 ? (
-            history.map(entry => (
-              <div key={entry.id} className="history-entry">
-                <span>{formatNumber(entry.balance)} {getPointsLabel()}</span>
-                <span className={entry.change > 0 ? 'positive' : 'negative'}>
-                  {entry.change > 0 ? '+' : ''}{formatNumber(entry.change)}
-                </span>
-                <span>{formatDate(entry.updated_at)}</span>
-              </div>
-            ))
-          ) : (
-            <p>Nenhum histórico disponível</p>
-          )}
-        </div>
-      )}
-      
-      {member.notes && (
-        <div className="member-notes">
-          <p>{member.notes}</p>
-        </div>
-      )}
-
-      {isEmptyMember() && (
-        <div className="empty-prompt">
-          <p>Clique em "Editar" para adicionar os dados desta conta</p>
-        </div>
-      )}
     </div>
-  );
-};
-
-const AddMemberModal = ({ companies, onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({
-    company_id: '',
-    owner_name: '',
-    loyalty_number: '',
-    current_balance: 0,
-    elite_tier: '',
-    notes: ''
-  });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit({
-      ...formData,
-      current_balance: parseInt(formData.current_balance) || 0
-    });
-  };
-
-  return (
-    <div className="modal-overlay">
-      <div className="modal">
-        <h2>Nova Conta</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Programa</label>
-            <select 
-              value={formData.company_id} 
-              onChange={(e) => setFormData({...formData, company_id: e.target.value})}
-              required
-            >
-              <option value="">Selecione o Programa</option>
-              {companies.map(company => (
-                <option key={company.id} value={company.id}>
-                  {company.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          
-          <div className="form-group">
-            <label>Nome do Titular</label>
-            <input 
-              type="text" 
-              value={formData.owner_name}
-              onChange={(e) => setFormData({...formData, owner_name: e.target.value})}
-              required
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Número da Conta</label>
-            <input 
-              type="text" 
-              value={formData.loyalty_number}
-              onChange={(e) => setFormData({...formData, loyalty_number: e.target.value})}
-              placeholder="Ex: 123456789"
-              required
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Saldo Atual</label>
-            <input 
-              type="number" 
-              value={formData.current_balance}
-              onChange={(e) => setFormData({...formData, current_balance: e.target.value})}
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Categoria/Status</label>
-            <input 
-              type="text" 
-              value={formData.elite_tier}
-              onChange={(e) => setFormData({...formData, elite_tier: e.target.value})}
-              placeholder="Ex: Gold, Platinum, Diamond"
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Observações</label>
-            <textarea 
-              value={formData.notes}
-              onChange={(e) => setFormData({...formData, notes: e.target.value})}
-              rows="3"
-              placeholder="Informações adicionais..."
-            />
-          </div>
-          
-          <div className="form-actions">
-            <button type="button" onClick={onClose}>Cancelar</button>
-            <button type="submit">Adicionar Conta</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
-
-const EditMemberModal = ({ member, companies, onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({
-    owner_name: member.owner_name,
-    loyalty_number: member.loyalty_number,
-    current_balance: member.current_balance,
-    elite_tier: member.elite_tier || '',
-    notes: member.notes || ''
-  });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(member.id, {
-      ...formData,
-      current_balance: parseInt(formData.current_balance) || 0
-    });
-  };
-
-  const company = companies.find(c => c.id === member.company_id);
-
-  return (
-    <div className="modal-overlay">
-      <div className="modal">
-        <h2>Editar Conta - {member.owner_name}</h2>
-        <p className="modal-subtitle">{company?.name}</p>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Nome do Titular</label>
-            <input 
-              type="text" 
-              value={formData.owner_name}
-              onChange={(e) => setFormData({...formData, owner_name: e.target.value})}
-              required
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Número da Conta</label>
-            <input 
-              type="text" 
-              value={formData.loyalty_number}
-              onChange={(e) => setFormData({...formData, loyalty_number: e.target.value})}
-              placeholder="Ex: 123456789"
-              required
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Saldo Atual ({company?.points_name || 'pontos'})</label>
-            <input 
-              type="number" 
-              value={formData.current_balance}
-              onChange={(e) => setFormData({...formData, current_balance: e.target.value})}
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Categoria/Status</label>
-            <input 
-              type="text" 
-              value={formData.elite_tier}
-              onChange={(e) => setFormData({...formData, elite_tier: e.target.value})}
-              placeholder="Ex: Gold, Platinum, Diamond"
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Observações</label>
-            <textarea 
-              value={formData.notes}
-              onChange={(e) => setFormData({...formData, notes: e.target.value})}
-              rows="3"
-              placeholder="Informações adicionais..."
-            />
-          </div>
-          
-          <div className="form-actions">
-            <button type="button" onClick={onClose}>Cancelar</button>
-            <button type="submit">Salvar Alterações</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
-
-const AddCompanyModal = ({ onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    color: '#000000',
-    max_members: 4,
-    points_name: 'pontos'
-  });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
-
-  return (
-    <div className="modal-overlay">
-      <div className="modal">
-        <h2>Novo Programa</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Nome do Programa</label>
-            <input 
-              type="text" 
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-              placeholder="Ex: TAP Miles&Go"
-              required
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Cor da Marca</label>
-            <input 
-              type="color" 
-              value={formData.color}
-              onChange={(e) => setFormData({...formData, color: e.target.value})}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Nome dos Pontos</label>
-            <select 
-              value={formData.points_name}
-              onChange={(e) => setFormData({...formData, points_name: e.target.value})}
-            >
-              <option value="milhas">Milhas</option>
-              <option value="pontos">Pontos</option>
-              <option value="miles">Miles</option>
-            </select>
-          </div>
-          
-          <div className="form-group">
-            <label>Máximo de Contas</label>
-            <input 
-              type="number" 
-              value={formData.max_members}
-              onChange={(e) => setFormData({...formData, max_members: parseInt(e.target.value)})}
-              min="1"
-              max="10"
-            />
-          </div>
-          
-          <div className="form-actions">
-            <button type="button" onClick={onClose}>Cancelar</button>
-            <button type="submit">Criar Programa</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
+  </div>
+);
 
 export default App;

@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 import uuid
 import os
@@ -29,88 +29,82 @@ db = mongo_client[os.getenv("DB_NAME")]
 # Collections
 companies_collection = db.companies
 members_collection = db.members
-balance_history_collection = db.balance_history
+global_log_collection = db.global_log
 
 # Pydantic models
 class Company(BaseModel):
     id: str
     name: str
     color: str
-    logo: Optional[str] = None
-    max_members: int = 4
-    points_name: str  # "milhas", "pontos", etc.
+    points_name: str
+
+class ProgramData(BaseModel):
+    company_id: str
+    login: str = ""
+    password: str = ""
+    cpf: str = ""
+    card_number: str = ""
+    current_balance: int = 0
+    elite_tier: str = ""
+    notes: str = ""
+    last_updated: datetime
+    last_change: str = ""
 
 class Member(BaseModel):
     id: str
-    company_id: str
-    owner_name: str
-    loyalty_number: str
-    current_balance: int = 0
-    elite_tier: Optional[str] = None
-    notes: Optional[str] = None
+    name: str
+    programs: Dict[str, ProgramData]
     created_at: datetime
-    last_updated: datetime
-
-class BalanceHistory(BaseModel):
-    id: str
-    member_id: str
-    balance: int
-    previous_balance: int
-    change: int
-    elite_tier: Optional[str] = None
-    notes: Optional[str] = None
     updated_at: datetime
-    updated_by: str = "manual"
-
-class MemberCreate(BaseModel):
-    company_id: str
-    owner_name: str
-    loyalty_number: str
-    current_balance: int = 0
-    elite_tier: Optional[str] = None
-    notes: Optional[str] = None
 
 class MemberUpdate(BaseModel):
-    owner_name: Optional[str] = None
-    loyalty_number: Optional[str] = None
+    name: Optional[str] = None
+    programs: Optional[Dict[str, Dict[str, Any]]] = None
+
+class GlobalLogEntry(BaseModel):
+    id: str
+    member_id: str
+    member_name: str
+    company_id: str
+    company_name: str
+    field_changed: str
+    old_value: str
+    new_value: str
+    timestamp: datetime
+    change_type: str  # "update", "create", "delete"
+
+class ProgramUpdate(BaseModel):
+    login: Optional[str] = None
+    password: Optional[str] = None
+    cpf: Optional[str] = None
+    card_number: Optional[str] = None
     current_balance: Optional[int] = None
     elite_tier: Optional[str] = None
     notes: Optional[str] = None
 
-class CompanyCreate(BaseModel):
-    name: str
-    color: str
-    logo: Optional[str] = None
-    max_members: int = 4
-    points_name: str = "pontos"
-
-# Initialize default companies and family members
+# Initialize default data
 async def init_default_data():
+    # Default companies
     default_companies = [
         {
             "id": "latam",
             "name": "LATAM Pass",
             "color": "#d31b2c",
-            "max_members": 4,
             "points_name": "milhas"
         },
         {
             "id": "smiles",
             "name": "Smiles",
             "color": "#ff6600",
-            "max_members": 4,
             "points_name": "milhas"
         },
         {
             "id": "azul",
             "name": "TudoAzul",
             "color": "#0072ce",
-            "max_members": 4,
             "points_name": "pontos"
         }
     ]
-    
-    family_members = ["Osvandré", "Marilise", "Graciela", "Leonardo"]
     
     # Create companies
     for company in default_companies:
@@ -118,36 +112,64 @@ async def init_default_data():
         if not existing:
             companies_collection.insert_one(company)
     
-    # Create family members for each company
-    for company in default_companies:
-        for member_name in family_members:
-            existing_member = members_collection.find_one({
-                "company_id": company["id"], 
-                "owner_name": member_name
-            })
+    # Family members
+    family_members = ["Osvandré", "Marilise", "Graciela", "Leonardo"]
+    
+    # Create family members with empty program data
+    for member_name in family_members:
+        existing_member = members_collection.find_one({"name": member_name})
+        
+        if not existing_member:
+            member_id = str(uuid.uuid4())
+            now = datetime.utcnow()
             
-            if not existing_member:
-                member_id = str(uuid.uuid4())
-                now = datetime.utcnow()
-                
-                member_data = {
-                    "id": member_id,
+            # Create empty program data for each company
+            programs = {}
+            for company in default_companies:
+                programs[company["id"]] = {
                     "company_id": company["id"],
-                    "owner_name": member_name,
-                    "loyalty_number": "",  # Empty for user to fill
+                    "login": "",
+                    "password": "",
+                    "cpf": "",
+                    "card_number": "",
                     "current_balance": 0,
                     "elite_tier": "",
                     "notes": "",
-                    "created_at": now,
-                    "last_updated": now
+                    "last_updated": now,
+                    "last_change": "Conta criada"
                 }
-                
-                members_collection.insert_one(member_data)
+            
+            member_data = {
+                "id": member_id,
+                "name": member_name,
+                "programs": programs,
+                "created_at": now,
+                "updated_at": now
+            }
+            
+            members_collection.insert_one(member_data)
 
 # Startup event
 @app.on_event("startup")
 async def startup_event():
     await init_default_data()
+
+# Helper function to log changes
+def log_change(member_id: str, member_name: str, company_id: str, company_name: str, 
+               field_changed: str, old_value: str, new_value: str, change_type: str = "update"):
+    log_entry = {
+        "id": str(uuid.uuid4()),
+        "member_id": member_id,
+        "member_name": member_name,
+        "company_id": company_id,
+        "company_name": company_name,
+        "field_changed": field_changed,
+        "old_value": str(old_value),
+        "new_value": str(new_value),
+        "timestamp": datetime.utcnow(),
+        "change_type": change_type
+    }
+    global_log_collection.insert_one(log_entry)
 
 # Company endpoints
 @app.get("/api/companies", response_model=List[Company])
@@ -155,133 +177,66 @@ async def get_companies():
     companies = list(companies_collection.find({}, {"_id": 0}))
     return companies
 
-@app.post("/api/companies", response_model=Company)
-async def create_company(company: CompanyCreate):
-    company_id = str(uuid.uuid4())
-    company_data = {
-        "id": company_id,
-        "name": company.name,
-        "color": company.color,
-        "logo": company.logo,
-        "max_members": company.max_members,
-        "points_name": company.points_name
-    }
-    
-    companies_collection.insert_one(company_data)
-    return Company(**company_data)
-
-@app.get("/api/companies/{company_id}", response_model=Company)
-async def get_company(company_id: str):
-    company = companies_collection.find_one({"id": company_id}, {"_id": 0})
-    if not company:
-        raise HTTPException(status_code=404, detail="Programa não encontrado")
-    return Company(**company)
-
 # Member endpoints
 @app.get("/api/members", response_model=List[Member])
-async def get_members(company_id: Optional[str] = None):
-    filter_query = {}
-    if company_id:
-        filter_query["company_id"] = company_id
-    
-    members = list(members_collection.find(filter_query, {"_id": 0}))
+async def get_members():
+    members = list(members_collection.find({}, {"_id": 0}))
     return members
-
-@app.post("/api/members", response_model=Member)
-async def create_member(member: MemberCreate):
-    # Check if company exists
-    company = companies_collection.find_one({"id": member.company_id})
-    if not company:
-        raise HTTPException(status_code=404, detail="Programa não encontrado")
-    
-    # Check member limit
-    current_members = members_collection.count_documents({"company_id": member.company_id})
-    if current_members >= company["max_members"]:
-        raise HTTPException(status_code=400, detail=f"Máximo de {company['max_members']} contas permitidas para este programa")
-    
-    # Create member
-    member_id = str(uuid.uuid4())
-    now = datetime.utcnow()
-    
-    member_data = {
-        "id": member_id,
-        "company_id": member.company_id,
-        "owner_name": member.owner_name,
-        "loyalty_number": member.loyalty_number,
-        "current_balance": member.current_balance,
-        "elite_tier": member.elite_tier,
-        "notes": member.notes,
-        "created_at": now,
-        "last_updated": now
-    }
-    
-    members_collection.insert_one(member_data)
-    
-    # Create initial balance history
-    if member.current_balance > 0:
-        history_data = {
-            "id": str(uuid.uuid4()),
-            "member_id": member_id,
-            "balance": member.current_balance,
-            "previous_balance": 0,
-            "change": member.current_balance,
-            "elite_tier": member.elite_tier,
-            "notes": "Saldo inicial",
-            "updated_at": now,
-            "updated_by": "manual"
-        }
-        balance_history_collection.insert_one(history_data)
-    
-    return Member(**member_data)
 
 @app.get("/api/members/{member_id}", response_model=Member)
 async def get_member(member_id: str):
     member = members_collection.find_one({"id": member_id}, {"_id": 0})
     if not member:
-        raise HTTPException(status_code=404, detail="Conta não encontrada")
+        raise HTTPException(status_code=404, detail="Membro não encontrado")
     return Member(**member)
 
-@app.put("/api/members/{member_id}", response_model=Member)
+@app.put("/api/members/{member_id}")
 async def update_member(member_id: str, member_update: MemberUpdate):
     member = members_collection.find_one({"id": member_id})
     if not member:
-        raise HTTPException(status_code=404, detail="Conta não encontrada")
+        raise HTTPException(status_code=404, detail="Membro não encontrado")
     
-    # Prepare update data
-    update_data = {}
-    if member_update.owner_name is not None:
-        update_data["owner_name"] = member_update.owner_name
-    if member_update.loyalty_number is not None:
-        update_data["loyalty_number"] = member_update.loyalty_number
-    if member_update.elite_tier is not None:
-        update_data["elite_tier"] = member_update.elite_tier
-    if member_update.notes is not None:
-        update_data["notes"] = member_update.notes
+    update_data = {"updated_at": datetime.utcnow()}
     
-    # Handle balance update
-    if member_update.current_balance is not None:
-        previous_balance = member["current_balance"]
-        new_balance = member_update.current_balance
-        update_data["current_balance"] = new_balance
+    # Update member name if provided
+    if member_update.name:
+        old_name = member["name"]
+        update_data["name"] = member_update.name
+        log_change(member_id, old_name, "", "", "nome", old_name, member_update.name)
+    
+    # Update programs if provided
+    if member_update.programs:
+        companies = {c["id"]: c for c in companies_collection.find({}, {"_id": 0})}
         
-        # Create balance history entry
-        if new_balance != previous_balance:
-            history_data = {
-                "id": str(uuid.uuid4()),
-                "member_id": member_id,
-                "balance": new_balance,
-                "previous_balance": previous_balance,
-                "change": new_balance - previous_balance,
-                "elite_tier": member_update.elite_tier or member["elite_tier"],
-                "notes": member_update.notes or "Atualização manual",
-                "updated_at": datetime.utcnow(),
-                "updated_by": "manual"
-            }
-            balance_history_collection.insert_one(history_data)
+        for company_id, program_data in member_update.programs.items():
+            if company_id in member["programs"]:
+                old_program = member["programs"][company_id]
+                updated_program = old_program.copy()
+                
+                # Track changes for each field
+                changes = []
+                for field, new_value in program_data.items():
+                    if field in old_program and old_program[field] != new_value:
+                        old_value = old_program[field]
+                        updated_program[field] = new_value
+                        changes.append(f"{field}: {old_value} → {new_value}")
+                        
+                        # Log individual field changes
+                        company_name = companies.get(company_id, {}).get("name", company_id)
+                        log_change(member_id, member["name"], company_id, company_name, 
+                                 field, str(old_value), str(new_value))
+                
+                # Update last_updated and last_change
+                updated_program["last_updated"] = datetime.utcnow()
+                if changes:
+                    updated_program["last_change"] = ", ".join(changes)
+                
+                # Update the member's program data
+                if "programs" not in update_data:
+                    update_data["programs"] = member["programs"].copy()
+                update_data["programs"][company_id] = updated_program
     
-    update_data["last_updated"] = datetime.utcnow()
-    
-    # Update member
+    # Update member in database
     members_collection.update_one(
         {"id": member_id},
         {"$set": update_data}
@@ -291,52 +246,87 @@ async def update_member(member_id: str, member_update: MemberUpdate):
     updated_member = members_collection.find_one({"id": member_id}, {"_id": 0})
     return Member(**updated_member)
 
-@app.delete("/api/members/{member_id}")
-async def delete_member(member_id: str):
-    result = members_collection.delete_one({"id": member_id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Conta não encontrada")
+@app.put("/api/members/{member_id}/programs/{company_id}")
+async def update_program(member_id: str, company_id: str, program_update: ProgramUpdate):
+    member = members_collection.find_one({"id": member_id})
+    if not member:
+        raise HTTPException(status_code=404, detail="Membro não encontrado")
     
-    # Also delete balance history
-    balance_history_collection.delete_many({"member_id": member_id})
+    if company_id not in member["programs"]:
+        raise HTTPException(status_code=404, detail="Programa não encontrado")
     
-    return {"message": "Conta excluída com sucesso"}
+    company = companies_collection.find_one({"id": company_id})
+    company_name = company["name"] if company else company_id
+    
+    old_program = member["programs"][company_id]
+    updated_program = old_program.copy()
+    
+    # Track changes
+    changes = []
+    update_dict = program_update.dict(exclude_unset=True)
+    
+    for field, new_value in update_dict.items():
+        if field in old_program and old_program[field] != new_value:
+            old_value = old_program[field]
+            updated_program[field] = new_value
+            changes.append(f"{field}: {old_value} → {new_value}")
+            
+            # Log change
+            log_change(member_id, member["name"], company_id, company_name, 
+                     field, str(old_value), str(new_value))
+    
+    # Update timestamps and change info
+    updated_program["last_updated"] = datetime.utcnow()
+    if changes:
+        updated_program["last_change"] = ", ".join(changes)
+    
+    # Update in database
+    members_collection.update_one(
+        {"id": member_id},
+        {
+            "$set": {
+                f"programs.{company_id}": updated_program,
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    return {"message": "Programa atualizado com sucesso", "changes": changes}
 
-# Balance history endpoints
-@app.get("/api/members/{member_id}/history", response_model=List[BalanceHistory])
-async def get_member_history(member_id: str):
-    history = list(balance_history_collection.find(
-        {"member_id": member_id},
+# Global log endpoint
+@app.get("/api/global-log")
+async def get_global_log(limit: int = 50):
+    log_entries = list(global_log_collection.find(
+        {}, 
         {"_id": 0}
-    ).sort("updated_at", -1))
-    return history
+    ).sort("timestamp", -1).limit(limit))
+    
+    return log_entries
 
 # Dashboard stats
 @app.get("/api/dashboard/stats")
 async def get_dashboard_stats():
     total_members = members_collection.count_documents({})
-    companies = list(companies_collection.find({}, {"_id": 0}))
+    total_companies = companies_collection.count_documents({})
     
-    # Get member counts per company
-    company_stats = []
-    for company in companies:
-        member_count = members_collection.count_documents({"company_id": company["id"]})
-        total_points = 0
-        
-        members = list(members_collection.find({"company_id": company["id"]}, {"current_balance": 1}))
-        for member in members:
-            total_points += member.get("current_balance", 0)
-        
-        company_stats.append({
-            "company": company,
-            "member_count": member_count,
-            "total_points": total_points
-        })
+    # Calculate total points across all programs
+    total_points = 0
+    members = list(members_collection.find({}, {"programs": 1}))
+    
+    for member in members:
+        for program in member.get("programs", {}).values():
+            total_points += program.get("current_balance", 0)
+    
+    # Get recent activity count
+    recent_logs = global_log_collection.count_documents({
+        "timestamp": {"$gte": datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)}
+    })
     
     return {
         "total_members": total_members,
-        "total_companies": len(companies),
-        "company_stats": company_stats
+        "total_companies": total_companies,
+        "total_points": total_points,
+        "recent_activity": recent_logs
     }
 
 # Health check
