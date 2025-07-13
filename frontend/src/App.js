@@ -312,7 +312,9 @@ function App() {
       <div className={`login-container ${darkMode ? 'dark-mode' : ''}`}>
         <div className="login-box">
           <h1>Programas de Milhas</h1>
-          <h2>lech.world</h2>
+          <div className="brand-card">
+            <span className="brand-text">lech.world</span>
+          </div>
           <form onSubmit={handleLogin} className="login-form">
             <div className="form-group">
               <label>Login:</label>
