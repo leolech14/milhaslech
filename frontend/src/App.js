@@ -233,7 +233,12 @@ function App() {
     }
   };
 
-  // Post-it functions
+  // Toggle dark mode
+  const toggleDarkMode = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    localStorage.setItem('lech_dark_mode', newDarkMode.toString());
+  };
   const createPostit = async (content) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/postits`, {
