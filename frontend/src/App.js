@@ -30,13 +30,6 @@ function App() {
     selectedProgram: 'LATAM Pass',
     customProgram: ''
   });
-  const [pullUpGesture, setPullUpGesture] = useState({
-    isActive: false,
-    startY: 0,
-    currentY: 0,
-    isDragging: false,
-    progress: 0
-  });
   const [uiSmartSystem, setUiSmartSystem] = useState({
     isActive: true,
     detectedIssues: [],
