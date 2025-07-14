@@ -1483,6 +1483,26 @@ body.dark-mode::before {
   padding: 2rem;
 }
 
+/* WhatsApp Modal Mobile */
+@media (max-width: 768px) {
+  .whatsapp-modal {
+    max-width: 95vw;
+    padding: 1.5rem;
+    margin: 1rem;
+    border-radius: 12px;
+  }
+  
+  .whatsapp-modal h3 {
+    font-size: 1.125rem;
+    text-align: center;
+  }
+  
+  .whatsapp-modal p {
+    font-size: 0.875rem;
+    text-align: center;
+  }
+}
+
 .whatsapp-modal h3 {
   color: var(--accent-primary);
   margin-bottom: 1rem;
