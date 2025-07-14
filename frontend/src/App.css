@@ -376,6 +376,30 @@ body.dark-mode::before {
   background-color: #e8f5e8;
   background-image: linear-gradient(135deg, #e8f5e8 0%, #d4f1d4 100%);
   border-color: #b8e6b8;
+  border-width: 2px;
+  border-style: dashed;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.postit.new-postit textarea {
+  color: #2d5a2d;
+  font-weight: 500;
+}
+
+.postit.new-postit textarea::placeholder {
+  color: #5a8a5a;
+  font-style: italic;
 }
 
 .postit.editing {
