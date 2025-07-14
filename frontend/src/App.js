@@ -696,7 +696,8 @@ const MemberCard = ({
   onToggleProgram, onStartEditing, onCancelEditing, onUpdateField, onSaveChanges,
   onCopyToClipboard, formatDate, formatNumber, getCompanyById,
   showAddCompany, newCompanyData, onShowAddCompany, onHideAddCompany,
-  onUpdateNewCompanyField, onCreateNewCompany, editingFields, setEditingFields
+  onUpdateNewCompanyField, onCreateNewCompany, editingFields, setEditingFields,
+  onDeleteProgram, onToggleFieldEditing
 }) => {
   return (
     <div className="member-card">
@@ -746,6 +747,7 @@ const MemberCard = ({
           const isExpanded = expandedPrograms[`${member.id}-${company.id}`];
           const isEditing = editingPrograms[`${member.id}-${company.id}`];
           const changes = programChanges[`${member.id}-${company.id}`] || {};
+          const isEditingFields = editingFields[`${member.id}-${company.id}`];
           
           return (
             <ProgramBlock
@@ -755,6 +757,7 @@ const MemberCard = ({
               program={program}
               isExpanded={isExpanded}
               isEditing={isEditing}
+              isEditingFields={isEditingFields}
               changes={changes}
               onToggle={() => onToggleProgram(member.id, company.id)}
               onStartEditing={() => onStartEditing(member.id, company.id, program)}
@@ -764,8 +767,8 @@ const MemberCard = ({
               onCopyToClipboard={onCopyToClipboard}
               formatDate={formatDate}
               formatNumber={formatNumber}
-              editingFields={editingFields}
-              setEditingFields={setEditingFields}
+              onDeleteProgram={() => onDeleteProgram(company.id)}
+              onToggleFieldEditing={() => onToggleFieldEditing(company.id)}
             />
           );
         })}
