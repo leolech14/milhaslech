@@ -1942,11 +1942,31 @@ const FieldDisplay = ({ label, value, onCopy }) => (
   </div>
 );
 
-const EditableFieldWithDelete = ({ label, value, onChange, onDelete, type = "text", canDelete = false }) => {
+const EditableFieldWithDelete = ({ 
+  label, 
+  value, 
+  onChange, 
+  onDelete, 
+  onRename, 
+  type = "text", 
+  canDelete = false,
+  canRename = false 
+}) => {
   return (
     <div className="field-group">
       <div className="field-container">
-        <label className="field-label">{label}:</label>
+        <label className="field-label">
+          {label}:
+          {canRename && (
+            <button 
+              className="rename-field-btn" 
+              onClick={() => onRename(label)}
+              title="Renomear campo"
+            >
+              ✏️
+            </button>
+          )}
+        </label>
         {canDelete && (
           <button className="delete-field-btn" onClick={() => onDelete(label)}>
             ×
