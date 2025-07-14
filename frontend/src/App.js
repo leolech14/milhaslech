@@ -268,72 +268,6 @@ function App() {
       // Scroll handling logic can be added here if needed
     };
 
-    // Pull-up gesture handlers for mobile WhatsApp
-    const handleTouchStart = (e) => {
-      const isMobile = window.innerWidth <= 768;
-      if (!isMobile) return;
-      
-      const touch = e.touches[0];
-      const screenHeight = window.innerHeight;
-      const startY = touch.clientY;
-      
-      // Only activate if touch starts in bottom 20% of screen
-      if (startY > screenHeight * 0.8) {
-        setPullUpGesture({
-          isActive: true,
-          startY: startY,
-          currentY: startY,
-          isDragging: false,
-          progress: 0
-        });
-      }
-    };
-
-    const handleTouchMove = (e) => {
-      if (!pullUpGesture.isActive) return;
-      
-      const touch = e.touches[0];
-      const currentY = touch.clientY;
-      const screenHeight = window.innerHeight;
-      const deltaY = pullUpGesture.startY - currentY;
-      const threshold = screenHeight * 0.4; // 40% of screen height
-      
-      if (deltaY > 0) { // Moving up
-        const progress = Math.min(deltaY / threshold, 1);
-        setPullUpGesture(prev => ({
-          ...prev,
-          currentY: currentY,
-          isDragging: true,
-          progress: progress
-        }));
-        
-        // Prevent default scrolling when dragging
-        if (progress > 0.1) {
-          e.preventDefault();
-        }
-      }
-    };
-
-    const handleTouchEnd = (e) => {
-      if (!pullUpGesture.isActive) return;
-      
-      const progress = pullUpGesture.progress;
-      
-      if (progress >= 1) {
-        // Trigger WhatsApp modal
-        showWhatsappModal();
-      }
-      
-      // Reset gesture state
-      setPullUpGesture({
-        isActive: false,
-        startY: 0,
-        currentY: 0,
-        isDragging: false,
-        progress: 0
-      });
-    };
-
     // Handle ESC key for modals
     const handleEsc = (event) => {
       if (event.key === 'Escape') {
@@ -353,20 +287,12 @@ function App() {
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('resize', handleScroll);
     
-    // Add touch event listeners
-    document.addEventListener('touchstart', handleTouchStart, { passive: false });
-    document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('touchend', handleTouchEnd, { passive: false });
-    
     return () => {
       document.removeEventListener('keydown', handleEsc);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
-      document.removeEventListener('touchstart', handleTouchStart);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [whatsappModal.show, deleteConfirmModal.show, pullUpGesture.isActive]);
+  }, [whatsappModal.show, deleteConfirmModal.show]);
 
   // Handle login
   const handleLogin = (e) => {
