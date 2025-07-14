@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-app = FastAPI(title="Programas de Milhas Família Lech API", version="1.0")
+app = FastAPI(title="Programas de Pontos Família Lech API", version="1.0")
 
 # CORS middleware
 app.add_middleware(
