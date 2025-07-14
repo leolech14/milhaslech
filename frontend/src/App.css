@@ -367,6 +367,7 @@ body.dark-mode::before {
   background-image: linear-gradient(135deg, #ffe6e6 0%, #ffd1d1 100%);
   border-color: #ffb3b3;
   cursor: default;
+  transform: none;
 }
 
 .postit-delete {
