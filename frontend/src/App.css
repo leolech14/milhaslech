@@ -1872,6 +1872,35 @@ body.dark-mode::before {
   border-color: var(--accent-danger);
 }
 
+.action-btn.whatsapp-btn {
+  background-color: #86efac; /* Verde pastel para light mode */
+  color: #16a34a;
+  border-color: #22c55e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn.whatsapp-btn:hover {
+  background-color: #4ade80;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+/* Dark mode WhatsApp button in bottom actions */
+.dark-mode .action-btn.whatsapp-btn {
+  background-color: #25D366; /* Verde neon para dark mode */
+  color: white;
+  border-color: #25D366;
+}
+
+.dark-mode .action-btn.whatsapp-btn:hover {
+  background-color: #20b858;
+  border-color: #20b858;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+}
+
 /* Enhanced Responsive Design */
 @media (max-width: 1024px) {
   .main-content {
