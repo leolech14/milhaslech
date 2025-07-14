@@ -842,7 +842,8 @@ const MemberCard = ({
 const ProgramBlock = ({ 
   member, company, program, isExpanded, isEditing, isEditingFields, changes,
   onToggle, onStartEditing, onCancelEditing, onUpdateField, onSaveChanges,
-  onCopyToClipboard, formatDate, formatNumber, onDeleteProgram, onToggleFieldEditing
+  onCopyToClipboard, formatDate, formatNumber, onDeleteProgram, onToggleFieldEditing,
+  onDeleteField
 }) => {
   const currentData = { ...program, ...changes };
 
