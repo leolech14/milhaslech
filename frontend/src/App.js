@@ -771,7 +771,7 @@ const ProgramBlock = ({
                 <FieldDisplay label="CPF" value={currentData.cpf} onCopy={onCopyToClipboard} />
                 <FieldDisplay label="Nº do Cartão" value={currentData.card_number} onCopy={onCopyToClipboard} />
                 <FieldDisplay 
-                  label={`Saldo (${company.points_name})`} 
+                  label="Saldo (pontos)" 
                   value={formatNumber(currentData.current_balance)} 
                   onCopy={onCopyToClipboard} 
                 />
