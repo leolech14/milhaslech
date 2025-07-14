@@ -778,9 +778,9 @@ const MemberCard = ({
 };
 
 const ProgramBlock = ({ 
-  member, company, program, isExpanded, isEditing, changes,
+  member, company, program, isExpanded, isEditing, isEditingFields, changes,
   onToggle, onStartEditing, onCancelEditing, onUpdateField, onSaveChanges,
-  onCopyToClipboard, formatDate, formatNumber 
+  onCopyToClipboard, formatDate, formatNumber, onDeleteProgram, onToggleFieldEditing
 }) => {
   const currentData = { ...program, ...changes };
 
@@ -864,12 +864,22 @@ const ProgramBlock = ({
               </div>
               
               <div className="edit-actions">
-                <button className="cancel-btn" onClick={onCancelEditing}>
-                  Cancelar
-                </button>
-                <button className="save-btn" onClick={onSaveChanges}>
-                  Salvar
-                </button>
+                <div className="left-actions">
+                  <button className="field-edit-btn" onClick={onToggleFieldEditing}>
+                    🔧 Editar campos
+                  </button>
+                  <button className="delete-program-btn" onClick={onDeleteProgram}>
+                    🗑️ Deletar programa
+                  </button>
+                </div>
+                <div className="right-actions">
+                  <button className="cancel-btn" onClick={onCancelEditing}>
+                    Cancelar
+                  </button>
+                  <button className="save-btn" onClick={onSaveChanges}>
+                    Salvar
+                  </button>
+                </div>
               </div>
             </div>
           )}
