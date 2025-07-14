@@ -30,6 +30,7 @@ function App() {
     selectedProgram: 'LATAM Pass',
     customProgram: ''
   });
+  const [showWhatsappBtn, setShowWhatsappBtn] = useState(false);
 
   // Fixed order for family members
   const familyOrder = ["Osvandré", "Marilise", "Graciela", "Leonardo"];
