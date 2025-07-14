@@ -499,7 +499,7 @@ function App() {
 const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats, postits, onCreatePostit, onUpdatePostit, onDeletePostit, editingPostit, setEditingPostit }) => (
   <aside className="sidebar">
     <div className="sidebar-header">
-      <h1>Programas de Milhas</h1>
+      <h1>Programas de Pontos</h1>
       <p>lech.world</p>
     </div>
     
