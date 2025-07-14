@@ -815,7 +815,7 @@ const ProgramBlock = ({
                   onChange={(value) => onUpdateField('card_number', value)}
                 />
                 <EditableField 
-                  label={`Saldo (${company.points_name})`} 
+                  label="Saldo (pontos)" 
                   value={currentData.current_balance} 
                   onChange={(value) => onUpdateField('current_balance', value)}
                   type="number"
