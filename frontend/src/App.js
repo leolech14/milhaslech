@@ -1185,12 +1185,6 @@ function App() {
       
       <main className="main-content">
         <TopBar 
-          onRefresh={() => {
-            fetchMembers();
-            fetchGlobalLog();
-            fetchDashboardStats();
-            fetchPostits();
-          }}
           dashboardStats={dashboardStats}
           darkMode={darkMode}
           onToggleDarkMode={toggleDarkMode}
