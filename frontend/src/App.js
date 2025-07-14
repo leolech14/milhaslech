@@ -270,16 +270,9 @@ function App() {
       document.body.classList.remove('dark-mode');
     }
 
-    // Handle scroll to show/hide WhatsApp button on mobile
+    // Handle scroll - removed WhatsApp button logic
     const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const isMobile = window.innerWidth <= 768;
-      
-      if (isMobile) {
-        setShowWhatsappBtn(scrollY > 200); // Show after scrolling 200px on mobile
-      } else {
-        setShowWhatsappBtn(true); // Always show on desktop (in sidebar)
-      }
+      // Scroll handling logic can be added here if needed
     };
 
     // Pull-up gesture handlers for mobile WhatsApp
