@@ -1340,10 +1340,16 @@ body.dark-mode::before {
   .whatsapp-btn-mobile.show {
     opacity: 1;
     transform: translateY(0);
+    display: flex;
   }
   
   .dark-mode .whatsapp-btn-mobile {
     background-color: #25D366; /* Verde neon para dark mode */
+    color: white;
+  }
+  
+  .dark-mode .whatsapp-btn-mobile.show {
+    background-color: #25D366;
     color: white;
   }
 }
