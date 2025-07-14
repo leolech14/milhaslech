@@ -830,6 +830,7 @@ const MemberCard = ({
               formatNumber={formatNumber}
               onDeleteProgram={() => onDeleteProgram(company.id)}
               onToggleFieldEditing={() => onToggleFieldEditing(company.id)}
+              onDeleteField={(fieldName) => onDeleteField(company.id, fieldName)}
             />
           );
         })}
