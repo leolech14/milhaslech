@@ -1572,7 +1572,7 @@ const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats, postits, onCreateP
   );
 };
 
-const TopBar = ({ onRefresh, dashboardStats, darkMode, onToggleDarkMode }) => (
+const TopBar = ({ dashboardStats, darkMode, onToggleDarkMode }) => (
   <header className="top-bar">
     <div className="top-bar-left">
       <h2>Painel</h2>
