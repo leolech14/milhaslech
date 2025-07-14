@@ -37,7 +37,6 @@ class Company(BaseModel):
     id: str
     name: str
     color: str
-    points_name: str
 
 class ProgramData(BaseModel):
     company_id: str
