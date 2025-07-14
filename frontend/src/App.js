@@ -348,6 +348,47 @@ function App() {
     }));
   };
 
+  // Confirm field editing changes
+  const confirmFieldEditing = (memberId, companyId) => {
+    const key = `${memberId}-${companyId}`;
+    setEditingFields(prev => ({
+      ...prev,
+      [key]: false
+    }));
+  };
+
+  // Cancel field editing
+  const cancelFieldEditing = (memberId, companyId) => {
+    const key = `${memberId}-${companyId}`;
+    setEditingFields(prev => ({
+      ...prev,
+      [key]: false
+    }));
+  };
+
+  // Add new field
+  const addNewField = async (memberId, companyId) => {
+    const fieldName = prompt('Nome do novo campo:');
+    if (!fieldName) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ [fieldName]: '' }),
+      });
+      
+      if (response.ok) {
+        await fetchMembers();
+        await fetchGlobalLog();
+      }
+    } catch (error) {
+      console.error('Erro ao adicionar campo:', error);
+    }
+  };
+
   // Delete individual field
   const deleteField = async (memberId, companyId, fieldName) => {
     if (!confirm(`Tem certeza que deseja excluir o campo "${fieldName}"?`)) return;
