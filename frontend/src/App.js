@@ -396,6 +396,116 @@ function App() {
     }
   };
 
+  // WhatsApp Export Functions
+  const showWhatsappModal = () => {
+    setWhatsappModal(prev => ({ ...prev, show: true }));
+  };
+
+  const hideWhatsappModal = () => {
+    setWhatsappModal({
+      show: false,
+      exportType: 'all',
+      selectedUser: 'Osvandré',
+      selectedProgram: 'LATAM Pass',
+      customProgram: ''
+    });
+  };
+
+  const updateWhatsappModal = (field, value) => {
+    setWhatsappModal(prev => ({ ...prev, [field]: value }));
+  };
+
+  const getAllData = () => {
+    let message = "📊 RESUMO COMPLETO - PROGRAMAS DE PONTOS\n\n";
+    
+    members.forEach(member => {
+      message += `👤 ${member.name.toUpperCase()}\n`;
+      companies.forEach(company => {
+        const program = member.programs[company.id];
+        if (program && program.current_balance > 0) {
+          message += `• ${company.name}: ${formatNumber(program.current_balance)} pontos\n`;
+          if (program.elite_tier) message += `  Categoria: ${program.elite_tier}\n`;
+        }
+      });
+      message += "\n";
+    });
+    
+    message += `📈 Total Geral: ${formatNumber(dashboardStats.total_points)} pontos\n`;
+    message += `📅 Atualizado em: ${new Date().toLocaleDateString('pt-BR')}`;
+    
+    return message;
+  };
+
+  const getUserData = (userName) => {
+    const member = members.find(m => m.name === userName);
+    if (!member) return "Usuário não encontrado";
+    
+    let message = `👤 RESUMO DE ${member.name.toUpperCase()}\n\n`;
+    
+    companies.forEach(company => {
+      const program = member.programs[company.id];
+      if (program) {
+        message += `${company.name}:\n`;
+        message += `• Pontos: ${formatNumber(program.current_balance)}\n`;
+        if (program.login) message += `• Login: ${program.login}\n`;
+        if (program.elite_tier) message += `• Categoria: ${program.elite_tier}\n`;
+        if (program.last_updated) {
+          message += `• Atualizado: ${formatDate(program.last_updated)}\n`;
+        }
+        message += "\n";
+      }
+    });
+    
+    return message;
+  };
+
+  const getProgramData = (programName) => {
+    const company = companies.find(c => c.name.toLowerCase() === programName.toLowerCase());
+    if (!company) return "Programa não encontrado";
+    
+    let message = `✈️ RESUMO DO PROGRAMA ${programName.toUpperCase()}\n\n`;
+    
+    members.forEach(member => {
+      const program = member.programs[company.id];
+      if (program && program.current_balance > 0) {
+        message += `👤 ${member.name}:\n`;
+        message += `• Pontos: ${formatNumber(program.current_balance)}\n`;
+        if (program.elite_tier) message += `• Categoria: ${program.elite_tier}\n`;
+        if (program.last_updated) {
+          message += `• Atualizado: ${formatDate(program.last_updated)}\n`;
+        }
+        message += "\n";
+      }
+    });
+    
+    return message;
+  };
+
+  const generateWhatsappMessage = () => {
+    const { exportType, selectedUser, selectedProgram, customProgram } = whatsappModal;
+    
+    switch (exportType) {
+      case 'all':
+        return getAllData();
+      case 'user':
+        return getUserData(selectedUser);
+      case 'program':
+        const programName = customProgram || selectedProgram;
+        return getProgramData(programName);
+      default:
+        return getAllData();
+    }
+  };
+
+  const exportToWhatsapp = () => {
+    const message = generateWhatsappMessage();
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    hideWhatsappModal();
+  };
+
   // Delete individual field
   const deleteField = async (memberId, companyId, fieldName) => {
     if (!confirm(`Tem certeza que deseja excluir o campo "${fieldName}"?`)) return;
