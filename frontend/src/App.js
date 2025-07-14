@@ -517,7 +517,7 @@ const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats, postits, onCreateP
 const TopBar = ({ onRefresh, dashboardStats, darkMode, onToggleDarkMode }) => (
   <header className="top-bar">
     <div className="top-bar-left">
-      <h2>Painel de pontos</h2>
+      <h2>Painel</h2>
       {dashboardStats && (
         <div className="total-points-inline">
           <span>Total:</span>
