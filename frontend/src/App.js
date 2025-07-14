@@ -1700,7 +1700,7 @@ const MemberCard = ({
   showAddCompany, newCompanyData, onShowAddCompany, onHideAddCompany,
   onUpdateNewCompanyField, onCreateNewCompany, editingFields, setEditingFields,
   onDeleteProgram, onToggleFieldEditing, onConfirmFieldEditing, onCancelFieldEditing,
-  onDeleteField, onAddNewField
+  onDeleteField, onRenameField, onAddNewField
 }) => {
   return (
     <div className="member-card">
