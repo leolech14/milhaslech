@@ -1242,6 +1242,7 @@ function App() {
               onConfirmFieldEditing={(companyId) => confirmFieldEditing(member.id, companyId)}
               onCancelFieldEditing={(companyId) => cancelFieldEditing(member.id, companyId)}
               onDeleteField={(companyId, fieldName) => deleteField(member.id, companyId, fieldName)}
+              onRenameField={(companyId, fieldName) => startFieldRenaming(member.id, companyId, fieldName)}
               onAddNewField={(companyId) => addNewField(member.id, companyId)}
             />
           ))}
