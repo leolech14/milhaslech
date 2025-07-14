@@ -508,7 +508,7 @@ function App() {
               onCreateNewCompany={() => createNewCompany(member.id)}
               editingFields={editingFields}
               setEditingFields={setEditingFields}
-              onDeleteProgram={(companyId) => deleteProgram(member.id, companyId)}
+              onDeleteProgram={(companyId) => showDeleteConfirm(member.id, companyId)}
               onToggleFieldEditing={(companyId) => toggleFieldEditing(member.id, companyId)}
             />
           ))}
