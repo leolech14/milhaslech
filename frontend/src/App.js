@@ -1775,6 +1775,7 @@ const MemberCard = ({
               onConfirmFieldEditing={() => onConfirmFieldEditing(company.id)}
               onCancelFieldEditing={() => onCancelFieldEditing(company.id)}
               onDeleteField={(fieldName) => onDeleteField(company.id, fieldName)}
+              onRenameField={(fieldName) => onRenameField(company.id, fieldName)}
               onAddNewField={() => onAddNewField(company.id)}
             />
           );
