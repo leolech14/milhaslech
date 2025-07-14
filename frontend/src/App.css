@@ -447,7 +447,8 @@ body.dark-mode::before {
   color: #444;
   word-wrap: break-word;
   padding: 0.5rem;
-  padding-top: 1.5rem; /* Space for delete button */
+  padding-top: 1rem; /* Space for delete button */
+  padding-right: 1rem; /* Space for delete button */
   cursor: pointer;
   min-height: 60px;
   display: flex;
