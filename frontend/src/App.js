@@ -25,6 +25,7 @@ function App() {
   const [editingPrograms, setEditingPrograms] = useState({});
   const [programChanges, setProgramChanges] = useState({});
   const [copyFeedback, setCopyFeedback] = useState('');
+  const [saveFeedback, setSaveFeedback] = useState({});
   const [postits, setPostits] = useState([]);
   const [editingPostit, setEditingPostit] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
@@ -451,7 +452,7 @@ function App() {
       ...prev,
       [key]: {
         ...prev[key],
-        [field]: field === 'current_balance' ? parseInt(value) || 0 : value
+        [field]: field === 'current_balance' ? (value === '' ? '' : parseInt(value) || 0) : value
       }
     }));
   };
@@ -466,13 +467,19 @@ function App() {
       return;
     }
 
+    // Ensure current_balance is a number when saving
+    const changesForSave = { ...changes };
+    if ('current_balance' in changesForSave) {
+      changesForSave.current_balance = parseInt(changesForSave.current_balance) || 0;
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(changes),
+        body: JSON.stringify(changesForSave),
       });
       
       if (response.ok) {
@@ -480,6 +487,17 @@ function App() {
         await fetchGlobalLog();
         await fetchDashboardStats();
         cancelEditing(memberId, companyId);
+        
+        // Show save feedback
+        const feedbackKey = `${memberId}-${companyId}`;
+        setSaveFeedback(prev => ({ ...prev, [feedbackKey]: true }));
+        setTimeout(() => {
+          setSaveFeedback(prev => {
+            const newFeedback = { ...prev };
+            delete newFeedback[feedbackKey];
+            return newFeedback;
+          });
+        }, 2000);
       } else {
         console.error('Erro ao salvar alterações');
       }
@@ -510,6 +528,10 @@ function App() {
       document.body.classList.add('dark-mode');
     } else {
       document.body.classList.remove('dark-mode');
+      // Force repaint to ensure all styles are properly updated
+      document.body.style.display = 'none';
+      document.body.offsetHeight; // Force reflow
+      document.body.style.display = '';
     }
     
     // Don't reload data when switching themes - this was causing data disappearance
@@ -1178,6 +1200,7 @@ function App() {
               expandedPrograms={expandedPrograms}
               editingPrograms={editingPrograms}
               programChanges={programChanges}
+              saveFeedback={saveFeedback}
               onToggleProgram={toggleProgram}
               onStartEditing={startEditing}
               onCancelEditing={cancelEditing}
@@ -1703,7 +1726,7 @@ const BottomActions = ({ onShowGlobalLog, onLogout, onShowWhatsappModal }) => (
 );
 
 const MemberCard = ({ 
-  member, companies, expandedPrograms, editingPrograms, programChanges,
+  member, companies, expandedPrograms, editingPrograms, programChanges, saveFeedback,
   onToggleProgram, onStartEditing, onCancelEditing, onUpdateField, onSaveChanges,
   onCopyToClipboard, formatDate, formatNumber, getCompanyById,
   showAddCompany, newCompanyData, onShowAddCompany, onHideAddCompany,
@@ -1760,6 +1783,7 @@ const MemberCard = ({
           const isEditing = editingPrograms[`${member.id}-${company.id}`];
           const changes = programChanges[`${member.id}-${company.id}`] || {};
           const isEditingFields = editingFields[`${member.id}-${company.id}`];
+          const hasSaveFeedback = saveFeedback[`${member.id}-${company.id}`];
           
           return (
             <ProgramBlock
@@ -1771,6 +1795,7 @@ const MemberCard = ({
               isEditing={isEditing}
               isEditingFields={isEditingFields}
               changes={changes}
+              hasSaveFeedback={hasSaveFeedback}
               onToggle={() => onToggleProgram(member.id, company.id)}
               onStartEditing={() => onStartEditing(member.id, company.id, program)}
               onCancelEditing={() => onCancelEditing(member.id, company.id)}
@@ -1795,7 +1820,7 @@ const MemberCard = ({
 };
 
 const ProgramBlock = ({ 
-  member, company, program, isExpanded, isEditing, isEditingFields, changes,
+  member, company, program, isExpanded, isEditing, isEditingFields, changes, hasSaveFeedback,
   onToggle, onStartEditing, onCancelEditing, onUpdateField, onSaveChanges,
   onCopyToClipboard, formatDate, formatNumber, onDeleteProgram, onToggleFieldEditing,
   onConfirmFieldEditing, onCancelFieldEditing, onDeleteField, onRenameField, onAddNewField
@@ -1809,6 +1834,9 @@ const ProgramBlock = ({
           <span className="program-title">
             {company.name} → {formatNumber(currentData.current_balance)} pontos
           </span>
+          {hasSaveFeedback && (
+            <span className="save-feedback">✔️ Salvo!</span>
+          )}
         </div>
         <div className="expand-icon">
           {isExpanded ? '▼' : '▶'}
@@ -1856,6 +1884,8 @@ const ProgramBlock = ({
                   onRename={onRenameField}
                   canDelete={isEditingFields}
                   canRename={isEditingFields}
+                  onSave={onSaveChanges}
+                  onCancel={onCancelEditing}
                 />
                 <EditableFieldWithDelete 
                   label="Senha" 
@@ -1865,6 +1895,8 @@ const ProgramBlock = ({
                   onRename={onRenameField}
                   canDelete={isEditingFields}
                   canRename={isEditingFields}
+                  onSave={onSaveChanges}
+                  onCancel={onCancelEditing}
                 />
                 <EditableFieldWithDelete 
                   label="CPF" 
@@ -1874,6 +1906,8 @@ const ProgramBlock = ({
                   onRename={onRenameField}
                   canDelete={isEditingFields}
                   canRename={isEditingFields}
+                  onSave={onSaveChanges}
+                  onCancel={onCancelEditing}
                 />
                 <EditableFieldWithDelete 
                   label="Nº do Cartão" 
@@ -1883,6 +1917,8 @@ const ProgramBlock = ({
                   onRename={onRenameField}
                   canDelete={isEditingFields}
                   canRename={isEditingFields}
+                  onSave={onSaveChanges}
+                  onCancel={onCancelEditing}
                 />
                 <EditableFieldWithDelete 
                   label="Saldo (pontos)" 
@@ -1893,6 +1929,8 @@ const ProgramBlock = ({
                   onRename={onRenameField}
                   canDelete={isEditingFields}
                   canRename={isEditingFields}
+                  onSave={onSaveChanges}
+                  onCancel={onCancelEditing}
                 />
                 <EditableFieldWithDelete 
                   label="Categoria" 
@@ -1902,6 +1940,8 @@ const ProgramBlock = ({
                   onRename={onRenameField}
                   canDelete={isEditingFields}
                   canRename={isEditingFields}
+                  onSave={onSaveChanges}
+                  onCancel={onCancelEditing}
                 />
               </div>
               
@@ -1973,8 +2013,20 @@ const EditableFieldWithDelete = ({
   onRename, 
   type = "text", 
   canDelete = false,
-  canRename = false 
+  canRename = false,
+  onSave,
+  onCancel 
 }) => {
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && onSave) {
+      e.preventDefault();
+      onSave();
+    } else if (e.key === 'Escape' && onCancel) {
+      e.preventDefault();
+      onCancel();
+    }
+  };
+
   return (
     <div className="field-group">
       <div className="field-container">
@@ -2000,6 +2052,7 @@ const EditableFieldWithDelete = ({
         type={type}
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={handleKeyDown}
         className="field-input"
       />
     </div>

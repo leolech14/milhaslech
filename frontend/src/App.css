@@ -918,6 +918,9 @@ body.dark-mode::before {
 
 .program-info {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .program-title {
@@ -927,6 +930,32 @@ body.dark-mode::before {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.save-feedback {
+  color: var(--accent-success);
+  font-size: 0.875rem;
+  font-weight: 600;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(10px);
+  }
 }
 
 .expand-icon {
