@@ -1184,7 +1184,6 @@ function App() {
         onDeletePostit={deletePostit}
         editingPostit={editingPostit}
         setEditingPostit={setEditingPostit}
-        showWhatsappBtn={showWhatsappBtn}
         showWhatsappModal={showWhatsappModal}
       />
       
