@@ -381,7 +381,7 @@ function App() {
           {darkMode ? '🔆' : '🌚'}
         </button>
         <div className="login-box">
-          <h1>Programas de Milhas</h1>
+          <h1>Programas de Pontos</h1>
           <div className="brand-card">
             <span className="brand-text">lech.world</span>
           </div>
