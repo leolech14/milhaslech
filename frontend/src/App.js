@@ -1012,6 +1012,68 @@ function App() {
       console.error('Erro ao deletar campo:', error);
     }
   };
+
+  // Field renaming functions
+  const startFieldRenaming = (memberId, companyId, fieldName) => {
+    setFieldRenaming({
+      isActive: true,
+      memberId: memberId,
+      companyId: companyId,
+      fieldName: fieldName,
+      newName: fieldName
+    });
+  };
+
+  const cancelFieldRenaming = () => {
+    setFieldRenaming({
+      isActive: false,
+      memberId: null,
+      companyId: null,
+      fieldName: '',
+      newName: ''
+    });
+  };
+
+  const confirmFieldRenaming = async () => {
+    const { memberId, companyId, fieldName, newName } = fieldRenaming;
+    
+    if (!newName.trim() || newName === fieldName) {
+      cancelFieldRenaming();
+      return;
+    }
+
+    try {
+      // Get current member data
+      const member = members.find(m => m.id === memberId);
+      const program = member.programs[companyId];
+      const currentValue = program[fieldName] || program.custom_fields?.[fieldName] || '';
+      
+      // Create update data: remove old field and add new field
+      const updateData = {
+        [fieldName]: '', // Remove old field
+        [newName]: currentValue // Add new field with same value
+      };
+      
+      // Send update to backend
+      const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+      
+      if (response.ok) {
+        await fetchMembers();
+        await fetchGlobalLog();
+        cancelFieldRenaming();
+      } else {
+        console.error('Erro ao renomear campo');
+      }
+    } catch (error) {
+      console.error('Erro ao renomear campo:', error);
+    }
+  };
   const createPostit = async (content) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/postits`, {
