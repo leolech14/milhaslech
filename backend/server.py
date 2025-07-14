@@ -315,6 +315,67 @@ async def update_program(member_id: str, company_id: str, program_update: Progra
     
     return {"message": "Programa atualizado com sucesso", "changes": changes}
 
+# Add new company to member
+@app.post("/api/members/{member_id}/companies")
+async def add_company_to_member(member_id: str, new_company: NewCompanyData):
+    member = members_collection.find_one({"id": member_id})
+    if not member:
+        raise HTTPException(status_code=404, detail="Membro não encontrado")
+    
+    # Create new company ID
+    company_id = str(uuid.uuid4())
+    
+    # Create company entry
+    company_data = {
+        "id": company_id,
+        "name": new_company.company_name,
+        "color": new_company.color,
+        "points_name": new_company.points_name
+    }
+    
+    # Add to companies collection if it doesn't exist
+    existing_company = companies_collection.find_one({"name": new_company.company_name})
+    if not existing_company:
+        companies_collection.insert_one(company_data)
+    else:
+        company_id = existing_company["id"]
+    
+    # Create default program data for the member
+    default_program = {
+        "company_id": company_id,
+        "login": "",
+        "password": "",
+        "cpf": "",
+        "card_number": "",
+        "current_balance": 0,
+        "elite_tier": "",
+        "notes": "",
+        "last_updated": datetime.utcnow(),
+        "last_change": "Programa criado",
+        "custom_fields": {}
+    }
+    
+    # Add program to member
+    members_collection.update_one(
+        {"id": member_id},
+        {
+            "$set": {
+                f"programs.{company_id}": default_program,
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    # Log the addition
+    log_change(member_id, member["name"], company_id, new_company.company_name, 
+               "programa", "", "adicionado")
+    
+    return {
+        "message": "Nova companhia adicionada com sucesso",
+        "company_id": company_id,
+        "company_name": new_company.company_name
+    }
+
 # Global log endpoint
 @app.get("/api/global-log")
 async def get_global_log(limit: int = 50):
