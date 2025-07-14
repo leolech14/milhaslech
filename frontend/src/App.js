@@ -57,9 +57,9 @@ function App() {
       const isMobile = window.innerWidth <= 768;
       
       if (isMobile) {
-        setShowWhatsappBtn(scrollY > 200); // Show after scrolling 200px
+        setShowWhatsappBtn(scrollY > 200); // Show after scrolling 200px on mobile
       } else {
-        setShowWhatsappBtn(true); // Always show on desktop
+        setShowWhatsappBtn(true); // Always show on desktop (in sidebar)
       }
     };
 
