@@ -950,10 +950,9 @@ function App() {
       )}
     </div>
   );
+}
 
-
-      {/* WhatsApp Export Modal */}
-      {whatsappModal.show && (
+// Components
         <div className="modal-overlay" onClick={hideWhatsappModal}>
           <div className="modal-content whatsapp-modal" onClick={(e) => e.stopPropagation()}>
             <h3>📱 Exportar para WhatsApp</h3>
