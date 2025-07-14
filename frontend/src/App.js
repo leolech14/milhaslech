@@ -23,6 +23,13 @@ function App() {
   const [newCompanyData, setNewCompanyData] = useState({});
   const [editingFields, setEditingFields] = useState({});
   const [deleteConfirmModal, setDeleteConfirmModal] = useState({ show: false, memberId: null, companyId: null });
+  const [whatsappModal, setWhatsappModal] = useState({
+    show: false,
+    exportType: 'all', // 'all', 'user', 'program'
+    selectedUser: 'Osvandré',
+    selectedProgram: 'LATAM Pass',
+    customProgram: ''
+  });
 
   // Fixed order for family members
   const familyOrder = ["Osvandré", "Marilise", "Graciela", "Leonardo"];
