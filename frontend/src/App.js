@@ -541,6 +541,7 @@ function App() {
               setEditingFields={setEditingFields}
               onDeleteProgram={(companyId) => showDeleteConfirm(member.id, companyId)}
               onToggleFieldEditing={(companyId) => toggleFieldEditing(member.id, companyId)}
+              onDeleteField={(companyId, fieldName) => deleteField(member.id, companyId, fieldName)}
             />
           ))}
           
