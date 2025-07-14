@@ -753,7 +753,7 @@ const ProgramBlock = ({
       <div className="program-header" onClick={onToggle}>
         <div className="program-info">
           <span className="program-title">
-            {company.name} → {formatNumber(currentData.current_balance)} {company.points_name}
+            {company.name} → {formatNumber(currentData.current_balance)} pontos
           </span>
         </div>
         <div className="expand-icon">
