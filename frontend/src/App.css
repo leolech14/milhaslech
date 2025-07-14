@@ -723,12 +723,89 @@ body.dark-mode::before {
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
   border-bottom: 2px solid var(--accent-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .member-header h3 {
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--accent-primary);
+  margin: 0;
+}
+
+/* Add Company Button */
+.add-company-btn {
+  padding: 0.375rem 0.75rem;
+  background-color: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.add-company-btn:hover {
+  background-color: var(--accent-primary-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+/* Add Company Modal */
+.add-company-modal {
+  background-color: var(--bg-secondary);
+  border: 2px solid var(--accent-primary);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.add-company-modal h4 {
+  color: var(--accent-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.add-company-modal .form-group {
+  margin-bottom: 0.75rem;
+}
+
+.add-company-modal label {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.add-company-modal input {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: var(--bg-white);
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.add-company-modal input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+}
+
+.add-company-modal .modal-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
 }
 
 /* Programs Container */
