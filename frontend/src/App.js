@@ -22,6 +22,7 @@ function App() {
   const [showAddCompany, setShowAddCompany] = useState({});
   const [newCompanyData, setNewCompanyData] = useState({});
   const [editingFields, setEditingFields] = useState({});
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState({ show: false, memberId: null, companyId: null });
 
   // Fixed order for family members
   const familyOrder = ["Osvandré", "Marilise", "Graciela", "Leonardo"];
