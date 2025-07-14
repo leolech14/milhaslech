@@ -989,12 +989,28 @@ const ProgramBlock = ({
               
               <div className="edit-actions">
                 <div className="left-actions">
-                  <button className="field-edit-btn" onClick={onToggleFieldEditing}>
-                    🔧 Editar campos
-                  </button>
-                  <button className="delete-program-btn" onClick={onDeleteProgram}>
-                    🗑️ Deletar programa
-                  </button>
+                  {!isEditingFields ? (
+                    <>
+                      <button className="field-edit-btn" onClick={onToggleFieldEditing}>
+                        🔧 Editar campos
+                      </button>
+                      <button className="delete-program-btn" onClick={onDeleteProgram}>
+                        🗑️ Deletar programa
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button className="add-field-btn" onClick={onAddNewField}>
+                        ➕ Adicionar campo
+                      </button>
+                      <button className="confirm-field-btn" onClick={onConfirmFieldEditing}>
+                        ✅ Confirmar
+                      </button>
+                      <button className="cancel-field-btn" onClick={onCancelFieldEditing}>
+                        ❌ Cancelar
+                      </button>
+                    </>
+                  )}
                 </div>
                 <div className="right-actions">
                   <button className="cancel-btn" onClick={onCancelEditing}>
