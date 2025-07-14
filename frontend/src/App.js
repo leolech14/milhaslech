@@ -1261,6 +1261,43 @@ function App() {
           getCompanyById={getCompanyById}
         />
       )}
+      {/* Field Renaming Modal */}
+      {fieldRenaming.isActive && (
+        <div className="modal-overlay">
+          <div className="modal-content field-rename-modal">
+            <h3>✏️ Renomear Campo</h3>
+            <p>Renomeie o campo "{fieldRenaming.fieldName}":</p>
+            
+            <div className="form-group">
+              <label>Novo nome:</label>
+              <input
+                type="text"
+                value={fieldRenaming.newName}
+                onChange={(e) => setFieldRenaming(prev => ({ ...prev, newName: e.target.value }))}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    confirmFieldRenaming();
+                  } else if (e.key === 'Escape') {
+                    cancelFieldRenaming();
+                  }
+                }}
+                autoFocus
+                placeholder="Digite o novo nome do campo"
+              />
+            </div>
+            
+            <div className="modal-actions">
+              <button className="cancel-btn" onClick={cancelFieldRenaming}>
+                Cancelar
+              </button>
+              <button className="confirm-btn" onClick={confirmFieldRenaming}>
+                ✏️ Renomear
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Delete Confirmation Modal */}
       {deleteConfirmModal.show && (
         <div className="modal-overlay">
