@@ -1843,28 +1843,36 @@ const ProgramBlock = ({
                   value={currentData.login} 
                   onChange={(value) => onUpdateField('login', value)}
                   onDelete={onDeleteField}
+                  onRename={onRenameField}
                   canDelete={isEditingFields}
+                  canRename={isEditingFields}
                 />
                 <EditableFieldWithDelete 
                   label="Senha" 
                   value={currentData.password} 
                   onChange={(value) => onUpdateField('password', value)}
                   onDelete={onDeleteField}
+                  onRename={onRenameField}
                   canDelete={isEditingFields}
+                  canRename={isEditingFields}
                 />
                 <EditableFieldWithDelete 
                   label="CPF" 
                   value={currentData.cpf} 
                   onChange={(value) => onUpdateField('cpf', value)}
                   onDelete={onDeleteField}
+                  onRename={onRenameField}
                   canDelete={isEditingFields}
+                  canRename={isEditingFields}
                 />
                 <EditableFieldWithDelete 
                   label="Nº do Cartão" 
                   value={currentData.card_number} 
                   onChange={(value) => onUpdateField('card_number', value)}
                   onDelete={onDeleteField}
+                  onRename={onRenameField}
                   canDelete={isEditingFields}
+                  canRename={isEditingFields}
                 />
                 <EditableFieldWithDelete 
                   label="Saldo (pontos)" 
@@ -1872,14 +1880,18 @@ const ProgramBlock = ({
                   onChange={(value) => onUpdateField('current_balance', value)}
                   type="number"
                   onDelete={onDeleteField}
+                  onRename={onRenameField}
                   canDelete={isEditingFields}
+                  canRename={isEditingFields}
                 />
                 <EditableFieldWithDelete 
                   label="Categoria" 
                   value={currentData.elite_tier} 
                   onChange={(value) => onUpdateField('elite_tier', value)}
                   onDelete={onDeleteField}
+                  onRename={onRenameField}
                   canDelete={isEditingFields}
+                  canRename={isEditingFields}
                 />
               </div>
               
