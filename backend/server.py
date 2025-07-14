@@ -99,20 +99,17 @@ async def init_default_data():
         {
             "id": "latam",
             "name": "LATAM Pass",
-            "color": "#d31b2c",
-            "points_name": "milhas"
+            "color": "#d31b2c"
         },
         {
             "id": "smiles",
             "name": "Smiles",
-            "color": "#ff6600",
-            "points_name": "milhas"
+            "color": "#ff6600"
         },
         {
             "id": "azul",
             "name": "TudoAzul",
-            "color": "#0072ce",
-            "points_name": "pontos"
+            "color": "#0072ce"
         }
     ]
     
