@@ -1143,6 +1143,17 @@ body.dark-mode::before {
   transform: scale(1.1);
 }
 
+.cancel-btn, .save-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
 .cancel-btn {
   background-color: var(--bg-tertiary);
   color: var(--text-secondary);
