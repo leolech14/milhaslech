@@ -33,7 +33,7 @@ ENV PYTHONUNBUFFERED=1
 EXPOSE 8080
 
 # Copy server wrapper
-COPY server_wrapper_fixed.py ./
+COPY server_wrapper_production.py ./
 
 # Run the backend server with static file serving
-CMD ["uvicorn", "server_wrapper_fixed:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "server_wrapper_production:app", "--host", "0.0.0.0", "--port", "8080"]

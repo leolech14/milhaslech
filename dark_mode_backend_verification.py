@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BACKEND_URL = "https://fa660bc8-5754-4ac2-919e-6e832b0a6e20.preview.emergentagent.com/api"
+BACKEND_URL = "https://c1e1c15d-a58b-41e4-a3ac-38d7ad819759.preview.emergentagent.com/api"
 
 class DarkModeBackendVerification:
     def __init__(self):

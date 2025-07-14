@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-app = FastAPI(title="Programas de Milhas Família Lech API", version="1.0")
+app = FastAPI(title="Programas de Pontos Família Lech API", version="1.0")
 
 # CORS middleware
 app.add_middleware(
@@ -37,7 +37,6 @@ class Company(BaseModel):
     id: str
     name: str
     color: str
-    points_name: str
 
 class ProgramData(BaseModel):
     company_id: str
@@ -48,8 +47,18 @@ class ProgramData(BaseModel):
     current_balance: int = 0
     elite_tier: str = ""
     notes: str = ""
-    last_updated: datetime
+    last_updated: datetime = None
     last_change: str = ""
+    custom_fields: Dict[str, Any] = {}
+
+class CustomField(BaseModel):
+    name: str
+    value: str = ""
+    field_type: str = "text"  # text or number
+
+class NewCompanyData(BaseModel):
+    company_name: str
+    color: str = "#4a90e2"
 
 class Member(BaseModel):
     id: str
@@ -90,20 +99,17 @@ async def init_default_data():
         {
             "id": "latam",
             "name": "LATAM Pass",
-            "color": "#d31b2c",
-            "points_name": "milhas"
+            "color": "#d31b2c"
         },
         {
             "id": "smiles",
             "name": "Smiles",
-            "color": "#ff6600",
-            "points_name": "milhas"
+            "color": "#ff6600"
         },
         {
             "id": "azul",
             "name": "TudoAzul",
-            "color": "#0072ce",
-            "points_name": "pontos"
+            "color": "#0072ce"
         }
     ]
     
@@ -303,6 +309,126 @@ async def update_program(member_id: str, company_id: str, program_update: Progra
     )
     
     return {"message": "Programa atualizado com sucesso", "changes": changes}
+
+# Add new company to member
+@app.post("/api/members/{member_id}/companies")
+async def add_company_to_member(member_id: str, new_company: NewCompanyData):
+    member = members_collection.find_one({"id": member_id})
+    if not member:
+        raise HTTPException(status_code=404, detail="Membro não encontrado")
+    
+    # Create new company ID
+    company_id = str(uuid.uuid4())
+    
+    # Create company entry
+    company_data = {
+        "id": company_id,
+        "name": new_company.company_name,
+        "color": new_company.color
+    }
+    
+    # Add to companies collection if it doesn't exist
+    existing_company = companies_collection.find_one({"name": new_company.company_name})
+    if not existing_company:
+        companies_collection.insert_one(company_data)
+    else:
+        company_id = existing_company["id"]
+    
+    # Create default program data for the member
+    default_program = {
+        "company_id": company_id,
+        "login": "",
+        "password": "",
+        "cpf": "",
+        "card_number": "",
+        "current_balance": 0,
+        "elite_tier": "",
+        "notes": "",
+        "last_updated": datetime.utcnow(),
+        "last_change": "Programa criado",
+        "custom_fields": {}
+    }
+    
+    # Add program to member
+    members_collection.update_one(
+        {"id": member_id},
+        {
+            "$set": {
+                f"programs.{company_id}": default_program,
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    # Log the addition
+    log_change(member_id, member["name"], company_id, new_company.company_name, 
+               "programa", "", "adicionado")
+    
+    return {
+        "message": "Nova companhia adicionada com sucesso",
+        "company_id": company_id,
+        "company_name": new_company.company_name
+    }
+
+# Custom fields management
+@app.put("/api/members/{member_id}/programs/{company_id}/fields")
+async def update_custom_fields(member_id: str, company_id: str, custom_fields: Dict[str, Any]):
+    member = members_collection.find_one({"id": member_id})
+    if not member:
+        raise HTTPException(status_code=404, detail="Membro não encontrado")
+    
+    if company_id not in member.get("programs", {}):
+        raise HTTPException(status_code=404, detail="Programa não encontrado")
+    
+    # Update custom fields
+    members_collection.update_one(
+        {"id": member_id},
+        {
+            "$set": {
+                f"programs.{company_id}.custom_fields": custom_fields,
+                f"programs.{company_id}.last_updated": datetime.utcnow(),
+                f"programs.{company_id}.last_change": "Campos personalizados atualizados"
+            }
+        }
+    )
+    
+    # Get company name for logging
+    company = companies_collection.find_one({"id": company_id})
+    company_name = company["name"] if company else company_id
+    
+    # Log the change
+    log_change(member_id, member["name"], company_id, company_name, 
+               "campos_customizados", "", "atualizados")
+    
+    return {"message": "Campos personalizados atualizados com sucesso"}
+
+@app.delete("/api/members/{member_id}/programs/{company_id}")
+async def delete_member_program(member_id: str, company_id: str):
+    member = members_collection.find_one({"id": member_id})
+    if not member:
+        raise HTTPException(status_code=404, detail="Membro não encontrado")
+    
+    if company_id not in member.get("programs", {}):
+        raise HTTPException(status_code=404, detail="Programa não encontrado")
+    
+    # Get company name for logging
+    company = companies_collection.find_one({"id": company_id})
+    company_name = company["name"] if company else company_id
+    
+    # Remove program from member
+    members_collection.update_one(
+        {"id": member_id},
+        {
+            "$unset": {f"programs.{company_id}": ""},
+            "$set": {"updated_at": datetime.utcnow()}
+        }
+    )
+    
+    # Log the deletion
+    log_change(member_id, member["name"], company_id, company_name, 
+               "programa", company_name, "removido")
+    
+    return {"message": "Programa removido com sucesso"}
 
 # Global log endpoint
 @app.get("/api/global-log")
