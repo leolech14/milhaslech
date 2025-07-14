@@ -1444,60 +1444,7 @@ body.dark-mode::before {
   transform: translateY(-1px);
 }
 
-/* WhatsApp Button - In Sidebar */
-.sidebar-whatsapp {
-  position: absolute;
-  bottom: 1rem;
-  left: 1rem;
-  right: 1rem;
-  padding: 0.75rem 1rem;
-  background-color: #86efac; /* Verde pastel para light mode */
-  color: #16a34a; /* Verde escuro para o texto */
-  border: 2px solid #22c55e;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
-  min-height: 48px;
-}
-
-.sidebar-whatsapp:hover {
-  background-color: #4ade80;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-}
-
-/* Dark mode WhatsApp button */
-.dark-mode .sidebar-whatsapp {
-  background-color: #25D366; /* Verde neon para dark mode */
-  color: white;
-  border-color: #25D366;
-}
-
-.dark-mode .sidebar-whatsapp:hover {
-  background-color: #20b858;
-  border-color: #20b858;
-  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
-}
-
-.sidebar-whatsapp svg {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-}
-
-.sidebar-whatsapp span {
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-/* WhatsApp Button - In Sidebar */
+/* Sidebar actions moved to bottom of app */
 
 /* WhatsApp Modal */
 .whatsapp-modal {
