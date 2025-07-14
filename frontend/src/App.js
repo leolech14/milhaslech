@@ -437,16 +437,32 @@ function App() {
       message += `👤 ${member.name.toUpperCase()}\n`;
       companies.forEach(company => {
         const program = member.programs[company.id];
-        if (program && program.current_balance > 0) {
-          message += `• ${company.name}: ${formatNumber(program.current_balance)} pontos\n`;
-          if (program.elite_tier) message += `  Categoria: ${program.elite_tier}\n`;
+        if (program) {
+          message += `\n✈️ ${company.name}:\n`;
+          message += `• Pontos: ${formatNumber(program.current_balance)}\n`;
+          if (program.login) message += `• Login: ${program.login}\n`;
+          if (program.password) message += `• Senha: ${program.password}\n`;
+          if (program.cpf) message += `• CPF: ${program.cpf}\n`;
+          if (program.card_number) message += `• Nº Cartão: ${program.card_number}\n`;
+          if (program.elite_tier) message += `• Categoria: ${program.elite_tier}\n`;
+          
+          // Add custom fields
+          if (program.custom_fields) {
+            Object.entries(program.custom_fields).forEach(([key, value]) => {
+              if (value) message += `• ${key}: ${value}\n`;
+            });
+          }
+          
+          if (program.last_updated) {
+            message += `• Atualizado: ${formatDate(program.last_updated)}\n`;
+          }
         }
       });
       message += "\n";
     });
     
     message += `📈 Total Geral: ${formatNumber(dashboardStats.total_points)} pontos\n`;
-    message += `📅 Atualizado em: ${new Date().toLocaleDateString('pt-BR')}`;
+    message += `📅 Exportado em: ${new Date().toLocaleDateString('pt-BR')}`;
     
     return message;
   };
@@ -455,37 +471,123 @@ function App() {
     const member = members.find(m => m.name === userName);
     if (!member) return "Usuário não encontrado";
     
-    let message = `👤 RESUMO DE ${member.name.toUpperCase()}\n\n`;
+    let message = `👤 DADOS COMPLETOS DE ${member.name.toUpperCase()}\n\n`;
     
     companies.forEach(company => {
       const program = member.programs[company.id];
       if (program) {
-        message += `${company.name}:\n`;
+        message += `✈️ ${company.name}:\n`;
         message += `• Pontos: ${formatNumber(program.current_balance)}\n`;
+        
+        // Always include all standard fields
         if (program.login) message += `• Login: ${program.login}\n`;
+        if (program.password) message += `• Senha: ${program.password}\n`;
+        if (program.cpf) message += `• CPF: ${program.cpf}\n`;
+        if (program.card_number) message += `• Nº Cartão: ${program.card_number}\n`;
         if (program.elite_tier) message += `• Categoria: ${program.elite_tier}\n`;
+        if (program.notes) message += `• Observações: ${program.notes}\n`;
+        
+        // Add ALL custom fields created by user
+        if (program.custom_fields && Object.keys(program.custom_fields).length > 0) {
+          message += `• Campos Personalizados:\n`;
+          Object.entries(program.custom_fields).forEach(([key, value]) => {
+            message += `  - ${key}: ${value || 'Não preenchido'}\n`;
+          });
+        }
+        
+        // Add any other fields that might exist in the program object
+        const standardFields = ['company_id', 'login', 'password', 'cpf', 'card_number', 'current_balance', 'elite_tier', 'notes', 'last_updated', 'last_change', 'custom_fields'];
+        Object.entries(program).forEach(([key, value]) => {
+          if (!standardFields.includes(key) && value && value !== '') {
+            message += `• ${key}: ${value}\n`;
+          }
+        });
+        
         if (program.last_updated) {
-          message += `• Atualizado: ${formatDate(program.last_updated)}\n`;
+          message += `• Última atualização: ${formatDate(program.last_updated)}\n`;
+        }
+        if (program.last_change) {
+          message += `• Última alteração: ${program.last_change}\n`;
         }
         message += "\n";
       }
     });
     
+    message += `📅 Exportado em: ${new Date().toLocaleDateString('pt-BR')}`;
     return message;
   };
 
   const getProgramData = (programName) => {
     const company = companies.find(c => c.name.toLowerCase() === programName.toLowerCase());
-    if (!company) return "Programa não encontrado";
+    if (!company) {
+      // Try to find by custom program name in any member's programs
+      let foundData = false;
+      let message = `✈️ DADOS DO PROGRAMA ${programName.toUpperCase()}\n\n`;
+      
+      members.forEach(member => {
+        Object.values(member.programs).forEach(program => {
+          const companyData = companies.find(c => c.id === program.company_id);
+          if (companyData && companyData.name.toLowerCase() === programName.toLowerCase()) {
+            foundData = true;
+            message += `👤 ${member.name}:\n`;
+            message += `• Pontos: ${formatNumber(program.current_balance)}\n`;
+            if (program.login) message += `• Login: ${program.login}\n`;
+            if (program.password) message += `• Senha: ${program.password}\n`;
+            if (program.cpf) message += `• CPF: ${program.cpf}\n`;
+            if (program.card_number) message += `• Nº Cartão: ${program.card_number}\n`;
+            if (program.elite_tier) message += `• Categoria: ${program.elite_tier}\n`;
+            if (program.notes) message += `• Observações: ${program.notes}\n`;
+            
+            // Custom fields
+            if (program.custom_fields) {
+              Object.entries(program.custom_fields).forEach(([key, value]) => {
+                if (value) message += `• ${key}: ${value}\n`;
+              });
+            }
+            
+            if (program.last_updated) {
+              message += `• Atualizado: ${formatDate(program.last_updated)}\n`;
+            }
+            message += "\n";
+          }
+        });
+      });
+      
+      if (!foundData) return "Programa não encontrado";
+      return message + `📅 Exportado em: ${new Date().toLocaleDateString('pt-BR')}`;
+    }
     
-    let message = `✈️ RESUMO DO PROGRAMA ${programName.toUpperCase()}\n\n`;
+    let message = `✈️ DADOS COMPLETOS DO ${company.name.toUpperCase()}\n\n`;
     
     members.forEach(member => {
       const program = member.programs[company.id];
-      if (program && program.current_balance > 0) {
+      if (program) {
         message += `👤 ${member.name}:\n`;
         message += `• Pontos: ${formatNumber(program.current_balance)}\n`;
+        
+        // Include ALL fields for complete export
+        if (program.login) message += `• Login: ${program.login}\n`;
+        if (program.password) message += `• Senha: ${program.password}\n`;
+        if (program.cpf) message += `• CPF: ${program.cpf}\n`;
+        if (program.card_number) message += `• Nº Cartão: ${program.card_number}\n`;
         if (program.elite_tier) message += `• Categoria: ${program.elite_tier}\n`;
+        if (program.notes) message += `• Observações: ${program.notes}\n`;
+        
+        // Custom fields
+        if (program.custom_fields && Object.keys(program.custom_fields).length > 0) {
+          Object.entries(program.custom_fields).forEach(([key, value]) => {
+            message += `• ${key}: ${value || 'Não preenchido'}\n`;
+          });
+        }
+        
+        // Any additional fields
+        const standardFields = ['company_id', 'login', 'password', 'cpf', 'card_number', 'current_balance', 'elite_tier', 'notes', 'last_updated', 'last_change', 'custom_fields'];
+        Object.entries(program).forEach(([key, value]) => {
+          if (!standardFields.includes(key) && value && value !== '') {
+            message += `• ${key}: ${value}\n`;
+          }
+        });
+        
         if (program.last_updated) {
           message += `• Atualizado: ${formatDate(program.last_updated)}\n`;
         }
@@ -493,6 +595,7 @@ function App() {
       }
     });
     
+    message += `📅 Exportado em: ${new Date().toLocaleDateString('pt-BR')}`;
     return message;
   };
 
