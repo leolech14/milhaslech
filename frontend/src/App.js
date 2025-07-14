@@ -690,15 +690,6 @@ const MemberCard = ({
               placeholder="Ex: Emirates, United, etc."
             />
           </div>
-          <div className="form-group">
-            <label>Nome dos Pontos:</label>
-            <input
-              type="text"
-              value={newCompanyData.points_name || 'pontos'}
-              onChange={(e) => onUpdateNewCompanyField('points_name', e.target.value)}
-              placeholder="Ex: milhas, pontos, miles"
-            />
-          </div>
           <div className="modal-actions">
             <button className="cancel-btn" onClick={onHideAddCompany}>
               Cancelar
