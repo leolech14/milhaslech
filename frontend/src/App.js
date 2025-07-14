@@ -985,18 +985,52 @@ function App() {
       console.error('Erro ao renomear campo:', error);
     }
   };
+  // Debounced save for post-its to improve performance
+  const debouncedSavePostit = useCallback(
+    debounce(async (postitId, content) => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/postits/${postitId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ content }),
+        });
+        
+        if (response.ok) {
+          // Update local state immediately for better UX
+          setPostits(prevPostits => 
+            prevPostits.map(postit => 
+              postit.id === postitId 
+                ? { ...postit, content }
+                : postit
+            )
+          );
+          setEditingPostit(null);
+        }
+      } catch (error) {
+        console.error('Erro ao atualizar post-it:', error);
+      }
+    }, 500),
+    []
+  );
+
   const createPostit = async (content) => {
+    if (!content.trim()) return;
+    
     try {
       const response = await fetch(`${API_BASE_URL}/api/postits`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ content: content.trim() }),
       });
       
       if (response.ok) {
-        fetchPostits();
+        const newPostit = await response.json();
+        // Update local state immediately for better UX
+        setPostits(prevPostits => [...prevPostits, newPostit]);
       }
     } catch (error) {
       console.error('Erro ao criar post-it:', error);
@@ -1004,35 +1038,29 @@ function App() {
   };
 
   const updatePostit = async (postitId, content) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/postits/${postitId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ content }),
-      });
-      
-      if (response.ok) {
-        fetchPostits();
-        setEditingPostit(null);
-      }
-    } catch (error) {
-      console.error('Erro ao atualizar post-it:', error);
-    }
+    if (!content.trim()) return;
+    
+    // Use debounced save for better performance
+    debouncedSavePostit(postitId, content.trim());
   };
 
   const deletePostit = async (postitId) => {
     try {
+      // Optimistic update - remove from UI immediately
+      setPostits(prevPostits => prevPostits.filter(postit => postit.id !== postitId));
+      
       const response = await fetch(`${API_BASE_URL}/api/postits/${postitId}`, {
         method: 'DELETE',
       });
       
-      if (response.ok) {
+      if (!response.ok) {
+        // If deletion failed, restore the post-it
         fetchPostits();
       }
     } catch (error) {
       console.error('Erro ao excluir post-it:', error);
+      // Restore post-its on error
+      fetchPostits();
     }
   };
 
