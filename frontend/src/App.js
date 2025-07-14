@@ -905,7 +905,6 @@ function App() {
           getCompanyById={getCompanyById}
         />
       )}
-
       {/* Delete Confirmation Modal */}
       {deleteConfirmModal.show && (
         <div className="modal-overlay">
