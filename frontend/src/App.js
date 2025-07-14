@@ -893,36 +893,48 @@ const ProgramBlock = ({
           ) : (
             <div className="edit-mode">
               <div className="detail-grid">
-                <EditableField 
+                <EditableFieldWithDelete 
                   label="Login" 
                   value={currentData.login} 
                   onChange={(value) => onUpdateField('login', value)}
+                  onDelete={onDeleteField}
+                  canDelete={isEditingFields}
                 />
-                <EditableField 
+                <EditableFieldWithDelete 
                   label="Senha" 
                   value={currentData.password} 
                   onChange={(value) => onUpdateField('password', value)}
+                  onDelete={onDeleteField}
+                  canDelete={isEditingFields}
                 />
-                <EditableField 
+                <EditableFieldWithDelete 
                   label="CPF" 
                   value={currentData.cpf} 
                   onChange={(value) => onUpdateField('cpf', value)}
+                  onDelete={onDeleteField}
+                  canDelete={isEditingFields}
                 />
-                <EditableField 
+                <EditableFieldWithDelete 
                   label="Nº do Cartão" 
                   value={currentData.card_number} 
                   onChange={(value) => onUpdateField('card_number', value)}
+                  onDelete={onDeleteField}
+                  canDelete={isEditingFields}
                 />
-                <EditableField 
+                <EditableFieldWithDelete 
                   label="Saldo (pontos)" 
                   value={currentData.current_balance} 
                   onChange={(value) => onUpdateField('current_balance', value)}
                   type="number"
+                  onDelete={onDeleteField}
+                  canDelete={isEditingFields}
                 />
-                <EditableField 
+                <EditableFieldWithDelete 
                   label="Categoria" 
                   value={currentData.elite_tier} 
                   onChange={(value) => onUpdateField('elite_tier', value)}
+                  onDelete={onDeleteField}
+                  canDelete={isEditingFields}
                 />
               </div>
               
