@@ -19,6 +19,9 @@ function App() {
   const [postits, setPostits] = useState([]);
   const [editingPostit, setEditingPostit] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
+  const [showAddCompany, setShowAddCompany] = useState({});
+  const [newCompanyData, setNewCompanyData] = useState({});
+  const [editingFields, setEditingFields] = useState({});
 
   // Fixed order for family members
   const familyOrder = ["Osvandré", "Marilise", "Graciela", "Leonardo"];
