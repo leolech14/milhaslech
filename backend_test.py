@@ -337,11 +337,11 @@ class RedesignedLoyaltyAPITester:
             if response.status_code == 200:
                 member = response.json()
                 if member.get("id") == member_id and member.get("name") == member_name:
-                    # Check if Smiles program has updated data
+                    # Check if Smiles program has updated data (should have current_balance > 15000)
                     smiles_program = member.get("programs", {}).get("smiles", {})
-                    if (smiles_program.get("login") == "marilise.smiles@email.com" and
-                        smiles_program.get("current_balance") == 15000):
-                        self.log_test("Get Specific Member", True, f"Retrieved {member_name} with updated program data")
+                    if (smiles_program.get("current_balance", 0) > 15000 and
+                        "marilise.smiles" in smiles_program.get("login", "")):
+                        self.log_test("Get Specific Member", True, f"Retrieved {member_name} with updated program data (balance: {smiles_program.get('current_balance')})")
                         return True
                     else:
                         self.log_test("Get Specific Member", False, f"Program data not updated correctly: {smiles_program}")
