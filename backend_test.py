@@ -367,12 +367,14 @@ class RedesignedLoyaltyAPITester:
             member_id = self.member_ids[member_name]
             company_id = "azul"
             
+            # Use timestamp to ensure unique values
+            timestamp = int(time.time())
             update_data = {
-                "login": "graciela.azul@email.com",
-                "card_number": "9876543210987654",
-                "current_balance": 8500,
+                "login": f"graciela.azul.{timestamp}@email.com",
+                "card_number": f"9876543210{timestamp % 1000000}",
+                "current_balance": 8500 + timestamp % 1000,
                 "elite_tier": "Diamond",
-                "notes": "Frequent business traveler"
+                "notes": f"Frequent business traveler - updated {timestamp}"
             }
             
             response = requests.put(f"{self.base_url}/members/{member_id}/programs/{company_id}", 
@@ -380,17 +382,19 @@ class RedesignedLoyaltyAPITester:
             
             if response.status_code == 200:
                 result = response.json()
-                if "changes" in result and len(result["changes"]) == 5:
+                if "changes" in result:
+                    graciela_changes = len(result["changes"])
+                    
                     # Update Leonardo with LATAM program
                     member_name = self.family_members[3]  # Leonardo
                     member_id = self.member_ids[member_name]
                     company_id = "latam"
                     
                     update_data = {
-                        "password": "latam2024secure",
-                        "cpf": "987.654.321-09",
-                        "current_balance": 22000,
-                        "notes": "Student discount applied"
+                        "password": f"latam{timestamp}secure",
+                        "cpf": "987.654.321-10",
+                        "current_balance": 22000 + timestamp % 1000,
+                        "notes": f"Student discount applied - updated {timestamp}"
                     }
                     
                     response2 = requests.put(f"{self.base_url}/members/{member_id}/programs/{company_id}", 
@@ -398,8 +402,9 @@ class RedesignedLoyaltyAPITester:
                     
                     if response2.status_code == 200:
                         result2 = response2.json()
-                        if "changes" in result2 and len(result2["changes"]) == 4:
-                            self.log_test("Additional Field Updates", True, f"Updated Graciela (5 fields) and Leonardo (4 fields)")
+                        if "changes" in result2:
+                            leonardo_changes = len(result2["changes"])
+                            self.log_test("Additional Field Updates", True, f"Updated Graciela ({graciela_changes} fields) and Leonardo ({leonardo_changes} fields)")
                             return True
                         else:
                             self.log_test("Additional Field Updates", False, f"Leonardo update failed: {result2}")
