@@ -327,8 +327,7 @@ async def add_company_to_member(member_id: str, new_company: NewCompanyData):
     company_data = {
         "id": company_id,
         "name": new_company.company_name,
-        "color": new_company.color,
-        "points_name": new_company.points_name
+        "color": new_company.color
     }
     
     # Add to companies collection if it doesn't exist
