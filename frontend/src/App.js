@@ -309,9 +309,17 @@ function App() {
   };
 
   // Delete program function
-  const deleteProgram = async (memberId, companyId) => {
-    if (!confirm('Tem certeza que deseja excluir este programa de pontos?')) return;
+  const showDeleteConfirm = (memberId, companyId) => {
+    setDeleteConfirmModal({ show: true, memberId, companyId });
+  };
 
+  const hideDeleteConfirm = () => {
+    setDeleteConfirmModal({ show: false, memberId: null, companyId: null });
+  };
+
+  const confirmDeleteProgram = async () => {
+    const { memberId, companyId } = deleteConfirmModal;
+    
     try {
       const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
         method: 'DELETE',
@@ -322,6 +330,7 @@ function App() {
         await fetchCompanies();
         await fetchGlobalLog();
         await fetchDashboardStats();
+        hideDeleteConfirm();
       } else {
         console.error('Erro ao excluir programa');
       }
