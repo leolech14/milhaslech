@@ -51,6 +51,18 @@ function App() {
       document.body.classList.remove('dark-mode');
     }
 
+    // Handle scroll to show/hide WhatsApp button on mobile
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const isMobile = window.innerWidth <= 768;
+      
+      if (isMobile) {
+        setShowWhatsappBtn(scrollY > 200); // Show after scrolling 200px
+      } else {
+        setShowWhatsappBtn(true); // Always show on desktop
+      }
+    };
+
     // Handle ESC key for modals
     const handleEsc = (event) => {
       if (event.key === 'Escape') {
@@ -63,8 +75,18 @@ function App() {
       }
     };
 
+    // Initial check
+    handleScroll();
+
     document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+    
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, [whatsappModal.show, deleteConfirmModal.show]);
 
   // Handle login
