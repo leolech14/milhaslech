@@ -1590,7 +1590,7 @@ const TopBar = ({ onRefresh, dashboardStats, darkMode, onToggleDarkMode }) => (
       )}
     </div>
     <div className="top-bar-center">
-      <a href="https://www.latamairlines.com/br/pt" target="_blank" rel="noopener noreferrer" className="program-link">
+      <a href="https://www.latampass.latam.com/pt_br/clube-latampass" target="_blank" rel="noopener noreferrer" className="program-link">
         Login LATAM
       </a>
       <a href="https://b2c.voegol.com.br/minhas-viagens/login" target="_blank" rel="noopener noreferrer" className="program-link">
@@ -1603,9 +1603,6 @@ const TopBar = ({ onRefresh, dashboardStats, darkMode, onToggleDarkMode }) => (
     <div className="top-bar-right">
       <button className="dark-mode-toggle" onClick={onToggleDarkMode}>
         {darkMode ? '🔆' : '🌚'}
-      </button>
-      <button className="refresh-btn" onClick={onRefresh}>
-        ↻ Atualizar
       </button>
     </div>
   </header>
