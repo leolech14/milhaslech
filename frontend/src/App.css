@@ -1993,6 +1993,49 @@ body.dark-mode::before {
   box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
 }
 
+/* Dark mode button text fixes */
+.dark-mode button,
+.dark-mode .action-btn,
+.dark-mode .btn,
+.dark-mode .login-btn,
+.dark-mode .refresh-btn,
+.dark-mode .add-postit-btn,
+.dark-mode .postit-save,
+.dark-mode .postit-cancel,
+.dark-mode .save-btn,
+.dark-mode .cancel-btn {
+  color: white !important;
+}
+
+.dark-mode .action-btn.logout-btn {
+  color: var(--text-primary) !important;
+}
+
+/* Ensure specific buttons maintain readability in dark mode */
+.dark-mode .program-btn,
+.dark-mode .edit-btn,
+.dark-mode .save-btn,
+.dark-mode .cancel-btn,
+.dark-mode .add-company-btn,
+.dark-mode .delete-program-btn,
+.dark-mode .field-edit-btn,
+.dark-mode .add-field-btn,
+.dark-mode .confirm-field-btn,
+.dark-mode .cancel-field-btn {
+  background-color: var(--accent-primary) !important;
+  color: white !important;
+  border-color: var(--accent-primary) !important;
+}
+
+.dark-mode .program-btn:hover,
+.dark-mode .edit-btn:hover,
+.dark-mode .add-company-btn:hover,
+.dark-mode .field-edit-btn:hover,
+.dark-mode .add-field-btn:hover {
+  background-color: var(--accent-primary-light) !important;
+  color: white !important;
+}
+
 /* Enhanced Responsive Design */
 @media (max-width: 1024px) {
   .main-content {
