@@ -30,7 +30,6 @@ function App() {
     selectedProgram: 'LATAM Pass',
     customProgram: ''
   });
-  const [showWhatsappBtn, setShowWhatsappBtn] = useState(false);
   const [pullUpGesture, setPullUpGesture] = useState({
     isActive: false,
     startY: 0,
