@@ -1496,6 +1496,51 @@ body.dark-mode::before {
   line-height: 1.5;
 }
 
+/* Modal Actions - General */
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  align-items: center;
+}
+
+/* WhatsApp Modal Actions - Mobile Optimized */
+.whatsapp-modal .modal-actions {
+  flex-direction: column-reverse;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.whatsapp-modal .modal-actions button {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Desktop WhatsApp Modal Actions */
+@media (min-width: 769px) {
+  .whatsapp-modal .modal-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  
+  .whatsapp-modal .modal-actions button {
+    width: auto;
+    min-width: 120px;
+  }
+}
+
 /* Export Options */
 .export-options {
   display: flex;
