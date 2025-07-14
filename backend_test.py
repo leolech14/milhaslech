@@ -402,6 +402,241 @@ class RedesignedLoyaltyAPITester:
             self.log_test("Additional Field Updates", False, f"Request error: {str(e)}")
             return False
     
+    def test_postits_crud(self):
+        """Test Post-it CRUD operations (GET, POST, PUT, DELETE)"""
+        try:
+            # 1. GET - List all post-its (should be empty initially)
+            response = requests.get(f"{self.base_url}/postits", timeout=10)
+            if response.status_code != 200:
+                self.log_test("Post-its CRUD", False, f"GET failed: HTTP {response.status_code}")
+                return False
+            
+            initial_postits = response.json()
+            initial_count = len(initial_postits)
+            
+            # 2. POST - Create a new post-it
+            create_data = {"content": "Test post-it for backend testing"}
+            response = requests.post(f"{self.base_url}/postits", json=create_data, timeout=10)
+            if response.status_code != 200:
+                self.log_test("Post-its CRUD", False, f"POST failed: HTTP {response.status_code}")
+                return False
+            
+            created_postit = response.json()
+            postit_id = created_postit.get("id")
+            if not postit_id:
+                self.log_test("Post-its CRUD", False, "POST response missing ID")
+                return False
+            
+            # 3. GET - Verify post-it was created
+            response = requests.get(f"{self.base_url}/postits", timeout=10)
+            if response.status_code != 200:
+                self.log_test("Post-its CRUD", False, f"GET after POST failed: HTTP {response.status_code}")
+                return False
+            
+            postits_after_create = response.json()
+            if len(postits_after_create) != initial_count + 1:
+                self.log_test("Post-its CRUD", False, f"Expected {initial_count + 1} post-its, got {len(postits_after_create)}")
+                return False
+            
+            # 4. PUT - Update the post-it
+            update_data = {"content": "Updated test post-it content"}
+            response = requests.put(f"{self.base_url}/postits/{postit_id}", json=update_data, timeout=10)
+            if response.status_code != 200:
+                self.log_test("Post-its CRUD", False, f"PUT failed: HTTP {response.status_code}")
+                return False
+            
+            updated_postit = response.json()
+            if updated_postit.get("content") != update_data["content"]:
+                self.log_test("Post-its CRUD", False, "PUT did not update content correctly")
+                return False
+            
+            # 5. DELETE - Remove the post-it
+            response = requests.delete(f"{self.base_url}/postits/{postit_id}", timeout=10)
+            if response.status_code != 200:
+                self.log_test("Post-its CRUD", False, f"DELETE failed: HTTP {response.status_code}")
+                return False
+            
+            # 6. GET - Verify post-it was deleted
+            response = requests.get(f"{self.base_url}/postits", timeout=10)
+            if response.status_code != 200:
+                self.log_test("Post-its CRUD", False, f"GET after DELETE failed: HTTP {response.status_code}")
+                return False
+            
+            final_postits = response.json()
+            if len(final_postits) != initial_count:
+                self.log_test("Post-its CRUD", False, f"Expected {initial_count} post-its after delete, got {len(final_postits)}")
+                return False
+            
+            self.log_test("Post-its CRUD", True, "All CRUD operations (GET, POST, PUT, DELETE) working correctly")
+            return True
+            
+        except Exception as e:
+            self.log_test("Post-its CRUD", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_add_new_company(self):
+        """Test POST /api/members/{id}/companies - Add new company to member"""
+        if not self.member_ids:
+            self.log_test("Add New Company", False, "No member IDs available")
+            return False
+        
+        try:
+            # Use Leonardo for this test
+            member_name = self.family_members[3]  # Leonardo
+            member_id = self.member_ids[member_name]
+            
+            # Add a new company
+            new_company_data = {
+                "company_name": "Multiplus",
+                "color": "#ff9900"
+            }
+            
+            response = requests.post(f"{self.base_url}/members/{member_id}/companies", 
+                                   json=new_company_data, timeout=10)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if ("company_id" in result and "company_name" in result and 
+                    result["company_name"] == new_company_data["company_name"]):
+                    
+                    # Verify the company was added to the member
+                    member_response = requests.get(f"{self.base_url}/members/{member_id}", timeout=10)
+                    if member_response.status_code == 200:
+                        member = member_response.json()
+                        company_id = result["company_id"]
+                        if company_id in member.get("programs", {}):
+                            self.log_test("Add New Company", True, f"Successfully added {new_company_data['company_name']} to {member_name}")
+                            return True
+                        else:
+                            self.log_test("Add New Company", False, "Company not found in member's programs")
+                            return False
+                    else:
+                        self.log_test("Add New Company", False, f"Failed to verify member update: HTTP {member_response.status_code}")
+                        return False
+                else:
+                    self.log_test("Add New Company", False, f"Invalid response format: {result}")
+                    return False
+            else:
+                self.log_test("Add New Company", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Add New Company", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_custom_fields(self):
+        """Test PUT /api/members/{id}/programs/{company_id}/fields - Custom fields management"""
+        if not self.member_ids:
+            self.log_test("Custom Fields", False, "No member IDs available")
+            return False
+        
+        try:
+            # Use Osvandré and LATAM program
+            member_name = self.family_members[0]  # Osvandré
+            member_id = self.member_ids[member_name]
+            company_id = "latam"
+            
+            # Add custom fields
+            custom_fields = {
+                "frequent_routes": "GRU-SCL, GRU-LIM",
+                "preferred_seat": "Window",
+                "special_meal": "Vegetarian",
+                "companion_pass": "Yes"
+            }
+            
+            response = requests.put(f"{self.base_url}/members/{member_id}/programs/{company_id}/fields", 
+                                  json=custom_fields, timeout=10)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if "message" in result and "sucesso" in result["message"]:
+                    # Verify custom fields were added
+                    member_response = requests.get(f"{self.base_url}/members/{member_id}", timeout=10)
+                    if member_response.status_code == 200:
+                        member = member_response.json()
+                        program = member.get("programs", {}).get(company_id, {})
+                        stored_fields = program.get("custom_fields", {})
+                        
+                        if all(key in stored_fields and stored_fields[key] == value 
+                               for key, value in custom_fields.items()):
+                            self.log_test("Custom Fields", True, f"Successfully added {len(custom_fields)} custom fields to {member_name}'s LATAM program")
+                            return True
+                        else:
+                            self.log_test("Custom Fields", False, f"Custom fields not stored correctly: {stored_fields}")
+                            return False
+                    else:
+                        self.log_test("Custom Fields", False, f"Failed to verify custom fields: HTTP {member_response.status_code}")
+                        return False
+                else:
+                    self.log_test("Custom Fields", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_test("Custom Fields", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Custom Fields", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_delete_program(self):
+        """Test DELETE /api/members/{id}/programs/{company_id} - Delete program from member"""
+        if not self.member_ids:
+            self.log_test("Delete Program", False, "No member IDs available")
+            return False
+        
+        try:
+            # Use Leonardo and delete the newly added Multiplus program
+            member_name = self.family_members[3]  # Leonardo
+            member_id = self.member_ids[member_name]
+            
+            # First, get the member to find the Multiplus company ID
+            member_response = requests.get(f"{self.base_url}/members/{member_id}", timeout=10)
+            if member_response.status_code != 200:
+                self.log_test("Delete Program", False, f"Failed to get member: HTTP {member_response.status_code}")
+                return False
+            
+            member = member_response.json()
+            programs = member.get("programs", {})
+            
+            # Find a company to delete (look for one that's not the original 3)
+            company_to_delete = None
+            for company_id, program in programs.items():
+                if company_id not in self.expected_companies:  # Not latam, smiles, or azul
+                    company_to_delete = company_id
+                    break
+            
+            if not company_to_delete:
+                # If no extra company found, skip this test
+                self.log_test("Delete Program", True, "No additional programs to delete (test skipped)")
+                return True
+            
+            # Delete the program
+            response = requests.delete(f"{self.base_url}/members/{member_id}/programs/{company_to_delete}", timeout=10)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if "message" in result and "sucesso" in result["message"]:
+                    # Verify the program was deleted
+                    verify_response = requests.get(f"{self.base_url}/members/{member_id}", timeout=10)
+                    if verify_response.status_code == 200:
+                        updated_member = verify_response.json()
+                        if company_to_delete not in updated_member.get("programs", {}):
+                            self.log_test("Delete Program", True, f"Successfully deleted program {company_to_delete} from {member_name}")
+                            return True
+                        else:
+                            self.log_test("Delete Program", False, "Program still exists after deletion")
+                            return False
+                    else:
+                        self.log_test("Delete Program", False, f"Failed to verify deletion: HTTP {verify_response.status_code}")
+                        return False
+                else:
+                    self.log_test("Delete Program", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_test("Delete Program", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Delete Program", False, f"Request error: {str(e)}")
+            return False
+    
     def run_all_tests(self):
         """Run all backend tests for the redesigned system"""
         print("🚀 Starting Redesigned Loyalty Control Tower Backend API Tests")
