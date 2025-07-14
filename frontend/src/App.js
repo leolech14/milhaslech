@@ -1449,7 +1449,7 @@ function App() {
 }
 
 // Components
-const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats, postits, onCreatePostit, onUpdatePostit, onDeletePostit, editingPostit, setEditingPostit, showWhatsappBtn, showWhatsappModal }) => {
+const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats, postits, onCreatePostit, onUpdatePostit, onDeletePostit, editingPostit, setEditingPostit, showWhatsappModal }) => {
   const handleEditPostit = (postitId) => {
     setEditingPostit(postitId);
   };
