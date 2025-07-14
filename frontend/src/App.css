@@ -1335,10 +1335,16 @@ body.dark-mode::before {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   font-weight: 600;
   transition: all 0.2s ease;
   border: 2px solid transparent;
+  text-align: center;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
 }
 
 /* Add Field Button */
