@@ -1375,6 +1375,13 @@ body.dark-mode::before {
   transform: translateY(100%);
 }
 
+/* Desktop - Hide mobile button completely */
+@media (min-width: 769px) {
+  .whatsapp-btn-mobile {
+    display: none !important;
+  }
+}
+
 @media (max-width: 768px) {
   .sidebar-whatsapp {
     display: none; /* Hide sidebar button on mobile */
