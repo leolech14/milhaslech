@@ -59,7 +59,6 @@ class CustomField(BaseModel):
 
 class NewCompanyData(BaseModel):
     company_name: str
-    points_name: str = "pontos"
     color: str = "#4a90e2"
 
 class Member(BaseModel):
