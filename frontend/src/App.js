@@ -583,7 +583,10 @@ function App() {
               setEditingFields={setEditingFields}
               onDeleteProgram={(companyId) => showDeleteConfirm(member.id, companyId)}
               onToggleFieldEditing={(companyId) => toggleFieldEditing(member.id, companyId)}
+              onConfirmFieldEditing={(companyId) => confirmFieldEditing(member.id, companyId)}
+              onCancelFieldEditing={(companyId) => cancelFieldEditing(member.id, companyId)}
               onDeleteField={(companyId, fieldName) => deleteField(member.id, companyId, fieldName)}
+              onAddNewField={(companyId) => addNewField(member.id, companyId)}
             />
           ))}
           
