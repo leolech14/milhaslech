@@ -260,7 +260,6 @@ function App() {
       ...prev,
       [memberId]: {
         company_name: '',
-        points_name: 'pontos',
         color: '#4a90e2'
       }
     }));
