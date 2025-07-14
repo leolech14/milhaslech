@@ -1653,10 +1653,14 @@ body.dark-mode::before {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 600;
   transition: all 0.2s ease;
   min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .whatsapp-export-btn:hover {
@@ -1665,6 +1669,25 @@ body.dark-mode::before {
   box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
 }
 
+/* Cancel Button in WhatsApp Modal */
+.whatsapp-modal .cancel-btn {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  border: 2px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  min-height: 48px;
+}
+
+.whatsapp-modal .cancel-btn:hover {
+  background-color: #e5e7eb;
+  color: #4b5563;
+  border-color: #d1d5db;
+  transform: none;
+}
+
+/* General Cancel Button */
 .cancel-btn {
   background-color: var(--bg-tertiary);
   color: var(--text-secondary);
