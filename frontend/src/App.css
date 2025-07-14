@@ -1307,49 +1307,46 @@ body.dark-mode::before {
 }
 
 /* Mobile WhatsApp Button - Bottom Banner */
+.whatsapp-btn-mobile {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #86efac; /* Verde pastel */
+  color: #16a34a;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  z-index: 1000;
+  display: none; /* Hidden by default */
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(100%);
+}
+
 @media (max-width: 768px) {
   .sidebar-whatsapp {
     display: none; /* Hide sidebar button on mobile */
   }
   
-  /* Mobile version appears at bottom */
   .whatsapp-btn-mobile {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    height: 60px;
-    background-color: #86efac; /* Verde pastel */
-    color: #16a34a;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 600;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    opacity: 0;
-    transform: translateY(100%);
+    display: flex; /* Show on mobile */
   }
   
   .whatsapp-btn-mobile.show {
     opacity: 1;
     transform: translateY(0);
-    display: flex;
   }
   
   .dark-mode .whatsapp-btn-mobile {
     background-color: #25D366; /* Verde neon para dark mode */
-    color: white;
-  }
-  
-  .dark-mode .whatsapp-btn-mobile.show {
-    background-color: #25D366;
     color: white;
   }
 }
