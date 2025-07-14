@@ -48,7 +48,207 @@ function App() {
   // Fixed order for family members
   const familyOrder = ["Osvandré", "Marilise", "Graciela", "Leonardo"];
 
-  // Check if user is already authenticated and load dark mode preference
+  // UI-Smart System - Continuously monitor and fix UI issues
+  useEffect(() => {
+    if (!uiSmartSystem.isActive) return;
+
+    const checkUIHealth = () => {
+      const issues = [];
+      const fixes = [];
+
+      // Check for contrast issues
+      const checkContrast = () => {
+        const elements = document.querySelectorAll('*');
+        elements.forEach(el => {
+          const computedStyle = window.getComputedStyle(el);
+          const bgColor = computedStyle.backgroundColor;
+          const color = computedStyle.color;
+          
+          // Convert colors to luminance and check contrast ratio
+          if (bgColor && color && bgColor !== 'rgba(0, 0, 0, 0)') {
+            const bgLuminance = getLuminance(bgColor);
+            const textLuminance = getLuminance(color);
+            const contrast = (Math.max(bgLuminance, textLuminance) + 0.05) / (Math.min(bgLuminance, textLuminance) + 0.05);
+            
+            if (contrast < 4.5) {
+              issues.push({
+                type: 'contrast',
+                element: el,
+                issue: `Low contrast ratio: ${contrast.toFixed(2)}`,
+                severity: 'medium'
+              });
+              
+              // Auto-fix: Adjust text color for better contrast
+              if (darkMode) {
+                el.style.color = '#ffffff';
+              } else {
+                el.style.color = '#1a1a1a';
+              }
+              fixes.push(`Fixed contrast for ${el.tagName.toLowerCase()}`);
+            }
+          }
+        });
+      };
+
+      // Check for overlapping elements
+      const checkOverlaps = () => {
+        const buttons = document.querySelectorAll('button, .clickable');
+        buttons.forEach(button => {
+          const rect = button.getBoundingClientRect();
+          const elementsAtPoint = document.elementsFromPoint(rect.left + rect.width/2, rect.top + rect.height/2);
+          
+          if (elementsAtPoint.length > 1 && elementsAtPoint[0] !== button) {
+            issues.push({
+              type: 'overlap',
+              element: button,
+              issue: 'Element is overlapped by other elements',
+              severity: 'high'
+            });
+            
+            // Auto-fix: Increase z-index
+            button.style.zIndex = '10';
+            button.style.position = 'relative';
+            fixes.push(`Fixed overlap for ${button.textContent || button.className}`);
+          }
+        });
+      };
+
+      // Check for text positioning issues
+      const checkTextPositioning = () => {
+        const textElements = document.querySelectorAll('p, span, h1, h2, h3, h4, h5, h6, label');
+        textElements.forEach(el => {
+          const computedStyle = window.getComputedStyle(el);
+          const lineHeight = parseFloat(computedStyle.lineHeight);
+          const fontSize = parseFloat(computedStyle.fontSize);
+          
+          // Check if line-height is too small
+          if (lineHeight < fontSize * 1.2) {
+            issues.push({
+              type: 'text-spacing',
+              element: el,
+              issue: 'Line height too small for readability',
+              severity: 'low'
+            });
+            
+            // Auto-fix: Improve line height
+            el.style.lineHeight = '1.4';
+            fixes.push(`Fixed line height for text element`);
+          }
+          
+          // Check if text is cut off
+          if (el.scrollHeight > el.clientHeight) {
+            issues.push({
+              type: 'text-overflow',
+              element: el,
+              issue: 'Text is cut off',
+              severity: 'medium'
+            });
+            
+            // Auto-fix: Adjust container
+            el.style.overflow = 'visible';
+            el.style.whiteSpace = 'normal';
+            fixes.push(`Fixed text overflow`);
+          }
+        });
+      };
+
+      // Check for hidden elements that should be visible
+      const checkHiddenElements = () => {
+        const importantElements = document.querySelectorAll('.important, [data-important="true"]');
+        importantElements.forEach(el => {
+          const computedStyle = window.getComputedStyle(el);
+          if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden') {
+            issues.push({
+              type: 'hidden-element',
+              element: el,
+              issue: 'Important element is hidden',
+              severity: 'high'
+            });
+            
+            // Auto-fix: Make visible
+            el.style.display = 'block';
+            el.style.visibility = 'visible';
+            fixes.push(`Made important element visible`);
+          }
+        });
+      };
+
+      // Check for responsive issues
+      const checkResponsive = () => {
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+          const elements = document.querySelectorAll('*');
+          elements.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.width > window.innerWidth) {
+              issues.push({
+                type: 'responsive',
+                element: el,
+                issue: 'Element wider than viewport',
+                severity: 'medium'
+              });
+              
+              // Auto-fix: Add responsive styling
+              el.style.maxWidth = '100%';
+              el.style.boxSizing = 'border-box';
+              fixes.push(`Fixed responsive width for element`);
+            }
+          });
+        }
+      };
+
+      // Run all checks
+      checkContrast();
+      checkOverlaps();
+      checkTextPositioning();
+      checkHiddenElements();
+      checkResponsive();
+
+      // Update UI system state
+      setUiSmartSystem(prev => ({
+        ...prev,
+        detectedIssues: issues,
+        fixedIssues: [...prev.fixedIssues, ...fixes],
+        lastCheck: Date.now()
+      }));
+    };
+
+    // Helper function to calculate luminance
+    const getLuminance = (color) => {
+      const rgb = color.match(/\d+/g);
+      if (!rgb) return 0;
+      
+      const [r, g, b] = rgb.map(x => {
+        x = x / 255;
+        return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+      });
+      
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+
+    // Run initial check
+    checkUIHealth();
+
+    // Set up periodic checks
+    const interval = setInterval(checkUIHealth, 5000); // Check every 5 seconds
+
+    // Also run checks when DOM changes
+    const observer = new MutationObserver(() => {
+      setTimeout(checkUIHealth, 100); // Debounce
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    });
+
+    return () => {
+      clearInterval(interval);
+      observer.disconnect();
+    };
+  }, [uiSmartSystem.isActive, darkMode]);
   useEffect(() => {
     const authStatus = localStorage.getItem('lech_authenticated');
     const darkModePreference = localStorage.getItem('lech_dark_mode');
