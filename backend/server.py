@@ -376,6 +376,66 @@ async def add_company_to_member(member_id: str, new_company: NewCompanyData):
         "company_name": new_company.company_name
     }
 
+# Custom fields management
+@app.put("/api/members/{member_id}/programs/{company_id}/fields")
+async def update_custom_fields(member_id: str, company_id: str, custom_fields: Dict[str, Any]):
+    member = members_collection.find_one({"id": member_id})
+    if not member:
+        raise HTTPException(status_code=404, detail="Membro não encontrado")
+    
+    if company_id not in member.get("programs", {}):
+        raise HTTPException(status_code=404, detail="Programa não encontrado")
+    
+    # Update custom fields
+    members_collection.update_one(
+        {"id": member_id},
+        {
+            "$set": {
+                f"programs.{company_id}.custom_fields": custom_fields,
+                f"programs.{company_id}.last_updated": datetime.utcnow(),
+                f"programs.{company_id}.last_change": "Campos personalizados atualizados"
+            }
+        }
+    )
+    
+    # Get company name for logging
+    company = companies_collection.find_one({"id": company_id})
+    company_name = company["name"] if company else company_id
+    
+    # Log the change
+    log_change(member_id, member["name"], company_id, company_name, 
+               "campos_customizados", "", "atualizados")
+    
+    return {"message": "Campos personalizados atualizados com sucesso"}
+
+@app.delete("/api/members/{member_id}/programs/{company_id}")
+async def delete_member_program(member_id: str, company_id: str):
+    member = members_collection.find_one({"id": member_id})
+    if not member:
+        raise HTTPException(status_code=404, detail="Membro não encontrado")
+    
+    if company_id not in member.get("programs", {}):
+        raise HTTPException(status_code=404, detail="Programa não encontrado")
+    
+    # Get company name for logging
+    company = companies_collection.find_one({"id": company_id})
+    company_name = company["name"] if company else company_id
+    
+    # Remove program from member
+    members_collection.update_one(
+        {"id": member_id},
+        {
+            "$unset": {f"programs.{company_id}": ""},
+            "$set": {"updated_at": datetime.utcnow()}
+        }
+    )
+    
+    # Log the deletion
+    log_change(member_id, member["name"], company_id, company_name, 
+               "programa", company_name, "removido")
+    
+    return {"message": "Programa removido com sucesso"}
+
 # Global log endpoint
 @app.get("/api/global-log")
 async def get_global_log(limit: int = 50):
