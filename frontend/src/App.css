@@ -967,22 +967,37 @@ body.dark-mode::before {
 
 .edit-btn {
   position: absolute;
-  top: 0;
-  right: 0;
-  padding: 0.5rem 1rem;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.5rem;
   background-color: var(--accent-primary);
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.75rem;
   transition: all 0.2s ease;
+  z-index: 10;
 }
 
 .edit-btn:hover {
   background-color: var(--accent-primary-light);
-  transform: translateY(-1px);
+  transform: scale(1.05);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .edit-btn {
+    position: static;
+    margin: 0.5rem 0;
+    width: 100%;
+    max-width: 100px;
+    align-self: flex-end;
+  }
+  
+  .view-mode {
+    position: relative;
+  }
 }
 
 /* Edit Actions */
