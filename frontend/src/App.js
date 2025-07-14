@@ -1025,7 +1025,7 @@ function App() {
   );
 
   const createPostit = async (content) => {
-    if (!content.trim()) return;
+    if (!content || !content.trim()) return;
     
     try {
       const response = await fetch(`${API_BASE_URL}/api/postits`, {
