@@ -989,46 +989,39 @@ function App() {
         currentValue = program.custom_fields[fieldName];
       }
       
-      // Use the custom fields endpoint to handle field renaming properly
-      const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}/fields`, {
+      // Manual renaming: add new field and remove old field
+      // Step 1: Add new field with the current value
+      const addResponse = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}/fields`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          rename_field: {
-            old_name: fieldName,
-            new_name: newName,
-            value: currentValue
-          }
+          [newName]: currentValue
         }),
       });
       
-      if (response.ok) {
-        await fetchMembers();
-        await fetchGlobalLog();
-        cancelFieldRenaming();
-      } else {
-        console.error('Erro ao renomear campo');
-        // Fallback to the old method if the new endpoint doesn't exist
-        const updateData = {
-          [fieldName]: '', // Remove old field
-          [newName]: currentValue // Add new field with same value
-        };
-        
-        const fallbackResponse = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
+      if (addResponse.ok) {
+        // Step 2: Remove old field by setting it to null
+        const deleteResponse = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(updateData),
+          body: JSON.stringify({
+            [fieldName]: null
+          }),
         });
         
-        if (fallbackResponse.ok) {
+        if (deleteResponse.ok) {
           await fetchMembers();
           await fetchGlobalLog();
           cancelFieldRenaming();
+        } else {
+          console.error('Erro ao remover campo antigo durante renomeação');
         }
+      } else {
+        console.error('Erro ao adicionar novo campo durante renomeação');
       }
     } catch (error) {
       console.error('Erro ao renomear campo:', error);
