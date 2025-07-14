@@ -1,7 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
+
+// Debounce utility function
+const debounce = (func, delay) => {
+  let timeoutId;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(null, args), delay);
+  };
+};
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
