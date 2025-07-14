@@ -1008,10 +1008,10 @@ body.dark-mode::before {
 /* Field Edit Button */
 .field-edit-btn {
   padding: 0.5rem 1rem;
-  background-color: var(--accent-warning);
-  color: white;
-  border: none;
-  border-radius: 6px;
+  background-color: #e2e8f0;  /* Tom claro similar ao cancelar */
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;  /* Mais arredondado */
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: 600;
@@ -1021,7 +1021,7 @@ body.dark-mode::before {
 }
 
 .field-edit-btn:hover {
-  background-color: #d69e2e;
+  background-color: #cbd5e0;
   transform: translateY(-1px);
   box-shadow: var(--shadow);
 }
@@ -1029,10 +1029,10 @@ body.dark-mode::before {
 /* Delete Program Button */
 .delete-program-btn {
   padding: 0.5rem 1rem;
-  background-color: var(--accent-danger);
-  color: white;
-  border: none;
-  border-radius: 6px;
+  background-color: #fed7d7;  /* Vermelho bem fraco/pastel */
+  color: #c53030;  /* Texto vermelho mais escuro */
+  border: 1px solid #feb2b2;
+  border-radius: 12px;  /* Mais arredondado */
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: 600;
@@ -1042,7 +1042,8 @@ body.dark-mode::before {
 }
 
 .delete-program-btn:hover {
-  background-color: #e53e3e;
+  background-color: #feb2b2;
+  color: #9b2c2c;
   transform: translateY(-1px);
   box-shadow: var(--shadow);
 }
