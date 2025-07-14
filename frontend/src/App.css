@@ -985,6 +985,12 @@ body.dark-mode::before {
   transform: scale(1.05);
 }
 
+/* View mode container adjustment */
+.view-mode {
+  position: relative;
+  padding-top: 2.5rem; /* Add padding to prevent overlap */
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .edit-btn {
@@ -996,7 +1002,9 @@ body.dark-mode::before {
   }
   
   .view-mode {
-    position: relative;
+    padding-top: 0; /* Remove extra padding on mobile */
+    display: flex;
+    flex-direction: column;
   }
 }
 
