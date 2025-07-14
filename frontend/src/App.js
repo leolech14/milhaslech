@@ -38,6 +38,12 @@ function App() {
     isDragging: false,
     progress: 0
   });
+  const [uiSmartSystem, setUiSmartSystem] = useState({
+    isActive: true,
+    detectedIssues: [],
+    fixedIssues: [],
+    lastCheck: Date.now()
+  });
 
   // Fixed order for family members
   const familyOrder = ["Osvandré", "Marilise", "Graciela", "Leonardo"];
