@@ -909,27 +909,38 @@ function App() {
     if (!confirm(`Tem certeza que deseja excluir o campo "${fieldName}"?`)) return;
 
     try {
-      // Get current member data
-      const member = members.find(m => m.id === memberId);
-      const program = member.programs[companyId];
-      
-      // Send empty value to effectively remove the field
-      const updateData = { [fieldName]: '' };
-      
-      // Send update to backend
-      const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
+      // Use a more explicit deletion approach
+      const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}/fields`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updateData),
+        body: JSON.stringify({
+          delete_field: fieldName
+        }),
       });
       
       if (response.ok) {
         await fetchMembers();
         await fetchGlobalLog();
       } else {
-        console.error('Erro ao deletar campo');
+        // Fallback to setting empty value if the delete endpoint doesn't exist
+        const updateData = { [fieldName]: null };
+        
+        const fallbackResponse = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updateData),
+        });
+        
+        if (fallbackResponse.ok) {
+          await fetchMembers();
+          await fetchGlobalLog();
+        } else {
+          console.error('Erro ao deletar campo');
+        }
       }
     } catch (error) {
       console.error('Erro ao deletar campo:', error);
