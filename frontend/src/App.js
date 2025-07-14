@@ -511,6 +511,9 @@ function App() {
     } else {
       document.body.classList.remove('dark-mode');
     }
+    
+    // Don't reload data when switching themes - this was causing data disappearance
+    // The data should persist across theme changes
   };
 
   // Add new company functions
