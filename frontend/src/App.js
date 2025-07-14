@@ -803,7 +803,8 @@ const MemberCard = ({
   onCopyToClipboard, formatDate, formatNumber, getCompanyById,
   showAddCompany, newCompanyData, onShowAddCompany, onHideAddCompany,
   onUpdateNewCompanyField, onCreateNewCompany, editingFields, setEditingFields,
-  onDeleteProgram, onToggleFieldEditing, onDeleteField
+  onDeleteProgram, onToggleFieldEditing, onConfirmFieldEditing, onCancelFieldEditing,
+  onDeleteField, onAddNewField
 }) => {
   return (
     <div className="member-card">
