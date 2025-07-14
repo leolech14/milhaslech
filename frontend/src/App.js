@@ -1402,11 +1402,76 @@ const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats, postits, onCreateP
       
       <div className="postits-container">
         <h3>Post-its</h3>
-        <button className="add-postit-btn" onClick={() => onCreatePostit('')}>
+        <button className="add-postit-btn" onClick={() => setEditingPostit('new')}>
           ➕ Adicionar
         </button>
         
         <div className="postits-grid">
+          {/* New post-it form */}
+          {editingPostit === 'new' && (
+            <div className="postit new-postit">
+              <button 
+                className="postit-delete"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingPostit(null);
+                }}
+                aria-label="Cancelar novo post-it"
+              >
+                ×
+              </button>
+              <textarea 
+                placeholder="Digite seu post-it aqui..."
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    const content = e.target.value.trim();
+                    if (content) {
+                      onCreatePostit(content);
+                      setEditingPostit(null);
+                    }
+                  }
+                  if (e.key === 'Escape') {
+                    setEditingPostit(null);
+                  }
+                }}
+                onBlur={(e) => {
+                  const content = e.target.value.trim();
+                  if (content) {
+                    onCreatePostit(content);
+                    setEditingPostit(null);
+                  }
+                }}
+                autoFocus
+              />
+              <div className="postit-actions">
+                <button 
+                  className="postit-save"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const textarea = e.target.closest('.postit').querySelector('textarea');
+                    const content = textarea.value.trim();
+                    if (content) {
+                      onCreatePostit(content);
+                      setEditingPostit(null);
+                    }
+                  }}
+                >
+                  ✓
+                </button>
+                <button 
+                  className="postit-cancel"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingPostit(null);
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          )}
+          
           {postits.map(postit => (
             <div key={postit.id} className="postit">
               {editingPostit === postit.id ? (
