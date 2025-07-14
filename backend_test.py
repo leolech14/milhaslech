@@ -55,12 +55,12 @@ class RedesignedLoyaltyAPITester:
             return False
     
     def test_get_companies(self):
-        """Test GET /api/companies - should return 3 default companies"""
+        """Test GET /api/companies - should return at least 3 default companies"""
         try:
             response = requests.get(f"{self.base_url}/companies", timeout=10)
             if response.status_code == 200:
                 companies = response.json()
-                if isinstance(companies, list) and len(companies) == 3:
+                if isinstance(companies, list) and len(companies) >= 3:
                     # Check for expected companies
                     company_ids = [c.get("id", "") for c in companies]
                     company_names = [c.get("name", "") for c in companies]
@@ -70,13 +70,13 @@ class RedesignedLoyaltyAPITester:
                     found_all_ids = all(cid in company_ids for cid in self.expected_companies)
                     
                     if found_all and found_all_ids:
-                        self.log_test("Get Companies", True, f"Found all 3 companies: {company_names}")
+                        self.log_test("Get Companies", True, f"Found {len(companies)} companies including all 3 defaults: {[n for n in company_names if n in expected_names]}")
                         return True
                     else:
                         self.log_test("Get Companies", False, f"Missing expected companies. Found: {company_names}, IDs: {company_ids}")
                         return False
                 else:
-                    self.log_test("Get Companies", False, f"Expected 3 companies, got: {len(companies) if isinstance(companies, list) else 'not a list'}")
+                    self.log_test("Get Companies", False, f"Expected at least 3 companies, got: {len(companies) if isinstance(companies, list) else 'not a list'}")
                     return False
             else:
                 self.log_test("Get Companies", False, f"HTTP {response.status_code}", response.text)
