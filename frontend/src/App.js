@@ -1241,6 +1241,7 @@ function App() {
           <BottomActions 
             onShowGlobalLog={() => setShowGlobalLog(true)}
             onLogout={handleLogout}
+            onShowWhatsappModal={showWhatsappModal}
           />
         </div>
       </main>
