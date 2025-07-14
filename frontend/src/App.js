@@ -31,6 +31,13 @@ function App() {
     customProgram: ''
   });
   const [showWhatsappBtn, setShowWhatsappBtn] = useState(false);
+  const [pullUpGesture, setPullUpGesture] = useState({
+    isActive: false,
+    startY: 0,
+    currentY: 0,
+    isDragging: false,
+    progress: 0
+  });
 
   // Fixed order for family members
   const familyOrder = ["Osvandré", "Marilise", "Graciela", "Leonardo"];
