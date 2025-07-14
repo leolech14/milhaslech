@@ -1350,6 +1350,55 @@ body.dark-mode::before {
   white-space: nowrap;
 }
 
+/* Pull-up WhatsApp Gesture Feedback */
+.pull-up-feedback {
+  position: fixed;
+  z-index: 1500;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.1s ease-out;
+}
+
+.whatsapp-icon-feedback {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #25D366 0%, #20b858 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 8px 32px rgba(37, 211, 102, 0.4);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  animation: pulse 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
+.pull-up-progress {
+  width: 4px;
+  height: 40px;
+  background: rgba(37, 211, 102, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar {
+  width: 100%;
+  background: linear-gradient(to top, #25D366 0%, #4ade80 100%);
+  border-radius: 2px;
+  transition: height 0.1s ease-out;
+  position: absolute;
+  bottom: 0;
+}
+
 /* Mobile WhatsApp Button - Always Fixed at Bottom */
 .whatsapp-btn-mobile {
   position: fixed;
@@ -1383,6 +1432,10 @@ body.dark-mode::before {
   .whatsapp-btn-mobile {
     display: none !important;
   }
+  
+  .pull-up-feedback {
+    display: none !important;
+  }
 }
 
 /* Mobile - Always show button at bottom */
@@ -1409,6 +1462,10 @@ body.dark-mode::before {
   /* Add padding to prevent content overlap */
   .app {
     padding-bottom: 60px;
+  }
+  
+  .pull-up-feedback {
+    display: flex !important;
   }
 }
 
