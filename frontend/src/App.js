@@ -347,6 +347,37 @@ function App() {
       [key]: !prev[key]
     }));
   };
+
+  // Delete individual field
+  const deleteField = async (memberId, companyId, fieldName) => {
+    if (!confirm(`Tem certeza que deseja excluir o campo "${fieldName}"?`)) return;
+
+    try {
+      // Get current member data
+      const member = members.find(m => m.id === memberId);
+      const program = member.programs[companyId];
+      
+      // Create updated program without the field
+      const updatedProgram = { ...program };
+      delete updatedProgram[fieldName];
+      
+      // Send update to backend
+      const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ [fieldName]: '' }), // Set to empty to effectively remove
+      });
+      
+      if (response.ok) {
+        await fetchMembers();
+        await fetchGlobalLog();
+      }
+    } catch (error) {
+      console.error('Erro ao deletar campo:', error);
+    }
+  };
   const createPostit = async (content) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/postits`, {
