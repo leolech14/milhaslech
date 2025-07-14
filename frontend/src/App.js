@@ -1789,7 +1789,7 @@ const ProgramBlock = ({
   member, company, program, isExpanded, isEditing, isEditingFields, changes,
   onToggle, onStartEditing, onCancelEditing, onUpdateField, onSaveChanges,
   onCopyToClipboard, formatDate, formatNumber, onDeleteProgram, onToggleFieldEditing,
-  onConfirmFieldEditing, onCancelFieldEditing, onDeleteField, onAddNewField
+  onConfirmFieldEditing, onCancelFieldEditing, onDeleteField, onRenameField, onAddNewField
 }) => {
   const currentData = { ...program, ...changes };
 
