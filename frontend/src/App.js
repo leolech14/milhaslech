@@ -357,9 +357,8 @@ function App() {
       const member = members.find(m => m.id === memberId);
       const program = member.programs[companyId];
       
-      // Create updated program without the field
-      const updatedProgram = { ...program };
-      delete updatedProgram[fieldName];
+      // Send empty value to effectively remove the field
+      const updateData = { [fieldName]: '' };
       
       // Send update to backend
       const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
@@ -367,12 +366,14 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ [fieldName]: '' }), // Set to empty to effectively remove
+        body: JSON.stringify(updateData),
       });
       
       if (response.ok) {
         await fetchMembers();
         await fetchGlobalLog();
+      } else {
+        console.error('Erro ao deletar campo');
       }
     } catch (error) {
       console.error('Erro ao deletar campo:', error);
