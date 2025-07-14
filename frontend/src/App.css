@@ -1999,35 +1999,44 @@ body.dark-mode::before {
   box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
 }
 
-/* Dark mode button text fixes */
-.dark-mode button,
-.dark-mode .action-btn,
-.dark-mode .btn,
+/* Dark mode button text fixes - Complete override */
+.dark-mode button {
+  color: white !important;
+}
+
+.dark-mode .action-btn {
+  color: white !important;
+}
+
 .dark-mode .login-btn,
 .dark-mode .refresh-btn,
 .dark-mode .add-postit-btn,
 .dark-mode .postit-save,
 .dark-mode .postit-cancel,
 .dark-mode .save-btn,
-.dark-mode .cancel-btn {
+.dark-mode .cancel-btn,
+.dark-mode .confirm-btn,
+.dark-mode .dark-mode-toggle {
   color: white !important;
+  background-color: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
 }
 
 .dark-mode .action-btn.logout-btn {
   color: var(--text-primary) !important;
+  background-color: var(--bg-tertiary) !important;
 }
 
-/* Ensure specific buttons maintain readability in dark mode */
+/* Program and field editing buttons */
 .dark-mode .program-btn,
 .dark-mode .edit-btn,
-.dark-mode .save-btn,
-.dark-mode .cancel-btn,
 .dark-mode .add-company-btn,
 .dark-mode .delete-program-btn,
 .dark-mode .field-edit-btn,
 .dark-mode .add-field-btn,
 .dark-mode .confirm-field-btn,
-.dark-mode .cancel-field-btn {
+.dark-mode .cancel-field-btn,
+.dark-mode .rename-field-btn {
   background-color: var(--accent-primary) !important;
   color: white !important;
   border-color: var(--accent-primary) !important;
@@ -2037,8 +2046,23 @@ body.dark-mode::before {
 .dark-mode .edit-btn:hover,
 .dark-mode .add-company-btn:hover,
 .dark-mode .field-edit-btn:hover,
-.dark-mode .add-field-btn:hover {
+.dark-mode .add-field-btn:hover,
+.dark-mode .save-btn:hover,
+.dark-mode .confirm-btn:hover {
   background-color: var(--accent-primary-light) !important;
+  color: white !important;
+}
+
+/* Delete buttons special styling */
+.dark-mode .delete-program-btn,
+.dark-mode .postit-delete {
+  background-color: var(--accent-danger) !important;
+  color: white !important;
+  border-color: var(--accent-danger) !important;
+}
+
+/* Modal buttons */
+.dark-mode .modal-content button {
   color: white !important;
 }
 
