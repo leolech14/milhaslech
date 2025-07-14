@@ -1048,15 +1048,99 @@ body.dark-mode::before {
   box-shadow: var(--shadow);
 }
 
-.cancel-btn, .save-btn {
+/* Delete Confirmation Modal */
+.delete-confirm-modal {
+  max-width: 400px;
+  padding: 2rem;
+}
+
+.delete-confirm-modal h3 {
+  color: var(--accent-danger);
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.delete-confirm-modal p {
+  margin-bottom: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.delete-confirm-btn {
   padding: 0.5rem 1rem;
+  background-color: var(--accent-danger);
+  color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   font-weight: 600;
   transition: all 0.2s ease;
-  border: 2px solid transparent;
+}
+
+.delete-confirm-btn:hover {
+  background-color: #e53e3e;
+  transform: translateY(-1px);
+}
+
+/* Field Group with Delete */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.field-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.field-label {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.field-input {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: var(--bg-white);
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+}
+
+/* Delete Field Button (like post-it delete) */
+.delete-field-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--accent-danger);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  margin-left: 0.5rem;
+}
+
+.delete-field-btn:hover {
+  background-color: #e53e3e;
+  transform: scale(1.1);
 }
 
 .cancel-btn {
