@@ -49,7 +49,22 @@ function App() {
     } else {
       document.body.classList.remove('dark-mode');
     }
-  }, []);
+
+    // Handle ESC key for modals
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        if (whatsappModal.show) {
+          hideWhatsappModal();
+        }
+        if (deleteConfirmModal.show) {
+          hideDeleteConfirm();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [whatsappModal.show, deleteConfirmModal.show]);
 
   // Handle login
   const handleLogin = (e) => {
