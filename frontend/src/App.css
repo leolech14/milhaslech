@@ -342,11 +342,13 @@ body.dark-mode::before {
   border-radius: 8px;
   padding: 0.75rem;
   position: relative;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
   min-height: 80px;
   font-family: 'Comic Sans MS', cursive, sans-serif;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .postit:hover {
