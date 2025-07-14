@@ -930,12 +930,11 @@ function App() {
         </div>
       )}
 
-      {/* Mobile WhatsApp Button */}
+      {/* Mobile WhatsApp Button - Only visible on mobile */}
       <button 
         className={`whatsapp-btn-mobile ${showWhatsappBtn ? 'show' : ''}`}
         onClick={showWhatsappModal}
         aria-label="Exportar dados para WhatsApp"
-        style={{ display: window.innerWidth <= 768 ? 'flex' : 'none' }}
       >
         <svg 
           viewBox="0 0 24 24" 
