@@ -460,6 +460,14 @@ function App() {
               formatDate={formatDate}
               formatNumber={formatNumber}
               getCompanyById={getCompanyById}
+              showAddCompany={showAddCompany[member.id]}
+              newCompanyData={newCompanyData[member.id] || {}}
+              onShowAddCompany={() => showAddCompanyModal(member.id)}
+              onHideAddCompany={() => hideAddCompanyModal(member.id)}
+              onUpdateNewCompanyField={(field, value) => updateNewCompanyField(member.id, field, value)}
+              onCreateNewCompany={() => createNewCompany(member.id)}
+              editingFields={editingFields}
+              setEditingFields={setEditingFields}
             />
           ))}
           
