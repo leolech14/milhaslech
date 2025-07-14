@@ -44,6 +44,13 @@ function App() {
     fixedIssues: [],
     lastCheck: Date.now()
   });
+  const [fieldRenaming, setFieldRenaming] = useState({
+    isActive: false,
+    memberId: null,
+    companyId: null,
+    fieldName: '',
+    newName: ''
+  });
 
   // Fixed order for family members
   const familyOrder = ["Osvandré", "Marilise", "Graciela", "Leonardo"];
