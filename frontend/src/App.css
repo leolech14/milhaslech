@@ -425,6 +425,7 @@ body.dark-mode::before {
   font-family: inherit;
   color: #444;
   outline: none;
+  padding: 0.5rem;
   margin-top: 0.5rem;
 }
 
@@ -432,16 +433,18 @@ body.dark-mode::before {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.5rem;
+  justify-content: flex-end;
 }
 
 .postit-save, .postit-cancel {
   padding: 0.25rem 0.5rem;
   border: none;
   border-radius: 4px;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  min-width: 40px;
 }
 
 .postit-save {
@@ -451,6 +454,7 @@ body.dark-mode::before {
 
 .postit-save:hover {
   background-color: #15803d;
+  transform: translateY(-1px);
 }
 
 .postit-cancel {
@@ -461,6 +465,7 @@ body.dark-mode::before {
 .postit-cancel:hover {
   background-color: var(--accent-danger);
   color: white;
+  transform: translateY(-1px);
 }
 
 .sidebar-actions {
