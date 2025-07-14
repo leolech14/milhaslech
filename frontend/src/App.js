@@ -662,17 +662,64 @@ const BottomActions = ({ onShowGlobalLog, onLogout }) => (
 const MemberCard = ({ 
   member, companies, expandedPrograms, editingPrograms, programChanges,
   onToggleProgram, onStartEditing, onCancelEditing, onUpdateField, onSaveChanges,
-  onCopyToClipboard, formatDate, formatNumber, getCompanyById 
+  onCopyToClipboard, formatDate, formatNumber, getCompanyById,
+  showAddCompany, newCompanyData, onShowAddCompany, onHideAddCompany,
+  onUpdateNewCompanyField, onCreateNewCompany, editingFields, setEditingFields
 }) => {
   return (
     <div className="member-card">
       <div className="member-header">
         <h3>{member.name}</h3>
+        <button 
+          className="add-company-btn"
+          onClick={onShowAddCompany}
+          title="Clique para adicionar novo programa de pontos"
+        >
+          + Programa
+        </button>
       </div>
+      
+      {showAddCompany && (
+        <div className="add-company-modal">
+          <h4>Adicionar Novo Programa de Pontos</h4>
+          <div className="form-group">
+            <label>Nome da Companhia:</label>
+            <input
+              type="text"
+              value={newCompanyData.company_name || ''}
+              onChange={(e) => onUpdateNewCompanyField('company_name', e.target.value)}
+              placeholder="Ex: Emirates, United, etc."
+            />
+          </div>
+          <div className="form-group">
+            <label>Nome dos Pontos:</label>
+            <input
+              type="text"
+              value={newCompanyData.points_name || 'pontos'}
+              onChange={(e) => onUpdateNewCompanyField('points_name', e.target.value)}
+              placeholder="Ex: milhas, pontos, miles"
+            />
+          </div>
+          <div className="modal-actions">
+            <button className="cancel-btn" onClick={onHideAddCompany}>
+              Cancelar
+            </button>
+            <button 
+              className="save-btn" 
+              onClick={onCreateNewCompany}
+              disabled={!newCompanyData.company_name}
+            >
+              Adicionar
+            </button>
+          </div>
+        </div>
+      )}
       
       <div className="programs-container">
         {companies.map(company => {
           const program = member.programs[company.id];
+          if (!program) return null;
+          
           const isExpanded = expandedPrograms[`${member.id}-${company.id}`];
           const isEditing = editingPrograms[`${member.id}-${company.id}`];
           const changes = programChanges[`${member.id}-${company.id}`] || {};
@@ -694,6 +741,8 @@ const MemberCard = ({
               onCopyToClipboard={onCopyToClipboard}
               formatDate={formatDate}
               formatNumber={formatNumber}
+              editingFields={editingFields}
+              setEditingFields={setEditingFields}
             />
           );
         })}
