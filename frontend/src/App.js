@@ -252,6 +252,61 @@ function App() {
       document.body.classList.remove('dark-mode');
     }
   };
+
+  // Add new company functions
+  const showAddCompanyModal = (memberId) => {
+    setShowAddCompany(prev => ({...prev, [memberId]: true}));
+    setNewCompanyData(prev => ({
+      ...prev,
+      [memberId]: {
+        company_name: '',
+        points_name: 'pontos',
+        color: '#4a90e2'
+      }
+    }));
+  };
+
+  const hideAddCompanyModal = (memberId) => {
+    setShowAddCompany(prev => ({...prev, [memberId]: false}));
+    setNewCompanyData(prev => ({...prev, [memberId]: {}}));
+  };
+
+  const updateNewCompanyField = (memberId, field, value) => {
+    setNewCompanyData(prev => ({
+      ...prev,
+      [memberId]: {
+        ...prev[memberId],
+        [field]: value
+      }
+    }));
+  };
+
+  const createNewCompany = async (memberId) => {
+    const companyData = newCompanyData[memberId];
+    if (!companyData?.company_name) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/companies`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(companyData),
+      });
+      
+      if (response.ok) {
+        await fetchMembers();
+        await fetchCompanies();
+        await fetchGlobalLog();
+        await fetchDashboardStats();
+        hideAddCompanyModal(memberId);
+      } else {
+        console.error('Erro ao criar nova companhia');
+      }
+    } catch (error) {
+      console.error('Erro ao criar nova companhia:', error);
+    }
+  };
   const createPostit = async (content) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/postits`, {
