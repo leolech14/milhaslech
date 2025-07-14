@@ -970,17 +970,26 @@ const FieldDisplay = ({ label, value, onCopy }) => (
   </div>
 );
 
-const EditableField = ({ label, value, onChange, type = "text" }) => (
-  <div className="detail-item">
-    <label>{label}:</label>
-    <input
-      type={type}
-      value={value || ''}
-      onChange={(e) => onChange(e.target.value)}
-      className="edit-input"
-    />
-  </div>
-);
+const EditableFieldWithDelete = ({ label, value, onChange, onDelete, type = "text", canDelete = false }) => {
+  return (
+    <div className="field-group">
+      <div className="field-container">
+        <label className="field-label">{label}:</label>
+        {canDelete && (
+          <button className="delete-field-btn" onClick={() => onDelete(label)}>
+            ×
+          </button>
+        )}
+      </div>
+      <input
+        type={type}
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+        className="field-input"
+      />
+    </div>
+  );
+};
 
 const GlobalLogModal = ({ globalLog, onClose, formatDate, getCompanyById }) => (
   <div className="modal-overlay">
