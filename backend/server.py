@@ -48,8 +48,19 @@ class ProgramData(BaseModel):
     current_balance: int = 0
     elite_tier: str = ""
     notes: str = ""
-    last_updated: datetime
+    last_updated: datetime = None
     last_change: str = ""
+    custom_fields: Dict[str, Any] = {}
+
+class CustomField(BaseModel):
+    name: str
+    value: str = ""
+    field_type: str = "text"  # text or number
+
+class NewCompanyData(BaseModel):
+    company_name: str
+    points_name: str = "pontos"
+    color: str = "#4a90e2"
 
 class Member(BaseModel):
     id: str
