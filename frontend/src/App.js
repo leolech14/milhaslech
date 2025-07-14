@@ -969,21 +969,28 @@ function App() {
       // Get current member data
       const member = members.find(m => m.id === memberId);
       const program = member.programs[companyId];
-      const currentValue = program[fieldName] || program.custom_fields?.[fieldName] || '';
       
-      // Create update data: remove old field and add new field
-      const updateData = {
-        [fieldName]: '', // Remove old field
-        [newName]: currentValue // Add new field with same value
-      };
+      // Get the current value from the field
+      let currentValue = '';
+      if (program[fieldName] !== undefined) {
+        currentValue = program[fieldName];
+      } else if (program.custom_fields && program.custom_fields[fieldName] !== undefined) {
+        currentValue = program.custom_fields[fieldName];
+      }
       
-      // Send update to backend
-      const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
+      // Use the custom fields endpoint to handle field renaming properly
+      const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}/fields`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updateData),
+        body: JSON.stringify({
+          rename_field: {
+            old_name: fieldName,
+            new_name: newName,
+            value: currentValue
+          }
+        }),
       });
       
       if (response.ok) {
@@ -992,6 +999,25 @@ function App() {
         cancelFieldRenaming();
       } else {
         console.error('Erro ao renomear campo');
+        // Fallback to the old method if the new endpoint doesn't exist
+        const updateData = {
+          [fieldName]: '', // Remove old field
+          [newName]: currentValue // Add new field with same value
+        };
+        
+        const fallbackResponse = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updateData),
+        });
+        
+        if (fallbackResponse.ok) {
+          await fetchMembers();
+          await fetchGlobalLog();
+          cancelFieldRenaming();
+        }
       }
     } catch (error) {
       console.error('Erro ao renomear campo:', error);
