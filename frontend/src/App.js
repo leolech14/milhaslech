@@ -836,6 +836,8 @@ function App() {
         onDeletePostit={deletePostit}
         editingPostit={editingPostit}
         setEditingPostit={setEditingPostit}
+        showWhatsappBtn={showWhatsappBtn}
+        showWhatsappModal={showWhatsappModal}
       />
       
       <main className="main-content">
