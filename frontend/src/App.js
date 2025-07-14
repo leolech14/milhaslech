@@ -306,6 +306,37 @@ function App() {
       console.error('Erro ao criar nova companhia:', error);
     }
   };
+
+  // Delete program function
+  const deleteProgram = async (memberId, companyId) => {
+    if (!confirm('Tem certeza que deseja excluir este programa de pontos?')) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/members/${memberId}/programs/${companyId}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        await fetchMembers();
+        await fetchCompanies();
+        await fetchGlobalLog();
+        await fetchDashboardStats();
+      } else {
+        console.error('Erro ao excluir programa');
+      }
+    } catch (error) {
+      console.error('Erro ao excluir programa:', error);
+    }
+  };
+
+  // Toggle field editing mode
+  const toggleFieldEditing = (memberId, companyId) => {
+    const key = `${memberId}-${companyId}`;
+    setEditingFields(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
   const createPostit = async (content) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/postits`, {
