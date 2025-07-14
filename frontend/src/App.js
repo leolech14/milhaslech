@@ -529,6 +529,25 @@ function App() {
         />
       )}
 
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmModal.show && (
+        <div className="modal-overlay">
+          <div className="modal-content delete-confirm-modal">
+            <h3>Confirmar Exclusão</h3>
+            <p>Tem certeza que deseja excluir este programa de pontos?</p>
+            <p><strong>Esta ação não pode ser desfeita.</strong></p>
+            <div className="modal-actions">
+              <button className="cancel-btn" onClick={hideDeleteConfirm}>
+                Cancelar
+              </button>
+              <button className="delete-confirm-btn" onClick={confirmDeleteProgram}>
+                🗑️ Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {copyFeedback && (
         <div className="copy-feedback">
           {copyFeedback}
