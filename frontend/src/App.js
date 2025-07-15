@@ -1867,19 +1867,29 @@ const MemberCard = ({
   showAddCompany, newCompanyData, onShowAddCompany, onHideAddCompany,
   onUpdateNewCompanyField, onCreateNewCompany, editingFields, setEditingFields,
   onDeleteProgram, onToggleFieldEditing, onConfirmFieldEditing, onCancelFieldEditing,
-  onDeleteField, onRenameField, onAddNewField
+  onDeleteField, onRenameField, onAddNewField, onDeleteMember
 }) => {
   return (
     <div className="member-card">
       <div className="member-header">
         <h3>{member.name}</h3>
-        <button 
-          className="add-company-btn"
-          onClick={onShowAddCompany}
-          title="Clique para adicionar novo programa de pontos"
-        >
-          + Programa
-        </button>
+        <div className="member-header-actions">
+          <button 
+            className="add-company-btn"
+            onClick={onShowAddCompany}
+            title="Clique para adicionar novo programa de pontos"
+          >
+            + Programa
+          </button>
+          <button 
+            className="delete-member-btn"
+            onClick={() => onDeleteMember(member.id, member.name)}
+            title="Deletar membro"
+          >
+            <span className="delete-member-icon">🗑️</span>
+            <span className="delete-member-text">Deletar</span>
+          </button>
+        </div>
       </div>
       
       {showAddCompany && (
