@@ -95,8 +95,8 @@ class NewMemberCreationTester:
     def test_duplicate_member_prevention(self):
         """Test that creating a member with existing name fails with proper error"""
         try:
-            # Try to create another member with name "Maria" (should fail)
-            duplicate_member_data = {"name": "Maria"}
+            # Try to create another member with name "Ana" (should fail)
+            duplicate_member_data = {"name": "Ana"}
             response = requests.post(f"{self.base_url}/members", json=duplicate_member_data, timeout=10)
             
             if response.status_code == 400:
