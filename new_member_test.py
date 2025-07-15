@@ -255,37 +255,37 @@ class NewMemberCreationTester:
             return False
     
     def test_maria_in_members_list(self):
-        """Test that Maria appears in GET /api/members"""
+        """Test that Ana appears in GET /api/members"""
         try:
             response = requests.get(f"{self.base_url}/members", timeout=10)
             
             if response.status_code == 200:
                 members = response.json()
                 
-                # Find Maria in the list
+                # Find Ana in the list
                 maria_member = None
                 for member in members:
-                    if member.get("name") == "Maria":
+                    if member.get("name") == "Ana":
                         maria_member = member
                         break
                 
                 if maria_member:
                     if maria_member.get("id") == self.maria_id:
-                        self.log_test("Maria in Members List", True, f"Maria found in members list with correct ID {self.maria_id}")
+                        self.log_test("Ana in Members List", True, f"Ana found in members list with correct ID {self.maria_id}")
                         return True
                     else:
-                        self.log_test("Maria in Members List", False, f"Maria found but ID mismatch: expected {self.maria_id}, got {maria_member.get('id')}")
+                        self.log_test("Ana in Members List", False, f"Ana found but ID mismatch: expected {self.maria_id}, got {maria_member.get('id')}")
                         return False
                 else:
-                    self.log_test("Maria in Members List", False, "Maria not found in members list")
+                    self.log_test("Ana in Members List", False, "Ana not found in members list")
                     member_names = [m.get("name") for m in members]
                     print(f"   Available members: {member_names}")
                     return False
             else:
-                self.log_test("Maria in Members List", False, f"HTTP {response.status_code}: {response.text}")
+                self.log_test("Ana in Members List", False, f"HTTP {response.status_code}: {response.text}")
                 return False
         except Exception as e:
-            self.log_test("Maria in Members List", False, f"Request error: {str(e)}")
+            self.log_test("Ana in Members List", False, f"Request error: {str(e)}")
             return False
     
     def run_new_member_tests(self):
