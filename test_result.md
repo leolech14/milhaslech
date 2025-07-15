@@ -345,7 +345,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "New member creation endpoint testing completed successfully"
+    - "Member deletion endpoint testing completed successfully"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
