@@ -1436,6 +1436,25 @@ function App() {
         </div>
       )}
 
+      {/* Delete Member Modal */}
+      {deleteMemberModal.show && (
+        <div className="modal-overlay">
+          <div className="modal-content delete-confirm-modal">
+            <h3>🗑️ Confirmar Exclusão</h3>
+            <p>Tem certeza que deseja excluir o membro <strong>{deleteMemberModal.memberName}</strong>?</p>
+            <p><strong>Esta ação não pode ser desfeita e todos os dados do membro serão perdidos.</strong></p>
+            <div className="modal-actions">
+              <button className="cancel-btn" onClick={hideDeleteMemberModal}>
+                Cancelar
+              </button>
+              <button className="delete-confirm-btn" onClick={confirmDeleteMember}>
+                🗑️ Excluir Membro
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {copyFeedback && (
         <div className="copy-feedback">
           {copyFeedback}
