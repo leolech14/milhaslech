@@ -310,6 +310,62 @@ async def update_program(member_id: str, company_id: str, program_update: Progra
     
     return {"message": "Programa atualizado com sucesso", "changes": changes}
 
+# Create new member
+class NewMemberData(BaseModel):
+    name: str
+
+@app.post("/api/members")
+async def create_member(new_member: NewMemberData):
+    # Check if member with same name already exists
+    existing_member = members_collection.find_one({"name": new_member.name})
+    if existing_member:
+        raise HTTPException(status_code=400, detail="Membro com esse nome já existe")
+    
+    # Create new member ID
+    member_id = str(uuid.uuid4())
+    now = datetime.utcnow()
+    
+    # Get all companies to create default programs
+    companies = list(companies_collection.find({}, {"_id": 0}))
+    
+    # Create empty program data for each company
+    programs = {}
+    for company in companies:
+        programs[company["id"]] = {
+            "company_id": company["id"],
+            "login": "",
+            "password": "",
+            "cpf": "",
+            "card_number": "",
+            "current_balance": 0,
+            "elite_tier": "",
+            "notes": "",
+            "last_updated": now,
+            "last_change": "Conta criada",
+            "custom_fields": {}
+        }
+    
+    # Create member data
+    member_data = {
+        "id": member_id,
+        "name": new_member.name,
+        "programs": programs,
+        "created_at": now,
+        "updated_at": now
+    }
+    
+    # Insert new member
+    members_collection.insert_one(member_data)
+    
+    # Log the creation
+    log_change(member_id, new_member.name, "", "", "membro", "", "criado", "create")
+    
+    return {
+        "message": "Membro criado com sucesso",
+        "member_id": member_id,
+        "member_name": new_member.name
+    }
+
 # Add new company to member
 @app.post("/api/members/{member_id}/companies")
 async def add_company_to_member(member_id: str, new_company: NewCompanyData):
