@@ -658,6 +658,212 @@ class RedesignedLoyaltyAPITester:
             self.log_test("Delete Program", False, f"Request error: {str(e)}")
             return False
     
+    def test_new_member_creation(self):
+        """Test POST /api/members - Create new member with name 'Maria'"""
+        try:
+            # Get initial member count
+            initial_response = requests.get(f"{self.base_url}/members", timeout=10)
+            if initial_response.status_code != 200:
+                self.log_test("New Member Creation", False, f"Failed to get initial members: HTTP {initial_response.status_code}")
+                return False
+            
+            initial_members = initial_response.json()
+            initial_count = len(initial_members)
+            
+            # Create new member with name "Maria"
+            new_member_data = {"name": "Maria"}
+            response = requests.post(f"{self.base_url}/members", json=new_member_data, timeout=10)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if ("member_id" in result and "member_name" in result and 
+                    result["member_name"] == "Maria"):
+                    
+                    maria_id = result["member_id"]
+                    
+                    # Verify new member appears in GET /api/members
+                    verify_response = requests.get(f"{self.base_url}/members", timeout=10)
+                    if verify_response.status_code == 200:
+                        updated_members = verify_response.json()
+                        if len(updated_members) == initial_count + 1:
+                            # Find Maria in the list
+                            maria_member = None
+                            for member in updated_members:
+                                if member.get("name") == "Maria" and member.get("id") == maria_id:
+                                    maria_member = member
+                                    break
+                            
+                            if maria_member:
+                                # Store Maria's ID for other tests
+                                self.member_ids["Maria"] = maria_id
+                                self.log_test("New Member Creation", True, f"Successfully created new member 'Maria' with ID {maria_id}")
+                                return True
+                            else:
+                                self.log_test("New Member Creation", False, "Maria not found in members list after creation")
+                                return False
+                        else:
+                            self.log_test("New Member Creation", False, f"Expected {initial_count + 1} members, got {len(updated_members)}")
+                            return False
+                    else:
+                        self.log_test("New Member Creation", False, f"Failed to verify member creation: HTTP {verify_response.status_code}")
+                        return False
+                else:
+                    self.log_test("New Member Creation", False, f"Invalid response format: {result}")
+                    return False
+            else:
+                self.log_test("New Member Creation", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("New Member Creation", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_duplicate_member_prevention(self):
+        """Test that creating a member with existing name fails with proper error"""
+        try:
+            # Try to create another member with name "Maria" (should fail)
+            duplicate_member_data = {"name": "Maria"}
+            response = requests.post(f"{self.base_url}/members", json=duplicate_member_data, timeout=10)
+            
+            if response.status_code == 400:
+                error_data = response.json()
+                if "detail" in error_data and "já existe" in error_data["detail"]:
+                    self.log_test("Duplicate Member Prevention", True, f"Correctly prevented duplicate member creation: {error_data['detail']}")
+                    return True
+                else:
+                    self.log_test("Duplicate Member Prevention", False, f"Wrong error message: {error_data}")
+                    return False
+            else:
+                self.log_test("Duplicate Member Prevention", False, f"Expected HTTP 400, got {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Duplicate Member Prevention", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_new_member_structure(self):
+        """Test that new member 'Maria' has all default programs (LATAM, Smiles, Azul) with empty fields"""
+        if "Maria" not in self.member_ids:
+            self.log_test("New Member Structure", False, "Maria's ID not available")
+            return False
+        
+        try:
+            maria_id = self.member_ids["Maria"]
+            response = requests.get(f"{self.base_url}/members/{maria_id}", timeout=10)
+            
+            if response.status_code == 200:
+                maria = response.json()
+                programs = maria.get("programs", {})
+                
+                # Check if all 3 default companies are present
+                if not all(company_id in programs for company_id in self.expected_companies):
+                    missing = [cid for cid in self.expected_companies if cid not in programs]
+                    self.log_test("New Member Structure", False, f"Missing programs: {missing}")
+                    return False
+                
+                # Check program structure and empty initial values
+                all_valid = True
+                issues = []
+                
+                for company_id in self.expected_companies:
+                    program = programs[company_id]
+                    
+                    # Check required fields exist
+                    required_fields = ["company_id", "login", "password", "cpf", "card_number", "current_balance", "elite_tier", "notes", "last_updated", "last_change", "custom_fields"]
+                    missing_fields = [field for field in required_fields if field not in program]
+                    
+                    if missing_fields:
+                        all_valid = False
+                        issues.append(f"{company_id}: Missing fields {missing_fields}")
+                        continue
+                    
+                    # Check initial empty values
+                    if (program["login"] != "" or program["password"] != "" or 
+                        program["cpf"] != "" or program["card_number"] != "" or 
+                        program["current_balance"] != 0 or program["elite_tier"] != "" or 
+                        program["notes"] != ""):
+                        issues.append(f"{company_id}: Fields not empty as expected")
+                    
+                    # Check custom_fields is empty dict
+                    if program.get("custom_fields") != {}:
+                        issues.append(f"{company_id}: custom_fields not empty dict")
+                
+                if all_valid and not issues:
+                    self.log_test("New Member Structure", True, f"Maria has all 3 default programs ({', '.join(self.expected_companies)}) with correct empty structure")
+                    return True
+                else:
+                    self.log_test("New Member Structure", False, f"Structure issues: {issues}")
+                    return False
+            else:
+                self.log_test("New Member Structure", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("New Member Structure", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_member_creation_logged(self):
+        """Test that member creation is logged to global log system"""
+        try:
+            # Get global log and look for Maria's creation entry
+            response = requests.get(f"{self.base_url}/global-log", timeout=10)
+            
+            if response.status_code == 200:
+                log_entries = response.json()
+                
+                # Look for Maria's creation log entry
+                maria_creation_log = None
+                for entry in log_entries:
+                    if (entry.get("member_name") == "Maria" and 
+                        entry.get("field_changed") == "membro" and
+                        entry.get("change_type") == "create" and
+                        entry.get("new_value") == "criado"):
+                        maria_creation_log = entry
+                        break
+                
+                if maria_creation_log:
+                    # Verify log entry structure
+                    required_fields = ["id", "member_id", "member_name", "company_id", "company_name", "field_changed", "old_value", "new_value", "timestamp", "change_type"]
+                    if all(field in maria_creation_log for field in required_fields):
+                        self.log_test("Member Creation Logged", True, f"Maria's creation properly logged with ID {maria_creation_log['id']}")
+                        return True
+                    else:
+                        self.log_test("Member Creation Logged", False, f"Log entry missing required fields: {maria_creation_log}")
+                        return False
+                else:
+                    self.log_test("Member Creation Logged", False, "Maria's creation not found in global log")
+                    return False
+            else:
+                self.log_test("Member Creation Logged", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Member Creation Logged", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_dashboard_stats_updated(self):
+        """Test that dashboard stats are updated correctly after new member creation"""
+        try:
+            response = requests.get(f"{self.base_url}/dashboard/stats", timeout=10)
+            
+            if response.status_code == 200:
+                stats = response.json()
+                required_fields = ["total_members", "total_companies", "total_points", "recent_activity"]
+                
+                if all(field in stats for field in required_fields):
+                    # Should now have 5 members (4 original + Maria)
+                    if stats["total_members"] == 5:
+                        self.log_test("Dashboard Stats Updated", True, f"Dashboard correctly shows 5 total members after Maria's creation. Stats: {stats['total_members']} members, {stats['total_companies']} companies, {stats['total_points']} points, {stats['recent_activity']} recent activities")
+                        return True
+                    else:
+                        self.log_test("Dashboard Stats Updated", False, f"Expected 5 total_members, got {stats['total_members']}")
+                        return False
+                else:
+                    self.log_test("Dashboard Stats Updated", False, f"Missing required fields: {required_fields}")
+                    return False
+            else:
+                self.log_test("Dashboard Stats Updated", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Dashboard Stats Updated", False, f"Request error: {str(e)}")
+            return False
+    
     def run_all_tests(self):
         """Run all backend tests for the redesigned system"""
         print("🚀 Starting Comprehensive Loyalty Control Tower Backend API Tests")
