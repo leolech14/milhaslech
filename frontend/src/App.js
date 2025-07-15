@@ -33,6 +33,7 @@ function App() {
   const [newCompanyData, setNewCompanyData] = useState({});
   const [editingFields, setEditingFields] = useState({});
   const [deleteConfirmModal, setDeleteConfirmModal] = useState({ show: false, memberId: null, companyId: null });
+  const [deleteMemberModal, setDeleteMemberModal] = useState({ show: false, memberId: null, memberName: null });
   const [whatsappModal, setWhatsappModal] = useState({
     show: false,
     exportType: 'all', // 'all', 'user', 'program'
