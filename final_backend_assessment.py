@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BACKEND_URL = "https://c1e1c15d-a58b-41e4-a3ac-38d7ad819759.preview.emergentagent.com/api"
+BACKEND_URL = "https://c9bdd9c9-2137-4e10-b285-3b5a9ce35099.preview.emergentagent.com/api"
 
 class FinalBackendAssessment:
     def __init__(self):
