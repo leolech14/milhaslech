@@ -192,10 +192,10 @@ class NewMemberCreationTester:
                 log_entries = response.json()
                 print(f"   Total log entries: {len(log_entries)}")
                 
-                # Look for Maria's creation log entry
+                # Look for Ana's creation log entry
                 maria_creation_log = None
                 for entry in log_entries:
-                    if (entry.get("member_name") == "Maria" and 
+                    if (entry.get("member_name") == "Ana" and 
                         entry.get("field_changed") == "membro" and
                         entry.get("change_type") == "create" and
                         entry.get("new_value") == "criado"):
@@ -206,7 +206,7 @@ class NewMemberCreationTester:
                     # Verify log entry structure
                     required_fields = ["id", "member_id", "member_name", "company_id", "company_name", "field_changed", "old_value", "new_value", "timestamp", "change_type"]
                     if all(field in maria_creation_log for field in required_fields):
-                        self.log_test("Member Creation Logged", True, f"Maria's creation properly logged with ID {maria_creation_log['id']}")
+                        self.log_test("Member Creation Logged", True, f"Ana's creation properly logged with ID {maria_creation_log['id']}")
                         print(f"   Log entry: {maria_creation_log}")
                         return True
                     else:
@@ -214,7 +214,7 @@ class NewMemberCreationTester:
                         self.log_test("Member Creation Logged", False, f"Log entry missing required fields: {missing_fields}")
                         return False
                 else:
-                    self.log_test("Member Creation Logged", False, "Maria's creation not found in global log")
+                    self.log_test("Member Creation Logged", False, "Ana's creation not found in global log")
                     # Print all log entries for debugging
                     for i, entry in enumerate(log_entries):
                         print(f"   Log {i}: {entry}")
