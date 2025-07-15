@@ -864,6 +864,150 @@ class RedesignedLoyaltyAPITester:
             self.log_test("Dashboard Stats Updated", False, f"Request error: {str(e)}")
             return False
     
+    def test_delete_existing_member(self):
+        """Test DELETE /api/members/{member_id} with existing member 'Maria'"""
+        if "Maria" not in self.member_ids:
+            self.log_test("Delete Existing Member", False, "Maria's ID not available")
+            return False
+        
+        try:
+            maria_id = self.member_ids["Maria"]
+            
+            # Get initial member count
+            initial_response = requests.get(f"{self.base_url}/members", timeout=10)
+            if initial_response.status_code != 200:
+                self.log_test("Delete Existing Member", False, f"Failed to get initial members: HTTP {initial_response.status_code}")
+                return False
+            
+            initial_members = initial_response.json()
+            initial_count = len(initial_members)
+            
+            # Delete Maria
+            response = requests.delete(f"{self.base_url}/members/{maria_id}", timeout=10)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if ("member_id" in result and "member_name" in result and 
+                    result["member_id"] == maria_id and result["member_name"] == "Maria"):
+                    
+                    # Verify member is removed from GET /api/members
+                    verify_response = requests.get(f"{self.base_url}/members", timeout=10)
+                    if verify_response.status_code == 200:
+                        updated_members = verify_response.json()
+                        if len(updated_members) == initial_count - 1:
+                            # Verify Maria is not in the list
+                            maria_found = any(member.get("name") == "Maria" for member in updated_members)
+                            if not maria_found:
+                                self.log_test("Delete Existing Member", True, f"Successfully deleted member 'Maria' (ID: {maria_id})")
+                                return True
+                            else:
+                                self.log_test("Delete Existing Member", False, "Maria still found in members list after deletion")
+                                return False
+                        else:
+                            self.log_test("Delete Existing Member", False, f"Expected {initial_count - 1} members, got {len(updated_members)}")
+                            return False
+                    else:
+                        self.log_test("Delete Existing Member", False, f"Failed to verify member deletion: HTTP {verify_response.status_code}")
+                        return False
+                else:
+                    self.log_test("Delete Existing Member", False, f"Invalid response format: {result}")
+                    return False
+            else:
+                self.log_test("Delete Existing Member", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Delete Existing Member", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_delete_nonexistent_member(self):
+        """Test DELETE /api/members/{member_id} with non-existent member (should return 404)"""
+        try:
+            # Use a fake UUID that doesn't exist
+            fake_member_id = "00000000-0000-0000-0000-000000000000"
+            
+            response = requests.delete(f"{self.base_url}/members/{fake_member_id}", timeout=10)
+            
+            if response.status_code == 404:
+                error_data = response.json()
+                if "detail" in error_data and "não encontrado" in error_data["detail"]:
+                    self.log_test("Delete Nonexistent Member", True, f"Correctly returned 404 for non-existent member: {error_data['detail']}")
+                    return True
+                else:
+                    self.log_test("Delete Nonexistent Member", False, f"Wrong error message: {error_data}")
+                    return False
+            else:
+                self.log_test("Delete Nonexistent Member", False, f"Expected HTTP 404, got {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Delete Nonexistent Member", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_member_deletion_logged(self):
+        """Test that member deletion is logged to global log system"""
+        try:
+            # Get global log and look for Maria's deletion entry
+            response = requests.get(f"{self.base_url}/global-log", timeout=10)
+            
+            if response.status_code == 200:
+                log_entries = response.json()
+                
+                # Look for Maria's deletion log entry
+                maria_deletion_log = None
+                for entry in log_entries:
+                    if (entry.get("member_name") == "Maria" and 
+                        entry.get("field_changed") == "membro" and
+                        entry.get("change_type") == "delete" and
+                        entry.get("old_value") == "ativo" and
+                        entry.get("new_value") == "deletado"):
+                        maria_deletion_log = entry
+                        break
+                
+                if maria_deletion_log:
+                    # Verify log entry structure
+                    required_fields = ["id", "member_id", "member_name", "company_id", "company_name", "field_changed", "old_value", "new_value", "timestamp", "change_type"]
+                    if all(field in maria_deletion_log for field in required_fields):
+                        self.log_test("Member Deletion Logged", True, f"Maria's deletion properly logged with ID {maria_deletion_log['id']}")
+                        return True
+                    else:
+                        self.log_test("Member Deletion Logged", False, f"Log entry missing required fields: {maria_deletion_log}")
+                        return False
+                else:
+                    self.log_test("Member Deletion Logged", False, "Maria's deletion not found in global log")
+                    return False
+            else:
+                self.log_test("Member Deletion Logged", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Member Deletion Logged", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_dashboard_stats_after_deletion(self):
+        """Test that dashboard stats are updated correctly after member deletion"""
+        try:
+            response = requests.get(f"{self.base_url}/dashboard/stats", timeout=10)
+            
+            if response.status_code == 200:
+                stats = response.json()
+                required_fields = ["total_members", "total_companies", "total_points", "recent_activity"]
+                
+                if all(field in stats for field in required_fields):
+                    # Should now have 4 members (back to original count after Maria's deletion)
+                    if stats["total_members"] == 4:
+                        self.log_test("Dashboard Stats After Deletion", True, f"Dashboard correctly shows 4 total members after Maria's deletion. Stats: {stats['total_members']} members, {stats['total_companies']} companies, {stats['total_points']} points, {stats['recent_activity']} recent activities")
+                        return True
+                    else:
+                        self.log_test("Dashboard Stats After Deletion", False, f"Expected 4 total_members, got {stats['total_members']}")
+                        return False
+                else:
+                    self.log_test("Dashboard Stats After Deletion", False, f"Missing required fields: {required_fields}")
+                    return False
+            else:
+                self.log_test("Dashboard Stats After Deletion", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Dashboard Stats After Deletion", False, f"Request error: {str(e)}")
+            return False
+    
     def run_all_tests(self):
         """Run all backend tests for the redesigned system"""
         print("🚀 Starting Comprehensive Loyalty Control Tower Backend API Tests")
