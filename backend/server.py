@@ -366,6 +366,29 @@ async def create_member(new_member: NewMemberData):
         "member_name": new_member.name
     }
 
+# Delete member
+@app.delete("/api/members/{member_id}")
+async def delete_member(member_id: str):
+    # Check if member exists
+    member = members_collection.find_one({"id": member_id})
+    if not member:
+        raise HTTPException(status_code=404, detail="Membro não encontrado")
+    
+    # Delete the member
+    result = members_collection.delete_one({"id": member_id})
+    
+    if result.deleted_count == 1:
+        # Log the deletion
+        log_change(member_id, member["name"], "", "", "membro", "ativo", "deletado", "delete")
+        
+        return {
+            "message": "Membro deletado com sucesso",
+            "member_id": member_id,
+            "member_name": member["name"]
+        }
+    else:
+        raise HTTPException(status_code=500, detail="Erro ao deletar membro")
+
 # Add new company to member
 @app.post("/api/members/{member_id}/companies")
 async def add_company_to_member(member_id: str, new_company: NewCompanyData):
