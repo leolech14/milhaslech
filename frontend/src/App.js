@@ -1319,6 +1319,7 @@ function App() {
               onDeleteField={(companyId, fieldName) => deleteField(member.id, companyId, fieldName)}
               onRenameField={(companyId, fieldName) => startFieldRenaming(member.id, companyId, fieldName)}
               onAddNewField={(companyId) => addNewField(member.id, companyId)}
+              onDeleteMember={showDeleteMemberModal}
             />
           ))}
           
