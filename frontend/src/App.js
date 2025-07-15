@@ -292,6 +292,9 @@ function App() {
         if (deleteConfirmModal.show) {
           hideDeleteConfirm();
         }
+        if (deleteMemberModal.show) {
+          hideDeleteMemberModal();
+        }
       }
     };
 
