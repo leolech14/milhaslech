@@ -886,6 +886,12 @@ class RedesignedLoyaltyAPITester:
             ("Add New Company", self.test_add_new_company),
             ("Custom Fields Management", self.test_custom_fields),
             ("Delete Program", self.test_delete_program),
+            # NEW MEMBER CREATION TESTS
+            ("New Member Creation", self.test_new_member_creation),
+            ("Duplicate Member Prevention", self.test_duplicate_member_prevention),
+            ("New Member Structure", self.test_new_member_structure),
+            ("Member Creation Logged", self.test_member_creation_logged),
+            ("Dashboard Stats Updated", self.test_dashboard_stats_updated),
         ]
         
         passed = 0
