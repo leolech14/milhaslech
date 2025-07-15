@@ -1361,6 +1361,47 @@ function App() {
         </div>
       )}
 
+      {/* Add New Member Modal */}
+      {showAddMember && (
+        <div className="modal-overlay">
+          <div className="modal-content add-member-modal">
+            <h3>👤 Adicionar Novo Membro</h3>
+            <p>Insira o nome do novo membro da família:</p>
+            
+            <div className="form-group">
+              <label>Nome:</label>
+              <input
+                type="text"
+                value={newMemberData.name}
+                onChange={(e) => updateNewMemberField('name', e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    createNewMember();
+                  } else if (e.key === 'Escape') {
+                    hideAddMemberModal();
+                  }
+                }}
+                autoFocus
+                placeholder="Digite o nome do novo membro"
+              />
+            </div>
+            
+            <div className="modal-actions">
+              <button className="cancel-btn" onClick={hideAddMemberModal}>
+                Cancelar
+              </button>
+              <button 
+                className="confirm-btn" 
+                onClick={createNewMember}
+                disabled={!newMemberData.name.trim()}
+              >
+                👤 Criar Membro
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {copyFeedback && (
         <div className="copy-feedback">
           {copyFeedback}
