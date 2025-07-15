@@ -2507,3 +2507,25 @@ body.dark-mode::before {
 .program-details {
   animation: fadeIn 0.2s ease-out;
 }
+
+/* Member Header */
+.member-header {
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--accent-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.member-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  margin: 0;
+}
+
+.member-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
