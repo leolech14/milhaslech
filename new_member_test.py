@@ -237,12 +237,12 @@ class NewMemberCreationTester:
                 
                 if all(field in stats for field in required_fields):
                     print(f"   Current stats: {stats}")
-                    # Should have increased member count (original 4 + Maria = 5, but there might be more from previous tests)
-                    if stats["total_members"] >= 5:
-                        self.log_test("Dashboard Stats Updated", True, f"Dashboard correctly shows {stats['total_members']} total members after Maria's creation. Stats: {stats['total_members']} members, {stats['total_companies']} companies, {stats['total_points']} points, {stats['recent_activity']} recent activities")
+                    # Should have increased member count (original 4 + Maria + Ana = 6, but there might be more from previous tests)
+                    if stats["total_members"] >= 6:
+                        self.log_test("Dashboard Stats Updated", True, f"Dashboard correctly shows {stats['total_members']} total members after Ana's creation. Stats: {stats['total_members']} members, {stats['total_companies']} companies, {stats['total_points']} points, {stats['recent_activity']} recent activities")
                         return True
                     else:
-                        self.log_test("Dashboard Stats Updated", False, f"Expected at least 5 total_members, got {stats['total_members']}")
+                        self.log_test("Dashboard Stats Updated", False, f"Expected at least 6 total_members, got {stats['total_members']}")
                         return False
                 else:
                     self.log_test("Dashboard Stats Updated", False, f"Missing required fields: {required_fields}")
