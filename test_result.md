@@ -237,6 +237,18 @@ backend:
         agent: "testing"
         comment: "✅ COMPREHENSIVE ASSESSMENT COMPLETE: DELETE /api/members/{id}/programs/{company_id} endpoint fully operational. Successfully tested program deletion from members. Properly removes program from member's programs collection, logs deletion to global log system, and updates member timestamps."
 
+  - task: "New member creation endpoint"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ NEW MEMBER CREATION FUNCTIONALITY COMPLETE: Conducted comprehensive testing of POST /api/members endpoint with 100% success rate (6/6 tests passed). VERIFIED FUNCTIONALITY: (1) ✅ New Member Creation: Successfully created new member 'Ana' with unique ID, (2) ✅ Duplicate Prevention: Properly prevents duplicate member creation with HTTP 400 error and Portuguese message 'Membro com esse nome já existe', (3) ✅ Member Structure: New members created with all 3 default programs (LATAM, Smiles, Azul) with correct empty structure including custom_fields as empty dict, (4) ✅ Global Logging: Member creation properly logged to global log system with all required fields (id, member_id, member_name, field_changed='membro', change_type='create', new_value='criado'), (5) ✅ Integration: New member appears correctly in GET /api/members endpoint, (6) ✅ Dashboard Stats: Dashboard statistics properly updated to reflect new member count. All requested test scenarios completed successfully."
+
   - task: "Authentication system"
     implemented: true
     working: true
