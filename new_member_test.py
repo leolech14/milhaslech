@@ -47,34 +47,34 @@ class NewMemberCreationTester:
             initial_count = len(initial_members)
             print(f"   Initial member count: {initial_count}")
             
-            # Create new member with name "Maria"
-            new_member_data = {"name": "Maria"}
+            # Create new member with name "Ana" (different name to avoid conflicts)
+            new_member_data = {"name": "Ana"}
             response = requests.post(f"{self.base_url}/members", json=new_member_data, timeout=10)
             
             if response.status_code == 200:
                 result = response.json()
                 if ("member_id" in result and "member_name" in result and 
-                    result["member_name"] == "Maria"):
+                    result["member_name"] == "Ana"):
                     
-                    self.maria_id = result["member_id"]
+                    self.maria_id = result["member_id"]  # Store Ana's ID in maria_id variable
                     
                     # Verify new member appears in GET /api/members
                     verify_response = requests.get(f"{self.base_url}/members", timeout=10)
                     if verify_response.status_code == 200:
                         updated_members = verify_response.json()
                         if len(updated_members) == initial_count + 1:
-                            # Find Maria in the list
+                            # Find Ana in the list
                             maria_member = None
                             for member in updated_members:
-                                if member.get("name") == "Maria" and member.get("id") == self.maria_id:
+                                if member.get("name") == "Ana" and member.get("id") == self.maria_id:
                                     maria_member = member
                                     break
                             
                             if maria_member:
-                                self.log_test("New Member Creation", True, f"Successfully created new member 'Maria' with ID {self.maria_id}")
+                                self.log_test("New Member Creation", True, f"Successfully created new member 'Ana' with ID {self.maria_id}")
                                 return True
                             else:
-                                self.log_test("New Member Creation", False, "Maria not found in members list after creation")
+                                self.log_test("New Member Creation", False, "Ana not found in members list after creation")
                                 return False
                         else:
                             self.log_test("New Member Creation", False, f"Expected {initial_count + 1} members, got {len(updated_members)}")
