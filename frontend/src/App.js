@@ -310,7 +310,7 @@ function App() {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
     };
-  }, [whatsappModal.show, deleteConfirmModal.show]);
+  }, [whatsappModal.show, deleteConfirmModal.show, deleteMemberModal.show]);
 
   // Handle login
   const handleLogin = (e) => {
