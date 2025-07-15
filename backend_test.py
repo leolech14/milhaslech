@@ -1036,6 +1036,11 @@ class RedesignedLoyaltyAPITester:
             ("New Member Structure", self.test_new_member_structure),
             ("Member Creation Logged", self.test_member_creation_logged),
             ("Dashboard Stats Updated", self.test_dashboard_stats_updated),
+            # MEMBER DELETION TESTS
+            ("Delete Existing Member", self.test_delete_existing_member),
+            ("Delete Nonexistent Member", self.test_delete_nonexistent_member),
+            ("Member Deletion Logged", self.test_member_deletion_logged),
+            ("Dashboard Stats After Deletion", self.test_dashboard_stats_after_deletion),
         ]
         
         passed = 0
