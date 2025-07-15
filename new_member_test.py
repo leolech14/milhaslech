@@ -115,9 +115,9 @@ class NewMemberCreationTester:
             return False
     
     def test_new_member_structure(self):
-        """Test that new member 'Maria' has all default programs (LATAM, Smiles, Azul) with empty fields"""
+        """Test that new member 'Ana' has all default programs (LATAM, Smiles, Azul) with empty fields"""
         if not self.maria_id:
-            self.log_test("New Member Structure", False, "Maria's ID not available")
+            self.log_test("New Member Structure", False, "Ana's ID not available")
             return False
         
         try:
@@ -127,7 +127,7 @@ class NewMemberCreationTester:
                 maria = response.json()
                 programs = maria.get("programs", {})
                 
-                print(f"   Maria's programs: {list(programs.keys())}")
+                print(f"   Ana's programs: {list(programs.keys())}")
                 
                 # Check if all 3 default companies are present
                 if not all(company_id in programs for company_id in self.expected_companies):
@@ -170,7 +170,7 @@ class NewMemberCreationTester:
                     print(f"   {company_id}: balance={program['current_balance']}, login='{program['login']}', custom_fields={program.get('custom_fields', 'missing')}")
                 
                 if all_valid and not issues:
-                    self.log_test("New Member Structure", True, f"Maria has all 3 default programs ({', '.join(self.expected_companies)}) with correct empty structure")
+                    self.log_test("New Member Structure", True, f"Ana has all 3 default programs ({', '.join(self.expected_companies)}) with correct empty structure")
                     return True
                 else:
                     self.log_test("New Member Structure", False, f"Structure issues: {issues}")
