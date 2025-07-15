@@ -1463,6 +1463,37 @@ body.dark-mode::before {
   font-weight: 600;
 }
 
+/* Delete Member Button */
+.delete-member-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: none;
+  color: var(--accent-danger);
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  margin-left: auto;
+}
+
+.delete-member-btn:hover {
+  background-color: var(--accent-danger);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.delete-member-icon {
+  font-size: 1rem;
+}
+
+.delete-member-text {
+  font-weight: 600;
+}
+
 /* Add Member Modal */
 .add-member-modal {
   max-width: 450px;
