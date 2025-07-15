@@ -1037,6 +1037,52 @@ function App() {
       console.error('Erro ao renomear campo:', error);
     }
   };
+
+  // New member creation functions
+  const showAddMemberModal = () => {
+    setShowAddMember(true);
+    setNewMemberData({ name: '' });
+  };
+
+  const hideAddMemberModal = () => {
+    setShowAddMember(false);
+    setNewMemberData({ name: '' });
+  };
+
+  const updateNewMemberField = (field, value) => {
+    setNewMemberData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const createNewMember = async () => {
+    if (!newMemberData.name.trim()) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/members`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: newMemberData.name.trim() }),
+      });
+      
+      if (response.ok) {
+        await fetchMembers();
+        await fetchGlobalLog();
+        await fetchDashboardStats();
+        hideAddMemberModal();
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Erro ao criar novo membro');
+      }
+    } catch (error) {
+      console.error('Erro ao criar novo membro:', error);
+      alert('Erro ao criar novo membro');
+    }
+  };
+
   // Debounced save for post-its to improve performance
   const debouncedSavePostit = useCallback(
     debounce(async (postitId, content) => {
