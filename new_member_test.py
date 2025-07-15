@@ -331,7 +331,7 @@ class NewMemberCreationTester:
         if failed == 0:
             print("\n🎉 All new member creation tests passed!")
             print("✨ Verified functionality:")
-            print("   • ✅ POST /api/members creates new member with name 'Maria'")
+            print("   • ✅ POST /api/members creates new member with name 'Ana'")
             print("   • ✅ Duplicate name prevention with proper error message")
             print("   • ✅ New member has all 3 default programs (LATAM, Smiles, Azul)")
             print("   • ✅ All program fields are empty/default values")
