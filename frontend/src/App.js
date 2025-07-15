@@ -53,6 +53,10 @@ function App() {
     fieldName: '',
     newName: ''
   });
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [newMemberData, setNewMemberData] = useState({
+    name: ''
+  });
 
   // Fixed order for family members
   const familyOrder = ["Osvandré", "Marilise", "Graciela", "Leonardo"];
