@@ -1273,6 +1273,7 @@ function App() {
           dashboardStats={dashboardStats}
           darkMode={darkMode}
           onToggleDarkMode={toggleDarkMode}
+          onShowAddMemberModal={showAddMemberModal}
         />
         
         <QuoteSection />
