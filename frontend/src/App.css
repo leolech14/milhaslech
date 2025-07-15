@@ -1437,25 +1437,22 @@ body.dark-mode::before {
 .add-member-btn {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 2rem;
-  background-color: var(--accent-success);
-  color: white;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: none;
+  color: var(--accent-success);
   border: none;
-  border-radius: 12px;
   cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
   transition: all 0.2s ease;
-  box-shadow: var(--shadow);
-  min-width: 200px;
-  justify-content: center;
+  border-radius: 6px;
 }
 
 .add-member-btn:hover {
-  background-color: #16a34a;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
+  background-color: var(--accent-success);
+  color: white;
+  transform: translateY(-1px);
 }
 
 .add-member-icon {
