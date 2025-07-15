@@ -1242,6 +1242,17 @@ function App() {
         <QuoteSection />
         
         <div className="members-container">
+          <div className="add-member-section">
+            <button 
+              className="add-member-btn"
+              onClick={showAddMemberModal}
+              title="Adicionar novo membro da família"
+            >
+              <span className="add-member-icon">👤</span>
+              <span className="add-member-text">Adicionar Membro</span>
+            </button>
+          </div>
+          
           {members.map(member => (
             <MemberCard 
               key={member.id}
