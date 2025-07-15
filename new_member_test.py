@@ -301,7 +301,7 @@ class NewMemberCreationTester:
             ("3. New Member Structure", self.test_new_member_structure),
             ("4. Member Creation Logged", self.test_member_creation_logged),
             ("5. Dashboard Stats Updated", self.test_dashboard_stats_updated),
-            ("6. Maria in Members List", self.test_maria_in_members_list),
+            ("6. Ana in Members List", self.test_maria_in_members_list),
         ]
         
         passed = 0
