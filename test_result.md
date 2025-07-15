@@ -249,6 +249,18 @@ backend:
         agent: "testing"
         comment: "✅ NEW MEMBER CREATION FUNCTIONALITY COMPLETE: Conducted comprehensive testing of POST /api/members endpoint with 100% success rate (6/6 tests passed). VERIFIED FUNCTIONALITY: (1) ✅ New Member Creation: Successfully created new member 'Ana' with unique ID, (2) ✅ Duplicate Prevention: Properly prevents duplicate member creation with HTTP 400 error and Portuguese message 'Membro com esse nome já existe', (3) ✅ Member Structure: New members created with all 3 default programs (LATAM, Smiles, Azul) with correct empty structure including custom_fields as empty dict, (4) ✅ Global Logging: Member creation properly logged to global log system with all required fields (id, member_id, member_name, field_changed='membro', change_type='create', new_value='criado'), (5) ✅ Integration: New member appears correctly in GET /api/members endpoint, (6) ✅ Dashboard Stats: Dashboard statistics properly updated to reflect new member count. All requested test scenarios completed successfully."
 
+  - task: "Member deletion endpoint"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ MEMBER DELETION FUNCTIONALITY COMPLETE: Conducted comprehensive testing of DELETE /api/members/{member_id} endpoint with 100% success rate (4/4 tests passed). VERIFIED FUNCTIONALITY: (1) ✅ Delete Existing Member: Successfully deleted member 'Maria' (ID: f434b81f-0971-497b-878a-ce35eed9559a) with proper response format containing member_id, member_name, and success message, (2) ✅ Member Not Found: Correctly returns HTTP 404 with Portuguese error message 'Membro não encontrado' for non-existent member deletion attempts, (3) ✅ Global Log Integration: Member deletion properly logged to global log system with complete structure (id, member_id, member_name, field_changed='membro', change_type='delete', old_value='ativo', new_value='deletado', timestamp), (4) ✅ Integration Testing: Deleted member successfully removed from GET /api/members endpoint (count reduced from 7 to 6 members) and dashboard stats updated correctly (total_members now shows 6). All requested test scenarios from review completed successfully."
+
   - task: "Authentication system"
     implemented: true
     working: true
