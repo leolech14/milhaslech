@@ -1730,10 +1730,18 @@ const Sidebar = ({ onShowGlobalLog, onLogout, dashboardStats, postits, onCreateP
   );
 };
 
-const TopBar = ({ dashboardStats, darkMode, onToggleDarkMode }) => (
+const TopBar = ({ dashboardStats, darkMode, onToggleDarkMode, onShowAddMemberModal }) => (
   <header className="top-bar">
     <div className="top-bar-left">
       <h2>Painel</h2>
+      <button 
+        className="add-member-btn-small"
+        onClick={onShowAddMemberModal}
+        title="Adicionar novo membro da família"
+      >
+        <span className="add-member-icon">👤</span>
+        <span className="add-member-text">Adicionar Membro</span>
+      </button>
       {dashboardStats && (
         <div className="total-points-inline">
           <span>Total:</span>
