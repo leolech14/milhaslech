@@ -2529,3 +2529,34 @@ body.dark-mode::before {
   align-items: center;
   gap: 0.5rem;
 }
+
+/* Small Add Member Button for TopBar */
+.add-member-btn-small {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  background: none;
+  color: var(--accent-success);
+  border: 1px solid var(--accent-success);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  margin-left: 1rem;
+}
+
+.add-member-btn-small:hover {
+  background-color: var(--accent-success);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.add-member-btn-small .add-member-icon {
+  font-size: 1rem;
+}
+
+.add-member-btn-small .add-member-text {
+  font-weight: 600;
+}
