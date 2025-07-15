@@ -1084,6 +1084,38 @@ function App() {
     }
   };
 
+  // Delete member functions
+  const showDeleteMemberModal = (memberId, memberName) => {
+    setDeleteMemberModal({ show: true, memberId, memberName });
+  };
+
+  const hideDeleteMemberModal = () => {
+    setDeleteMemberModal({ show: false, memberId: null, memberName: null });
+  };
+
+  const confirmDeleteMember = async () => {
+    if (!deleteMemberModal.memberId) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/members/${deleteMemberModal.memberId}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        await fetchMembers();
+        await fetchGlobalLog();
+        await fetchDashboardStats();
+        hideDeleteMemberModal();
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Erro ao deletar membro');
+      }
+    } catch (error) {
+      console.error('Erro ao deletar membro:', error);
+      alert('Erro ao deletar membro');
+    }
+  };
+
   // Debounced save for post-its to improve performance
   const debouncedSavePostit = useCallback(
     debounce(async (postitId, content) => {
